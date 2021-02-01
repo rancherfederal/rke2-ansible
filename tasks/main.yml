@@ -1,0 +1,17 @@
+---
+
+- import_tasks: yum.yml
+- import_tasks: config.yml
+
+# Firewalld | disable
+- name: FIREWALLD | disable
+  ansible.builtin.systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+# CIS mode
+- import_tasks: cis-profile.yml
+  when: rke2_cis_mode
+
+- import_tasks: rke2-master.yml

@@ -1,0 +1,36 @@
+#!/usr/bin/ansible-playbook
+#               ,        ,  _______________________________
+#   ,-----------|'------'|  |                             |
+#  /.           '-'    |-'  |_____________________________|
+# |/|             |    |    
+#   |   .________.'----'    _______________________________
+#   |  ||        |  ||      |                             |
+#   \__|'        \__|'      |_____________________________|
+#
+#|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+#|________________________________________________________|
+#
+#|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+#|________________________________________________________|
+---
+
+- name: add the rke2-common repo
+  yum_repository:
+    name: rke2-common
+    description: Rancher RKE2 Common Latest
+    baseurl: "{{ rke2_repo_common_baseurl }}"
+    gpgcheck: "{{ rke2_repo_common_gpg_check }}"
+    gpgkey: "{{ rke2_repo_common_gpg_key }}"
+    enabled: yes
+
+- name: add the rke2-v1.19 repo
+  yum_repository:
+    name: rke2-v1.19
+    description: Rancher RKE2 1.19 Latest
+    baseurl: "{{ rke2_repo_package_baseurl }}"
+    gpgcheck: "{{ rke2_repo_package_gpg_check }}"
+    gpgkey: "{{ rke2_repo_package_gpg_key }}"
+    enabled: yes
+
+
+

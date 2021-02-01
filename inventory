@@ -1,0 +1,11 @@
+[rke2-cluster]
+rke2m1 ansible_host=10.0.100.61 role=master
+rke2m2 ansible_host=10.0.100.62 role=master
+rke2m3 ansible_host=10.0.100.63 role=master
+rke2k1 ansible_host=10.0.100.64 role=agent
+rke2k2 ansible_host=10.0.100.65 role=agent
+rke2k3 ansible_host=10.0.100.66 role=agent
+
+[rke2-cluster:vars]
+ansible_ssh_user=root
+#deploy_target=root

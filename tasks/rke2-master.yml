@@ -1,0 +1,29 @@
+---
+- name: YUM | Install rke2-server
+  yum:
+    name: rke2-server
+    state: latest
+
+- name: CIS | copy systemctl file for kernel hardening
+  ansible.builtin.copy:
+    src: /usr/share/rke2/rke2-cis-sysctl.conf
+    dest: /etc/sysctl.d/60-rke2-cis.conf
+    ## TODO: add checking so we dont always restart the following service
+
+- name: CIS | restart systemd-sysctl
+  ansible.builtin.systemd:
+    state: restarted
+    name: systemd-sysctl
+
+# CIS Mode Kernel Hardening
+- name: CIS | copy systemctl file for kernel hardening
+  ansible.builtin.copy:
+    src: /usr/share/rke2/rke2-cis-sysctl.conf
+    dest: /etc/sysctl.d/60-rke2-cis.conf
+  when: rke2_cis_mode
+
+- name: SYSTEMD | rke2-server 
+  ansible.builtin.systemd:
+    name: rke2-server
+    state: started
+    enabled: yes

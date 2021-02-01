@@ -1,0 +1,115 @@
+---
+################
+
+################
+
+# Security configuration
+rke2_cis_mode: true
+rke2_selinux: true
+
+# YUM repository configuration
+rke2_repo_common_baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/7/noarch"
+rke2_repo_common_gpg_check: true
+rke2_repo_common_gpg_key: "https://rpm.rancher.io/public.key"
+rke2_repo_package_baseurl: "https://rpm.rancher.io/rke2/latest/1.19/centos/7/x86_64"
+rke2_repo_package_gpg_check: true
+rke2_repo_package_gpg_key: "https://rpm.rancher.io/public.key"
+ 
+# config.yaml configuration
+##TODO
+rke2_write_kubeconfig_mode: "0644"
+rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
+rke2_lb_hostname:  #used in HA 
+
+# etcd snapshot configuration
+##TODO
+rke2_etcd_disable_snapshots: false
+rke2_etcd_snapshot_cron: "0 */12 * * *"
+rke2_etcd_snapshot_retention: 5
+#rke2_etcd_dir: ${data-dir}/db/snapshots
+
+
+
+# systemd configuration
+##TODO
+rke2_systemd_enable_service: true
+
+# container registry configuration
+## https://docs.rke2.io/install/containerd_registry_configuration/
+##TODO
+
+# network default-interface override
+## https://docs.rke2.io/install/network_options/
+##TODO
+rke2_default_interface: "auto"
+
+# airgap configuration
+##TODO
+rke2_airgap_mode: false
+rke2_image_file_url: https://github.com/rancher/rke2/releases/download/v1.18.15%2Brke2r1/rke2-images.linux-amd64.tar.gz
+
+
+
+
+## old
+# Containerd configuration.
+docker_apt_arch: arm64
+
+# Kubernetes configuration.
+kubernetes_allow_pods_on_master: false
+kubernetes_version: '1.19'
+kubernetes_packages:
+  - name: kubelet=1.19.7-00
+    state: present
+  - name: kubectl=1.19.7-00
+    state: present
+  - name: kubeadm=1.19.7-00
+    state: present
+  - name: kubernetes-cni
+    state: present
+
+k8s_manage_namespace: false
+k8s_no_log: false
+k8s_manifests_base_dir: k8s-manifests/
+k8s_manifests:
+  - nfs/rbac
+  - nfs/deployment
+  - kube-system/ingress/rbac
+  - kube-system/ingress/deployment
+  - dir: docker-registry
+    namespace: registry
+  - dir: drupal/mysql
+    namespace: drupal
+  - dir: drupal/drupal
+    namespace: drupal
+
+kubernetes_toleration_not_ready: 300
+
+# Python settings and dependencies.
+pip_package: python3-pip
+pip_executable: pip3
+pip_install_packages:
+  - openshift
+
+# Swap configuration.
+swap_file_state: absent
+swap_file_path: /dev/mapper/packer--debian--10--amd64--vg-swap_1
+
+# Image to use for MySQL.
+mysql_container_image: mariadb:10
+
+# Image to use for the traefik-ingress-controller daemonset.
+traefik_image: traefik:1.7
+
+# Manifest to use for the metrics-server deployment.
+metrics_server_manifest: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Image to use for nfs-client deployment.
+nfs_client_image: quay.io/external_storage/nfs-client-provisioner-arm:latest
+
+# NFS configuration.
+nfs_share_dir: /srv/nfs
+nfs_exports: { "/srv/nfs *(rw,sync,no_root_squash,no_subtree_check)" }
+# nfs_mount_dir: /mnt/nfs # defined in global vars file.
+nfs_extra_dirs:
+  - k8s

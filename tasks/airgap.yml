@@ -1,0 +1,20 @@
+---
+# airgap-images
+# v1.18.15+rke2r1
+# https://github.com/rancher/rke2/releases/download/v1.18.15%2Brke2r1/rke2-images.linux-amd64.tar.gz
+- name: create the airgap images folder
+  ansible.builtin.file:
+    path: /var/lib/rancher/rke2/agent/images
+    state: directory
+    recurse: yes
+
+- name: WGET | download rke2 images to disk (just to speed up repeated testing)
+  get_url:
+    url: https://github.com/rancher/rke2/releases/download/v1.18.15%2Brke2r1/rke2-images.linux-amd64.tar.gz
+    dest: /opt/rke2-images.linux-amd64.tar.gz
+
+# copy the container-image tar to the airgap image. we have to do this every time because rke2 will delete the file on disk after the images are ingested into the containerd store
+- name: COPY | airgap images to /var/lib/rancher/rke2/agent/images
+  ansible.builtin.copy:
+    src: /opt/rke2-images.linux-amd64.tar.gz
+    dest: /var/lib/rancher/rke2/agent/images/rke2-images.linux-amd64.tar.gz
