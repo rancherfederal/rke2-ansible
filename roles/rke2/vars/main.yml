@@ -3,7 +3,8 @@
 
 ################
 
-#variables
+# variables I need to work on
+
 master_node: 192.168.1.162
 
 # Security configuration
@@ -23,6 +24,8 @@ rke2_repo_package_gpg_key: "https://rpm.rancher.io/public.key"
 rke2_write_kubeconfig_mode: "0644"
 rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
 rke2_lb_hostname:  #used in HA 
+rke2_registration_token: "sHwyCR6B6sYluvsM9KMp2qCsPG2FVszjf3df2MonIvGDmbma3W47bWQDuqysFUvN"
+#this needs to be a long random string
 
 # etcd snapshot configuration
 ##TODO

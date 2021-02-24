@@ -14,6 +14,8 @@
   register: systemctl_state
     ## TODO: add checking so we dont always restart the following service
 
+
+
 - name: CIS | restart systemd-sysctl
   ansible.builtin.systemd:
     state: restarted
@@ -28,6 +30,7 @@
 #    remote_src: true
 #  when: rke2_cis_mode
 
+
 - name: SYSTEMD | rke2-server 
   ansible.builtin.systemd:
     name: rke2-server
@@ -35,22 +38,28 @@
     enabled: yes
   register: systemd_rke
 
+
 #add when last changed
-- name: Pausing for token generation
+- name: Pausing for build
   pause:
    minutes: 1
   when: systemd_rke.changed
 
-- name: Grabbing Registration Token
-  ansible.builtin.slurp:
-    src: /var/lib/rancher/rke2/server/node-token
-  register: token
+#- name: Pausing for token generation
+#  pause:
+#   minutes: 1
+#  when: systemd_rke.changed
 
-- name: "show token"
-  debug: 
-    msg: “{{ token['content'] }}” 
+#- name: Grabbing Registration Token
+#  ansible.builtin.slurp:
+#    src: /var/lib/rancher/rke2/server/node-token
+#  register: token
 
-- name: setting token fact
-  set_fact:
-    registration_token: “{{ token['content'] }}”
+#- name: "show token"
+#  debug: 
+#    msg: “{{ token['content'] }}” 
+
+#- name: setting token fact
+#  set_fact:
+#    registration_token: “{{ token['content'] }}”
 

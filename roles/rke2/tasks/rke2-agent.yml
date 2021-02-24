@@ -20,26 +20,22 @@
     name: systemd-sysctl
   when: systemctl_state.changed
 
-- name: Pulling registration token
-  synchronize:
-    mode: pull
-    src: rsync://"{{ master_node }}"/var/lib/rancher/rke2/server/node-token
-    dest: /etc/rancher/rke2/token
 
 
-- name: Importing agent config
-  ansible.builtin.template:
-    src: ../templates/config.yaml.j2
-    dest: /etc/rancher/rke2/config.yaml
-    owner: root
-    group: root
-    mode: 0600
+#- name: Pulling registration token
+#  synchronize:
+#    mode: pull
+#    src: rsync://"{{ master_node }}"/var/lib/rancher/rke2/server/node-token
+#    dest: /etc/rancher/rke2/token
 
-- name: Add Token to agent config
-  ansible.builtin.lineinfile:
-    path: /etc/rancher/rke2/config.yaml
-    regexp: ^token:\sreplaceme
-    line: "token: {{ registration_token }}"
+
+
+
+#- name: Add Token to agent config
+#  ansible.builtin.lineinfile:
+#    path: /etc/rancher/rke2/config.yaml
+#    regexp: ^token:\sreplaceme
+#    line: "token: {{ registration_token }}"
 
 
 - name: SYSTEMD | rke2-agent 

@@ -1,0 +1,16 @@
+---
+
+- name: "create the .kube dir"
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    recurse: yes
+
+- name: copy kubeconfig 
+  copy:
+    src: /etc/rancher/rke2/rke2.yaml
+    dest: /root/.kube/config
+    owner: root
+    group: root
+    mode: 0600
+    remote_src: true
