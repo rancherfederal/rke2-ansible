@@ -1,5 +1,5 @@
 ---
-- hosts: rke2_cluster
+- hosts: rke2-cluster
   become: true
   roles:
   - rke2 

@@ -1,22 +1,22 @@
 ---
 
-- import_tasks: yum.yml
-- import_tasks: config.yml
+#- import_tasks: yum.yml
+#- import_tasks: config.yml
 
 # Firewalld | disable
-- name: FIREWALLD | disable
-  ansible.builtin.systemd:
-    name: firewalld
-    state: stopped
-    enabled: no
+#- name: FIREWALLD | disable
+#  ansible.builtin.systemd:
+#    name: firewalld
+#    state: stopped
+#    enabled: no
 
 # CIS mode
-- import_tasks: cis-profile.yml
-  when: rke2_cis_mode
+#- import_tasks: cis-profile.yml
+#  when: rke2_cis_mode
 
 #need to add when role==master
 - include_tasks: rke2-master.yml
   when: role == "master"
 
-- include_tasks: rke2-master.yml
+- include_tasks: rke2-agent.yml
   when: role =="agent"
