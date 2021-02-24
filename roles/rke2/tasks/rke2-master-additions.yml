@@ -1,0 +1,65 @@
+---
+- name: YUM | Install rke2-server
+  yum:
+    name: rke2-server
+    state: latest
+
+#this fails
+- name: CIS | copy systemctl file for kernel hardening
+  ansible.builtin.copy:
+    src: /usr/share/rke2/rke2-cis-sysctl.conf
+    dest: /etc/sysctl.d/60-rke2-cis.conf
+    remote_src: true
+  when: rke2_cis_mode
+  register: systemctl_state
+    ## TODO: add checking so we dont always restart the following service
+
+
+
+- name: CIS | restart systemd-sysctl
+  ansible.builtin.systemd:
+    state: restarted
+    name: systemd-sysctl
+  when: systemctl_state.changed
+
+# CIS Mode Kernel Hardening
+#- name: CIS | copy systemctl file for kernel hardening
+#  ansible.builtin.copy:
+#    src: /usr/share/rke2/rke2-cis-sysctl.conf
+#    dest: /etc/sysctl.d/60-rke2-cis.conf
+#    remote_src: true
+#  when: rke2_cis_mode
+
+
+- name: SYSTEMD | rke2-server 
+  ansible.builtin.systemd:
+    name: rke2-server
+    state: started
+    enabled: yes
+  register: systemd_rke
+
+
+#add when last changed
+- name: Pausing for build
+  pause:
+   minutes: 1
+  when: systemd_rke.changed
+
+#- name: Pausing for token generation
+#  pause:
+#   minutes: 1
+#  when: systemd_rke.changed
+
+#- name: Grabbing Registration Token
+#  ansible.builtin.slurp:
+#    src: /var/lib/rancher/rke2/server/node-token
+#  register: token
+
+#- name: "show token"
+#  debug: 
+#    msg: “{{ token['content'] }}” 
+
+#- name: setting token fact
+#  set_fact:
+#    registration_token: “{{ token['content'] }}”
+

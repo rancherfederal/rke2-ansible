@@ -1,5 +1,5 @@
 [rke2-cluster]
-rke2m1 ansible_host=192.168.1.162 role=master
+rke2m1 ansible_host=192.168.1.162 role=init_master
 #rke2m2 ansible_host=10.0.100.62 role=master
 #rke2m3 ansible_host=10.0.100.63 role=master
 rke2k1 ansible_host=192.168.1.163 role=agent

@@ -3,7 +3,11 @@
 - import_tasks: yum.yml
 
 - import_tasks: master-config.yml
+  when: role == "init_master"
+
+- import_tasks: agent-config.yml
   when: role == "master"
+
 - import_tasks: agent-config.yml
   when: role == "agent"
 
@@ -20,16 +24,19 @@
 
 #need to add when role==master
 - include_tasks: rke2-master.yml
+  when: role == "init_master" 
+
+- include_tasks: rke2-master-additions.yml
   when: role == "master" 
 
 - include_tasks: rke2-agent.yml
   when: role =="agent"
 
 - import_tasks: kubectl-install.yml
-  when: role == "master"
+  when: role == "init_master"
 
 - import_tasks: kubectl-install.yml
-  when: role == "master"
+  when: role == "init_master"
 
 - import_tasks: kubectl-config.yml
-  when: role == "master"
+  when: role == "init_master"
