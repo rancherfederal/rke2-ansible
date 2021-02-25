@@ -3,9 +3,8 @@
 
 ################
 
-# variables I need to work on
-
-init_master: 192.168.1.162
+# Initial Master host. Can use an IP or hostname 
+init_master: rke2m1
 
 # Security configuration
 rke2_cis_mode: true
