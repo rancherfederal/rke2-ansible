@@ -1,3 +1,8 @@
+## TO DO
+1.  Break init master out into its own role
+2.  make init_master variable dynamic so it doesnt have to be defined in vars main.yml
+3.  make cis profile a fillable variable 
+
 Role Name
 =========
 

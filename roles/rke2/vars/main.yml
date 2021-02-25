@@ -5,7 +5,7 @@
 
 # variables I need to work on
 
-master_node: 192.168.1.162
+init_master: 192.168.1.162
 
 # Security configuration
 rke2_cis_mode: true
