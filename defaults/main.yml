@@ -1,2 +1,48 @@
 ---
-# defaults file for .
+################
+
+################
+
+# Security configuration
+rke2_cis_mode: true
+rke2_selinux: true
+
+# YUM repository configuration
+rke2_repo_common_baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/7/noarch"
+rke2_repo_common_gpg_check: true
+rke2_repo_common_gpg_key: "https://rpm.rancher.io/public.key"
+rke2_repo_package_baseurl: "https://rpm.rancher.io/rke2/latest/1.19/centos/7/x86_64"
+rke2_repo_package_gpg_check: true
+rke2_repo_package_gpg_key: "https://rpm.rancher.io/public.key"
+
+# config.yaml configuration
+## TODO
+rke2_write_kubeconfig_mode: "0644"
+rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
+rke2_lb_hostname:  # used in HA
+
+# etcd snapshot configuration
+## TODO
+rke2_etcd_disable_snapshots: false
+rke2_etcd_snapshot_cron: "0 */12 * * *"
+rke2_etcd_snapshot_retention: 5
+# rke2_etcd_dir: ${data-dir}/db/snapshots
+
+
+# systemd configuration
+## TODO
+rke2_systemd_enable_service: true
+
+# container registry configuration
+## https://docs.rke2.io/install/containerd_registry_configuration/
+## TODO
+
+# network default-interface override
+## https://docs.rke2.io/install/network_options/
+## TODO
+rke2_default_interface: "auto"
+
+# airgap configuration
+## TODO
+rke2_airgap_mode: false
+rke2_image_file_url: https://github.com/rancher/rke2/releases/download/v1.18.15%2Brke2r1/rke2-images.linux-amd64.tar.gz

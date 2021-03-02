@@ -15,9 +15,11 @@
 
 # Setup...
 - import_tasks: config.yml
+  become: yes
 
-# Firewalld | disable
-- name: FIREWALLD | disable
+# Disable Firewalld
+# We recommend disabling firewalld. For Kubernetes 1.19, firewalld must be turned off.
+- name: disable FIREWALLD
   ansible.builtin.systemd:
     name: firewalld
     state: stopped
