@@ -29,7 +29,7 @@
     gpgcheck: "{{ rke2_repo_common_gpg_check }}"
     gpgkey: "{{ rke2_repo_common_gpg_key }}"
     enabled: yes
-    when: not stat_rke2_common.stat.exists
+  when: not stat_rke2_common.stat.exists
 
 # Does the Rancher RKE2 1.19 repo exist already
 - name: Check to see if rke2-v1.19.repo exists
@@ -46,4 +46,4 @@
     gpgcheck: "{{ rke2_repo_package_gpg_check }}"
     gpgkey: "{{ rke2_repo_package_gpg_key }}"
     enabled: yes
-    when: not stat_rke2_v119.stat.exists
+  when: not stat_rke2_v119.stat.exists

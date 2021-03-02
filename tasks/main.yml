@@ -6,7 +6,7 @@
 
 # Checks if Red Hat system
 - name: REQUIRES YUM based system
-  meta: stop_play
+  meta: end_play
   when: ansible_os_family != 'RedHat'
 
 # Setup Yum repos
