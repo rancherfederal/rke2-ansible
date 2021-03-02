@@ -3,6 +3,10 @@
 # This role installs RKE2 on control plane
 # nodes and on worker nodes that are
 # RHEL/CentOS based.
+# TODO: Add Ubuntu 18/20 support
+
+- name: Populate service facts
+  service_facts:
 
 # Checks if Red Hat system
 - name: REQUIRES YUM based system
@@ -24,6 +28,8 @@
     name: firewalld
     state: stopped
     enabled: no
+  become: yes
+  when: ansible_facts.services["firewalld.service"] is defined
 
 # CIS mode
 - import_tasks: cis-profile.yml
