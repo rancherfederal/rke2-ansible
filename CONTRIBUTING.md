@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-The following is a set of guidelines for contributing to the NGINX Ansible role. We really appreciate that you are considering contributing!
+The following is a set of guidelines for contributing to the RKE2 Ansible role. We really appreciate that you are considering contributing!
 
 #### Table Of Contents
 
