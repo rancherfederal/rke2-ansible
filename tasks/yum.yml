@@ -2,7 +2,7 @@
 #               ,        ,  _______________________________
 #   ,-----------|'------'|  |                             |
 #  /.           '-'    |-'  |_____________________________|
-# |/|             |    |    
+# |/|             |    |
 #   |   .________.'----'    _______________________________
 #   |  ||        |  ||      |                             |
 #   \__|'        \__|'      |_____________________________|
@@ -14,6 +14,13 @@
 #|________________________________________________________|
 ---
 
+# Does the Rancher RKE2 Common repo exist already
+- name: Check to see if rke2-common.repo exists
+  stat:
+    path: '/etc/yum.repos.d/rke2-common.repo'
+  register: stat_rke2_common
+
+# Add RKE2 Common repo if it doesn't exist
 - name: add the rke2-common repo
   yum_repository:
     name: rke2-common
@@ -22,7 +29,15 @@
     gpgcheck: "{{ rke2_repo_common_gpg_check }}"
     gpgkey: "{{ rke2_repo_common_gpg_key }}"
     enabled: yes
+    when: not stat_rke2_common.stat.exists
 
+# Does the Rancher RKE2 1.19 repo exist already
+- name: Check to see if rke2-v1.19.repo exists
+  stat:
+    path: '/etc/yum.repos.d/rke2-v1.19.repo'
+  register: stat_rke2_v119
+
+# Add RKE2 1.19 repo if it doesn't exist
 - name: add the rke2-v1.19 repo
   yum_repository:
     name: rke2-v1.19
@@ -31,6 +46,4 @@
     gpgcheck: "{{ rke2_repo_package_gpg_check }}"
     gpgkey: "{{ rke2_repo_package_gpg_key }}"
     enabled: yes
-
-
-
+    when: not stat_rke2_v119.stat.exists
