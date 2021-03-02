@@ -1,10 +1,23 @@
 ---
 
-- import_tasks: yum.yml
-- import_tasks: config.yml
+# This role installs RKE2 on control plane
+# nodes and on worker nodes that are
+# RHEL/CentOS based.
 
-# Firewalld | disable
-- name: FIREWALLD | disable
+
+# Checks if Red Hat system
+- name: REQUIRES YUM based system
+  meta: stop_play
+  when: ansible_os_family != 'RedHat'
+
+- import_tasks: yum.yml
+  become: yes
+- import_tasks: config.yml
+  become: yes
+
+# Disable Firewalld
+# We recommend disabling firewalld. For Kubernetes 1.19, firewalld must be turned off.
+- name: disable FIREWALLD
   ansible.builtin.systemd:
     name: firewalld
     state: stopped

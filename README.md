@@ -1,38 +1,106 @@
-Role Name
+Ansible RKE2 (RKE Government) Role
 =========
 
-A brief description of the role goes here.
+RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible role installs RKE2 for both the control plane and workers.
+
+See the [docs](https://docs.rke2.io/) more information about [RKE Government](https://docs.rke2.io/).  
 
 Requirements
 ------------
+### Ansible
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+*   This role is developed and tested with [maintained](https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html) versions of Ansible base.
+
+### Molecule
+
+*   Molecule `3.x` is used to test the various functionalities of the role.
+*   Instructions on how to install Molecule can be found in the [Molecule website](https://molecule.readthedocs.io/en/latest/installation.html).
+
+
+Installation
+------------
+### Ansible Galaxy
+
+Use `ansible-galaxy install rancherfederal.rke2-ansible` to install the latest stable release of the role on your system.
+
+### Git
+
+Use `git clone https://github.com/rancherfederal/rke2-ansible.git` to pull the latest edge commit of the role from GitHub.
+
+Platforms
+---------
+The RKE2 Ansible role only supports CentOS and Red Hat, but will eventually support all [RKE2 Supported Operating Systems](https://docs.rke2.io/install/requirements/#operating-systems)
+
+Currently supported:
+```yaml
+CentOS:
+  - 7.8
+  - 8.2
+Red Hat:
+  - 7.8
+  - 8.2
+```
+TODO: Add Support for
+```yaml
+Ubuntu:
+  - bionic
+  - focal
+```
+
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+This role has multiple variables. The descriptions and defaults for all these variables can be found in the **[`defaults/main/`](https://github.com/rancherfederal/rke2-ansible/blob/main/defaults/main/)** folder in the following files:
 
-Dependencies
-------------
+|Name|Description|
+|----|-----------|
+|**[`main.yml`](https://github.com/rancherfederal/rke2-ansible/blob/main/defaults/main/main.yml)**|RKE2 installation variables|
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+
+Similarly, descriptions and defaults for preset variables can be found in the **[`vars/`](https://github.com/rancherfederal/rke2-ansible/blob/main/vars/)** folder in the following files:
+
+|Name|Description|
+|----|-----------|
+|**[`main.yml`](https://github.com/rancherfederal/rke2-ansible/blob/main/vars/main.yml)**|List of supported  currently variables|
+
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Add the following to the full playbook:
 
-    - hosts: servers
+    - hosts: all
+      become: yes
       roles:
-         - { role: username.rolename, x: 42 }
+         - rke2-ansible
+
+
+Inventory should be broken up between control plan nodes and worker nodes.
+
+    [control_plane]
+    192.168.0.3
+    192.168.0.4
+    192.168.0.5
+
+    [workers]
+    192.168.0.10
+    192.168.0.11
+    192.168.0.12
+    192.168.0.13
+
+
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+[Dave Vigil](https://github.com/dgvigil)
+
+[Brandon Gulla](https://github.com/bgulla)
+
+[Rancher Federal](https://rancherfederal.com/)
