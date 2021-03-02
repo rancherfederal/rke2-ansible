@@ -17,8 +17,9 @@
 - include: yum.yml
   become: yes
 
-# Setup...
-- import_tasks: config.yml
+# Setup needed directories, touch config files,
+# setup selinux, set rke2_write_kubeconfig_mode
+- include: config.yml
   become: yes
 
 # Disable Firewalld
