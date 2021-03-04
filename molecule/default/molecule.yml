@@ -1,6 +1,9 @@
 ---
 dependency:
   name: galaxy
+lint: |
+      yamllint .
+      ansible-lint
 driver:
   name: ec2
 platforms:
