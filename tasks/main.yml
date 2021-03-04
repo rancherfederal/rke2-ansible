@@ -2,14 +2,14 @@
 
 # This role installs RKE2 on control plane
 # nodes and on worker nodes that are
-# RHEL/CentOS based.
+# RHEL/CentOS 7/8 based.
 # TODO: Add Ubuntu 18/20 support
 
 - name: Populate service facts
   service_facts:
 
 # Checks if Red Hat system
-- name: REQUIRES YUM based system
+- name: Currently REQUIRES YUM based system
   meta: end_play
   when: ansible_os_family != 'RedHat'
 

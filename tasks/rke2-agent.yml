@@ -15,7 +15,7 @@
     state: restarted
     name: systemd-sysctl
 
-- name: SYSTEMD | rke2-agent 
+- name: SYSTEMD | rke2-agent
   ansible.builtin.systemd:
     name: rke2-agent
     state: started
