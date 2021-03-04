@@ -1,32 +1,29 @@
 ---
-# /etc/rancher/rke2/config.yaml`
-- name: create the /etc/rancher/rke2 config dir
+# /etc/rancher/rke2/config.yaml
+
+# Does the /etc/rancher/rke2 directory exist?
+- name: Does the /etc/rancher/rke2 directory exist?
+  stat:
+    path: /etc/rancher/rke2
+  register: etc_rancher_rke2
+
+- name: Create the /etc/rancher/rke2 config dir
   ansible.builtin.file:
     path: /etc/rancher/rke2
     state: directory
     recurse: yes
+  when: not etc_rancher_rke2.stat.exists
+
+- name: Does /etc/rancher/rke2/config.yaml exist
+  stat:
+      path: /etc/rancher/rke2/config.yaml
+  register: etc_rancher_rke2_config
 
 - name: create the /etc/rancher/rke2/config.yaml file
   ansible.builtin.file:
     path: /etc/rancher/rke2/config.yaml
     state: touch
-
-- name: create the /etc/rancher/rke2 config dir
-  ansible.builtin.file:
-    path: /etc/rancher/rke2
-    state: directory
-    recurse: yes
-
-- name: create the airgap images folder
-  ansible.builtin.file:
-    path: /var/lib/rancher/rke2/agent/images
-    state: directory
-    recurse: yes
-
-- name: create the /etc/rancher/rke2/config.yaml file
-  ansible.builtin.file:
-    path: /etc/rancher/rke2/config.yaml
-    state: touch
+  when: not etc_rancher_rke2_config.stat.exists
 
 # CONFIG FILE GENERATION
 - name: rke2- config enable selinux
@@ -38,3 +35,17 @@
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "write-kubeconfig-mode: {{ rke2_write_kubeconfig_mode }}"
+
+# Airgap Images
+- name: Does the airgap images folder exist?
+  stat:
+      path: /var/lib/rancher/rke2/agent/images
+  register: rke2_agent_images
+
+- name: create the airgap images folder
+  ansible.builtin.file:
+    path: /var/lib/rancher/rke2/agent/images
+    state: directory
+    recurse: yes
+  when: not rke2_agent_images.stat.exists
+
