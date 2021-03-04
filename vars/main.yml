@@ -1,2 +1,4 @@
 ---
-#
+
+# RKE2 version
+rke_repo_version: 1.19
