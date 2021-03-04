@@ -48,4 +48,3 @@
     state: directory
     recurse: yes
   when: not rke2_agent_images.stat.exists
-
