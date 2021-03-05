@@ -6,4 +6,3 @@ rke_version_full: 1.19.8
 
 # Is this an airgapped install
 rke2_airgap_mode: false
-
