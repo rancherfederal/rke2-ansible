@@ -2,7 +2,7 @@
 - name: YUM | Install rke2-server
   yum:
     name: rke2-server
-    state: latest
+    state: latest # noqa package-latest
 
 - name: CIS | copy systemctl file for kernel hardening
   ansible.builtin.copy:
@@ -22,7 +22,7 @@
     dest: /etc/sysctl.d/60-rke2-cis.conf
   when: rke2_cis_mode
 
-- name: SYSTEMD | rke2-server 
+- name: SYSTEMD | rke2-server
   ansible.builtin.systemd:
     name: rke2-server
     state: started

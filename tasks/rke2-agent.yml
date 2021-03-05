@@ -2,7 +2,7 @@
 - name: YUM | Install rke2-agent
   yum:
     name: rke2-agent
-    state: latest
+    state: latest # noqa package-latest
 
 - name: CIS | copy systemctl file for kernel hardening
   ansible.builtin.copy:
