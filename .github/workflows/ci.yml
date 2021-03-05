@@ -30,6 +30,12 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install yamllint ansible ansible-lint
 
+      - name: Verify versions
+        run: |
+            ansible --version
+            ansible-lint --version
+            yamllint --version
+
       - name: Lint code.
         run: |
           yamllint .
