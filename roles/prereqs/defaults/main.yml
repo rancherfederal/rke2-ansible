@@ -1,8 +1,4 @@
 ---
-################
-
-################
-
 # Security configuration
 rke2_cis_mode: true
 rke2_selinux: true

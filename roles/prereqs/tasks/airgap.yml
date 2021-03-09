@@ -10,10 +10,11 @@
 
     - name: WGET | download rke2 images to disk (just to speed up repeated testing)
       get_url:
-        url: "https://github.com/rancher/rke2/releases/download/v{{ rke_version_full }}%2Brke2r1/rke2-images.linux-amd64.tar.gz"
+        url: "{{ rke2_image_file_url }}"
         dest: /opt/rke2-images.linux-amd64.tar.gz
 
-    # copy the container-image tar to the airgap image. we have to do this every time because rke2 will delete the file on disk after the images are ingested into the containerd store
+    # copy the container-image tar to the airgap image. we have to do this every time because rke2 will delete the
+    # file on disk after the images are ingested into the containerd store
     - name: COPY | airgap images to /var/lib/rancher/rke2/agent/images
       copy:
         src: /opt/rke2-images.linux-amd64.tar.gz
