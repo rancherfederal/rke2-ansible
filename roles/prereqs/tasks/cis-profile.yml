@@ -1,6 +1,6 @@
 ---
 
-## CIS-Mode 
+## CIS-Mode
 # https://docs.rke2.io/security/hardening_guide/
 - name: CONFIG | enable CIS-MODE
   lineinfile:

@@ -1,0 +1,18 @@
+---
+
+- hosts: rke2_cluster
+  gather_facts: yes
+  become: yes
+  roles:
+    - role: prereq
+    - role: download
+
+- hosts: master
+  become: yes
+  roles:
+    - role: rke2/master
+
+- hosts: node
+  become: yes
+  roles:
+    - role: rke2/node

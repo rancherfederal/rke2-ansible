@@ -1,32 +1,29 @@
-Ansible RKE2 (RKE Government) Role
+Build a Kubernetes cluster using RKE2 via Ansible
 =========
+```
+               ,        ,  _______________________________
+   ,-----------|'------'|  |                             |
+  /.           '-'    |-'  |_____________________________|
+ |/|             |    |
+   |   .________.'----'    _______________________________
+   |  ||        |  ||      |                             |
+   \__|'        \__|'      |_____________________________|
+
+|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+|________________________________________________________|
+
+|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
+|________________________________________________________|
+```
+
+Ansible RKE2 (RKE Government) Playbook
+---------
 [![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml)
 
-RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible role installs RKE2 for both the control plane and workers.
+RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible  playbook installs RKE2 for both the control plane and workers.
 
 See the [docs](https://docs.rke2.io/) more information about [RKE Government](https://docs.rke2.io/).
 
-Requirements
-------------
-### Ansible
-
-*   This role is developed and tested with [maintained](https://docs.ansible.com/ansible/devel/reference_appendices/release_and_maintenance.html) versions of Ansible base.
-
-### Molecule
-
-*   Molecule `3.x` is used to test the various functionalities of the role.
-*   Instructions on how to install Molecule can be found in the [Molecule website](https://molecule.readthedocs.io/en/latest/installation.html).
-
-
-Installation
-------------
-### Ansible Galaxy
-
-Use `ansible-galaxy install rancherfederal.rke2-ansible` to install the latest stable release of the role on your system.
-
-### Git
-
-Use `git clone https://github.com/rancherfederal/rke2-ansible.git` to pull the latest edge commit of the role from GitHub.
 
 Platforms
 ---------
@@ -49,53 +46,53 @@ Ubuntu:
 ```
 
 
-Role Variables
---------------
+System requirements
+-------------------
 
-This role has multiple variables. The descriptions and defaults for all these variables can be found in the **[`defaults/main/`](https://github.com/rancherfederal/rke2-ansible/blob/main/defaults/main/)** folder in the following files:
+Deployment environment must have Ansible 2.9.0+
 
-|Name|Description|
-|----|-----------|
-|**[`main.yml`](https://github.com/rancherfederal/rke2-ansible/blob/main/defaults/main/main.yml)**|RKE2 installation variables|
+Server and agent nodes must have passwordless SSH access
 
+Usage
+-----
 
-Similarly, descriptions and defaults for preset variables can be found in the **[`vars/`](https://github.com/rancherfederal/rke2-ansible/blob/main/vars/)** folder in the following files:
+First create a new directory based on the `sample` directory within the `inventory` directory:
 
-|Name|Description|
-|----|-----------|
-|**[`main.yml`](https://github.com/rancherfederal/rke2-ansible/blob/main/vars/main.yml)**|List of supported  currently variables|
+```bash
+cp -R inventory/sample inventory/my-cluster
+```
 
+Second, edit `inventory/my-cluster/hosts.ini` to match the system information gathered above. For example:
 
-Example Playbook
-----------------
+```bash
+[server]
+192.16.35.12
 
-Add the following to the full playbook:
+[agent]
+192.16.35.[10:11]
 
-    - hosts: all
-      become: yes
-      roles:
-         - rke2-ansible
+[rke2_cluster:children]
+server
+agent
+```
 
+If needed, you can also edit `inventory/my-cluster/group_vars/all.yml` to match your environment.
 
-Inventory should be broken up between control plan nodes and worker nodes.
+Start provisioning of the cluster using the following command:
 
-    [control_plane]
-    192.168.0.3
-    192.168.0.4
-    192.168.0.5
+```bash
+ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
+```
 
-    [workers]
-    192.168.0.10
-    192.168.0.11
-    192.168.0.12
-    192.168.0.13
+Kubeconfig
+----------
 
+To get access to your **Kubernetes** cluster just
 
+```bash
+scp debian@server_ip:~/.kube/config ~/.kube/config
+```
 
-License
--------
-
-MIT
 
 Author Information
 ------------------

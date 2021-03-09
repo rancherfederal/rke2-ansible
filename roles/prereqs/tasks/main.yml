@@ -35,5 +35,3 @@
 # CIS mode
 - import_tasks: cis-profile.yml
   when: rke2_cis_mode
-
-- import_tasks: rke2-master.yml

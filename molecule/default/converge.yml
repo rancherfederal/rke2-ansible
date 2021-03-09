@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include rke2-ansible"
-      include_role:
-        name: "rke2-ansible"
