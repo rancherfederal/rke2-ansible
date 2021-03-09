@@ -41,4 +41,4 @@ rke2_default_interface: "auto"
 # airgap configuration
 ## TODO
 rke2_airgap_mode: false
-rke2_image_file_url: https://github.com/rancher/rke2/releases/download/v1.18.15%2Brke2r1/rke2-images.linux-amd64.tar.gz
+rke2_image_file_url: https://github.com/rancher/rke2/releases/download/v1.19.8%2Brke2r1/rke2-images.linux-amd64.tar.gz
