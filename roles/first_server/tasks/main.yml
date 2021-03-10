@@ -4,10 +4,19 @@
     name: rke2-server
     state: latest  # noqa package-latest
 
-- name: config.yaml | server
+
+- name: Add tls-san to first server pt1
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
-    line: "server: https://{{ server_ip }}:9345"
+    line: "tls-san:"
+
+- name: Add tls-san to first server pt2
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    insertafter: "tls-san:"
+    line: "  - {{ item }}"
+  with_items:
+    - "{{ tls_san }}"
 
 - name: SYSTEMD | rke2-server
   ansible.builtin.systemd:

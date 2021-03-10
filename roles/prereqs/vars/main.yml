@@ -1,8 +1,6 @@
 ---
+# The defaults for the variables used in role can be
+# found in roles/prereqs/defaults/main.yml
 
-# RKE2 version
-rke_version: 1.19
-rke_version_full: 1.19.8
-
-# Is this an airgapped install
+rke2_selinux: false
 rke2_airgap_mode: false

@@ -1,7 +1,14 @@
 ---
-k3s_version: v1.17.5+k3s1
+rke2_version: 1.19
+rke2_version_dot: 1.19.8
+rke2_full_version: v1.19.8+rke2r1
+
 ansible_user: debian
 systemd_dir: /etc/systemd/system
 master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+rke2_cis_mode: true
 extra_server_args: ""
 extra_agent_args: ""
+
+rke2_config_token: "K1073c9e4acf45d514ae907dbc4838c5fceeac1b2bc90dc443be33c1e53b80ad019"
+rke2_write_kubeconfig_mode: "0644"

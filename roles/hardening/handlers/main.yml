@@ -1,0 +1,6 @@
+---
+
+- name: restart systemd-sysctl
+  service:
+    state: restarted
+    name: systemd-sysctl
