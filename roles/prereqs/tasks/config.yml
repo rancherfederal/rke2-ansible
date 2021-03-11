@@ -30,14 +30,9 @@
     line: "selinux: {{ rke2_selinux }}"
   when: rke2_selinux | bool
 
-- name: config.yaml | write-kubeconfig-mode
-  lineinfile:
-    dest: /etc/rancher/rke2/config.yaml
-    line: "write-kubeconfig-mode: {{ rke2_write_kubeconfig_mode }}"
-  when: rke2_write_kubeconfig_mode is defined
-
 - name: config.yaml | config enable selinux
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "token: {{ rke2_config_token }}"
   when: rke2_selinux | bool
+

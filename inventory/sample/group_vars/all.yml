@@ -5,7 +5,7 @@ rke2_full_version: v1.19.8+rke2r1
 
 ansible_user: debian
 systemd_dir: /etc/systemd/system
-master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
 rke2_cis_mode: true
 extra_server_args: ""
 extra_agent_args: ""

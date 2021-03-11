@@ -4,11 +4,17 @@
     name: rke2-server
     state: latest  # noqa package-latest
 
+- name: config.yaml | write-kubeconfig-mode
+  lineinfile:
+    dest: /etc/rancher/rke2/config.yaml
+    line: "write-kubeconfig-mode: {{ rke2_write_kubeconfig_mode }}"
+  when: rke2_write_kubeconfig_mode is defined
 
 - name: Add tls-san to first server pt1
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "tls-san:"
+  when: tls_san is defined
 
 - name: Add tls-san to first server pt2
   lineinfile:
@@ -17,9 +23,28 @@
     line: "  - {{ item }}"
   with_items:
     - "{{ tls_san }}"
-
+  when: tls_san is defined
+  
 - name: SYSTEMD | rke2-server
   ansible.builtin.systemd:
     name: rke2-server
     state: started
     enabled: yes
+
+- name: Wait for node-token
+  wait_for:
+    path: /var/lib/rancher/rke2/server/node-token
+
+- name: Read node-token from master
+  slurp:
+    src: /var/lib/rancher/rke2/server/node-token
+  register: node_token
+
+- name: Store Master node-token
+  set_fact:
+    rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+- name: "Add RKE2 Token to dummy host"
+  add_host:
+    name:   "RKE2_TOKEN_HOLDER"
+    token:  "{{ rke2_config_token }}"

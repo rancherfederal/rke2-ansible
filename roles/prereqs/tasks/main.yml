@@ -12,10 +12,6 @@
   ansible.builtin.package_facts:
     manager: auto
 
-# Checks if Red Hat system
-- name: Currently REQUIRES YUM based system
-  ansible.builtin.meta: end_play
-  when: ansible_os_family != 'RedHat'
 
 # For use with ansible_lsb
 - name: Install redhat-lsb-core

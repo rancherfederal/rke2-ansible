@@ -9,6 +9,11 @@
     dest: /etc/rancher/rke2/config.yaml
     line: "server: https://{{ server_ip }}:9345"
 
+- name: Add Token to config.yaml
+  lineinfile:
+    dest: /etc/rancher/rke2/config.yaml
+    line: "token: {{ hostvars['RKE2_TOKEN_HOLDER']['token'] }}"
+
 - name: SYSTEMD | rke2-agent
   ansible.builtin.systemd:
     name: rke2-agent
