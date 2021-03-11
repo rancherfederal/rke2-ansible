@@ -24,25 +24,14 @@
   when: not etc_rancher_rke2_config.stat.exists
 
 # CONFIG FILE GENERATION
-- name: rke2- config enable selinux
+- name: config.yaml | config enable selinux
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "selinux: {{ rke2_selinux }}"
+  when: rke2_selinux | bool
 
-- name: rke2- write-kubeconfig-mode
+- name: config.yaml | config enable selinux
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
-    line: "write-kubeconfig-mode: {{ rke2_write_kubeconfig_mode }}"
-
-# Airgap Images
-- name: Does the airgap images folder exist?
-  stat:
-    path: /var/lib/rancher/rke2/agent/images
-  register: rke2_agent_images
-
-- name: create the airgap images folder
-  ansible.builtin.file:
-    path: /var/lib/rancher/rke2/agent/images
-    state: directory
-    recurse: yes
-  when: not rke2_agent_images.stat.exists
+    line: "token: {{ rke2_config_token }}"
+  when: rke2_selinux | bool

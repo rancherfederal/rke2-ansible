@@ -2,11 +2,17 @@
 - name: Air Gap Setup
   become: yes
   block:
+    - name: Does the airgap images folder exist?
+      stat:
+        path: /var/lib/rancher/rke2/agent/images
+      register: rke2_agent_images
+
     - name: create the airgap images folder
       file:
         path: /var/lib/rancher/rke2/agent/images
         state: directory
         recurse: yes
+      when: not rke2_agent_images.stat.exists
 
     - name: WGET | download rke2 images to disk (just to speed up repeated testing)
       get_url:
@@ -20,4 +26,4 @@
         src: /opt/rke2-images.linux-amd64.tar.gz
         dest: /var/lib/rancher/rke2/agent/images/rke2-images.linux-amd64.tar.gz
         mode: '0644'
-  when: rke2_airgap_mode == true
+  when: rke2_airgap_mode | bool

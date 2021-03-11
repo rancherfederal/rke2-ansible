@@ -7,29 +7,49 @@
   register: stat_rke2_common
 
 # Add RKE2 Common repo if it doesn't exist
-- name: add the rke2-common repo
-  yum_repository:
+- name: add the rke2-common repo RHEL/CentOS 7
+  ansible.builtin.yum_repository:
     name: rke2-common
     description: Rancher RKE2 Common Latest
-    baseurl: "{{ rke2_repo_common_baseurl }}"
+    baseurl: "{{ rke2_repo_common_baseurl_rhel7 }}"
     gpgcheck: "{{ rke2_repo_common_gpg_check }}"
     gpgkey: "{{ rke2_repo_common_gpg_key }}"
     enabled: yes
-  when: not stat_rke2_common.stat.exists
+  when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '7'
 
-# Does the Rancher RKE2 1.19 repo exist already
+- name: add the rke2-common repo RHEL/CentOS 8
+  ansible.builtin.yum_repository:
+    name: rke2-common
+    description: Rancher RKE2 Common Latest
+    baseurl: "{{ rke2_repo_common_baseurl_rhel8 }}"
+    gpgcheck: "{{ rke2_repo_common_gpg_check }}"
+    gpgkey: "{{ rke2_repo_common_gpg_key }}"
+    enabled: yes
+  when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '8'
+
+# Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
   stat:
-    path: '/etc/yum.repos.d/rke2-v{{rke_version}}.repo'  # noqa var-spacing
+    path: '/etc/yum.repos.d/rke2-v{{rke2_version}}.repo'  # noqa var-spacing
   register: stat_rke2_versioned_repo
 
-# Add RKE2 1.19 repo if it doesn't exist
-- name: add the rke2 versioned repo
-  yum_repository:
-    name: rke2-v1.19
-    description: Rancher RKE2 1.19 Latest
-    baseurl: "{{ rke2_repo_package_baseurl }}"
+# Add RKE2 versioned repo if it doesn't exist
+- name: Add the rke2 versioned repo CentOS/RHEL 7
+  ansible.builtin.yum_repository:
+    name: "rke2-v{{rke2_version}}"  # noqa var-spacing
+    description: Rancher RKE2 Latest
+    baseurl: "{{ rke2_repo_package_baseurl_rhel7 }}"
     gpgcheck: "{{ rke2_repo_package_gpg_check }}"
     gpgkey: "{{ rke2_repo_package_gpg_key }}"
     enabled: yes
-  when: not stat_rke2_versioned_repo.stat.exists
+  when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '7')
+
+- name: add the rke2 versioned repo CentOS/RHEL 8
+  ansible.builtin.yum_repository:
+    name: "rke2-v{{rke2_version}}"  # noqa var-spacing
+    description: Rancher RKE2 Latest
+    baseurl: "{{ rke2_repo_package_baseurl_rhel8 }}"
+    gpgcheck: "{{ rke2_repo_package_gpg_check }}"
+    gpgkey: "{{ rke2_repo_package_gpg_key }}"
+    enabled: yes
+  when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '8')

@@ -1,26 +1,25 @@
 ---
 
-# This role installs RKE2 on control plane
-# nodes and on worker nodes that are
+# This role installs the prerequisites of RKE2 on control plane
+# (aka server) nodes and on worker (aka agent)   nodes that are
 # RHEL/CentOS 7/8 based.
 # TODO: Add Ubuntu 18/20 support
 
 - name: Populate service facts
-  service_facts:
+  ansible.builtin.service_facts:
 
-# Checks if Red Hat system
-- name: Currently REQUIRES YUM based system
-  meta: end_play
-  when: ansible_os_family != 'RedHat'
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
 
-# Setup Yum repos
-- include: yum.yml
-  become: yes
 
-# Setup needed directories, touch config files,
-# setup selinux, set rke2_write_kubeconfig_mode
-- include: config.yml
-  become: yes
+# For use with ansible_lsb
+- name: Install redhat-lsb-core
+  ansible.builtin.yum: name=redhat-lsb-core state=present
+  when: "'redhat-lsb-core' not in ansible_facts.packages"
+- name: Reread ansible_lsb facts
+  ansible.builtin.setup: filter=ansible_lsb*
+  when: "'redhat-lsb-core' not in ansible_facts.packages"
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19, firewalld must be turned off.
@@ -29,9 +28,14 @@
     name: firewalld
     state: stopped
     enabled: no
-  become: yes
   when: ansible_facts.services["firewalld.service"] is defined
 
-# CIS mode
-- import_tasks: cis-profile.yml
-  when: rke2_cis_mode
+# Setup Yum repos
+- include: yum.yml
+
+# Setup needed directories, touch config files,
+# setup selinux, set rke2_write_kubeconfig_mode
+- include: config.yml
+
+- include: airgap.yml
+  when: rke2_airgap_mode | bool

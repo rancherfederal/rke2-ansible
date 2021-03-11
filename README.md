@@ -90,7 +90,7 @@ Kubeconfig
 To get access to your **Kubernetes** cluster just
 
 ```bash
-scp debian@server_ip:~/.kube/config ~/.kube/config
+scp ec2-user@server_ip:~/.kube/config ~/.kube/config
 ```
 
 

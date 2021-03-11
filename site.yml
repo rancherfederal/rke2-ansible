@@ -4,15 +4,33 @@
   gather_facts: yes
   become: yes
   roles:
-    - role: prereq
-    - role: download
+    - role: prereqs
 
-- hosts: master
+- hosts: server[0]
   become: yes
   roles:
-    - role: rke2/master
+    - role: first_server
 
-- hosts: node
+- hosts: server[1:]
   become: yes
   roles:
-    - role: rke2/node
+    - role: server
+
+- hosts: agent
+  become: yes
+  roles:
+    - role: agent
+
+- hosts: server[1:]
+  become: yes
+  tasks:
+    - name: Restart rke2-server
+      ansible.builtin.systemd:
+        name: rke2-server
+        state: restarted
+
+# - hosts: rke2_cluster
+#   gather_facts: yes
+#   become: yes
+#   roles:
+#     - role: hardening
