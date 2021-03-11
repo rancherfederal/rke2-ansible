@@ -24,7 +24,7 @@
   with_items:
     - "{{ tls_san }}"
   when: tls_san is defined
-  
+
 - name: SYSTEMD | rke2-server
   ansible.builtin.systemd:
     name: rke2-server
@@ -46,5 +46,5 @@
 
 - name: "Add RKE2 Token to dummy host"
   add_host:
-    name:   "RKE2_TOKEN_HOLDER"
-    token:  "{{ rke2_config_token }}"
+    name: "RKE2_TOKEN_HOLDER"
+    token: "{{ rke2_config_token }}"

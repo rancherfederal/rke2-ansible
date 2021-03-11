@@ -35,4 +35,3 @@
     dest: /etc/rancher/rke2/config.yaml
     line: "token: {{ rke2_config_token }}"
   when: rke2_selinux | bool
-
