@@ -90,7 +90,7 @@ Kubeconfig
 To get access to your **Kubernetes** cluster just
 
 ```bash
-scp ec2-user@server_ip:~/.kube/config ~/.kube/config
+ssh ec2-user@server_ip "sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes"
 ```
 
 
