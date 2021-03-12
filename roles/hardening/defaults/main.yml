@@ -1,4 +1,0 @@
----
-
-cis_15_enabled: false
-cis_16_enabled: false  #  coming soon https://github.com/rancher/rke2/issues/350
