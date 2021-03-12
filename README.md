@@ -93,6 +93,20 @@ To get access to your **Kubernetes** cluster just
 ssh ec2-user@server_ip "sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes"
 ```
 
+Available configurations
+------------------------
+Server Configurations
+
+| Options | Descriptions|
+|---------|-------------|
+| rke2_write_kubeconfig | Load configuration from FILE (default: "/etc/rancher/rke2/config.yaml")|
+| tls_san | Add additional hostname or IP as a Subject Alternative Name in the TLS cert ie. ["compute.internal"] |
+| rke2_config_token | Shared secret used to join a server or agent to a cluster. (default: Automatically created) |
+| rke2_write_kubeconfig_mode | Write kubeconfig with this mode (default: "0644" ) |
+| cis_15_enabled | Validate system configuration against the CIS 1.5 benchmark (default: false) |
+
+These variables can be modified in the specific roles (`{role}/vars/main.yml`) or can be set in your `inventory/cluster/group_vars/all.yml`
+
 
 Author Information
 ------------------
