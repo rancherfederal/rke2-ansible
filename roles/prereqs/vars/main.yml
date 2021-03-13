@@ -11,12 +11,6 @@ rke2_repo_package_gpg_check: true
 rke2_repo_package_gpg_key: "https://rpm.rancher.io/public.key"
 
 # config.yml configuration
-## TODO: Add all from
 rke2_write_kubeconfig_mode: "0644"
 rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
-rke2_selinux: false
-
-# airgap.yml configuration
-## TODO
-rke2_airgap_mode: false
-rke2_image_file_url: https://github.com/rancher/rke2/releases/download/v1.19.8%2Brke2r1/rke2-images.linux-amd64.tar.gz
+rke2_selinux: true

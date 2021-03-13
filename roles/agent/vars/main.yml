@@ -1,8 +1,3 @@
 ---
 
-# RKE2 version
-rke_version: 1.19
-rke_version_full: 1.19.8
-
-# Is this an airgapped install
-rke2_airgap_mode: false
+server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"

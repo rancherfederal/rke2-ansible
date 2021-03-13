@@ -1,15 +1,15 @@
 ---
-- name: YUM | Install rke2-server
+- name: Install rke2-server
   yum:
     name: rke2-server
     state: latest  # noqa package-latest
 
-- name: config.yaml | server
+- name: Add server url to config file
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "server: https://{{ server_ip }}:9345"
 
-- name: Add Token to config.yaml
+- name: Add token to config.yaml
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "token: {{ hostvars['RKE2_TOKEN_HOLDER']['token'] }}"
@@ -29,7 +29,7 @@
     - "{{ tls_san }}"
   when: tls_san is defined
 
-- name: SYSTEMD | rke2-server
+- name: Start rke2-server
   ansible.builtin.systemd:
     name: rke2-server
     state: started
