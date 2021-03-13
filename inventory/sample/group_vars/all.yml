@@ -3,6 +3,15 @@ rke2_version: 1.19
 rke2_version_dot: 1.19.8
 rke2_full_version: v1.19.8+rke2r1
 
-ansible_user: debian
-systemd_dir: /etc/systemd/system
+rke2_config_token: ""
+
+rke2_write_kubeconfig_mode: "0644"
+rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
+
+tls_san: ["compute.internal"]
+
 server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+
+cis_15_enabled: false
+
+selinux_enabled: true
