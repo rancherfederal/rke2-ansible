@@ -33,8 +33,7 @@
 # Setup Yum repos
 - include: yum.yml
 
-# Setup needed directories, touch config files,
-# setup selinux, set rke2_write_kubeconfig_mode
+# Setup needed directories, touch config file
 - include: config.yml
 
 - include: airgap.yml

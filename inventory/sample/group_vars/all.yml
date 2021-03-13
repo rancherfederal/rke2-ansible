@@ -1,17 +1,24 @@
 ---
+# version info
 rke2_version: 1.19
 rke2_version_dot: 1.19.8
 rke2_full_version: v1.19.8+rke2r1
 
+# rke2 config file options
 rke2_config_token: ""
-
 rke2_write_kubeconfig_mode: "0644"
 rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
-
 tls_san: ["compute.internal"]
-
 server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+cis_15_enabled: true
+rke2_selinux: true
 
-cis_15_enabled: false
-
-selinux_enabled: true
+# YUM repository configuration
+rke2_repo_common_baseurl_rhel7: "https://rpm.rancher.io/rke2/latest/common/centos/7/noarch"
+rke2_repo_common_baseurl_rhel8: "https://rpm.rancher.io/rke2/latest/common/centos/8/noarch"
+rke2_repo_common_gpg_check: true
+rke2_repo_common_gpg_key: "https://rpm.rancher.io/public.key"
+rke2_repo_package_baseurl_rhel7: "https://rpm.rancher.io/rke2/latest/1.19/centos/7/x86_64"
+rke2_repo_package_baseurl_rhel8: "https://rpm.rancher.io/rke2/latest/1.19/centos/8/x86_64"
+rke2_repo_package_gpg_check: true
+rke2_repo_package_gpg_key: "https://rpm.rancher.io/public.key"
