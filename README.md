@@ -99,12 +99,11 @@ Server Configurations
 
 | Options | Descriptions|
 |---------|-------------|
+| cis_15_enabled | Validate system configuration against the CIS 1.5 benchmark (default: false) |
 | rke2_channel | Channel to use for fetching the desired RKE2 version.  (default: stable, available: latest, stable, v1.19, v1.18)
-| rke2_write_kubeconfig | Load configuration from FILE (default: "/etc/rancher/rke2/config.yaml")|
-| tls_san | Add additional hostname or IP as a Subject Alternative Name in the TLS cert ie. ["compute.internal", "branch.mil"] |
 | rke2_config_token | Shared secret used to join a server or agent to a cluster. (default: Automatically created) |
 | rke2_write_kubeconfig_mode | Write kubeconfig with this mode (default: "0644" ) |
-| cis_15_enabled | Validate system configuration against the CIS 1.5 benchmark (default: false) |
+| tls_san | Add additional hostname or IP as a Subject Alternative Name in the TLS cert ie. ["compute.internal", "branch.mil"] |
 
 These variables can be modified in the specific roles (`{role}/vars/main.yml`) or can be set in your `inventory/cluster/group_vars/all.yml`
 
