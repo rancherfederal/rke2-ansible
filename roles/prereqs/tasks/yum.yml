@@ -34,7 +34,10 @@
 
 - name: Describe versions
   debug:
-    msg: "Full version: {{ rke2_full_version.stdout }} dot version: {{ rke2_version_dot.stdout }} Maj.Min version: {{ rke2_version.stdout }}"
+    msg:
+      - "Full version: {{ rke2_full_version.stdout }}"
+      - "dot version: {{ rke2_version_dot.stdout }}"
+      - "Maj.Min version: {{ rke2_version.stdout }}"
 
 # Does the Rancher RKE2 Common repo exist already
 - name: Check to see if rke2-common.repo exists
