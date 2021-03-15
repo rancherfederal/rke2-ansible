@@ -1,5 +1,41 @@
 ---
 
+- name: Stop if the provided channel is not valid
+  fail:
+    msg: "Provided channel is not valid"
+  when: rke2_channel not in channels
+
+- name: Get full version name url
+  uri:
+    url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
+    follow_redirects: all
+  register: rke2_version_url
+
+- name: Set full version name
+  shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+  register: rke2_full_version
+  changed_when: false
+  args:
+    executable: /usr/bin/bash
+
+- name: Set dot version
+  shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
+  register: rke2_version_dot
+  changed_when: false
+  args:
+    executable: /usr/bin/bash
+
+- name: Set Maj.Min version
+  shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+  register: rke2_version
+  changed_when: false
+  args:
+    executable: /usr/bin/bash
+
+- name: Describe versions
+  debug:
+    msg: "Full version: {{ rke2_full_version.stdout }} dot version: {{ rke2_version_dot.stdout }} Maj.Min version: {{ rke2_version.stdout }}"
+
 # Does the Rancher RKE2 Common repo exist already
 - name: Check to see if rke2-common.repo exists
   stat:
@@ -11,9 +47,9 @@
   ansible.builtin.yum_repository:
     name: rke2-common
     description: Rancher RKE2 Common Latest
-    baseurl: "{{ rke2_repo_common_baseurl_rhel7 }}"
-    gpgcheck: "{{ rke2_repo_common_gpg_check }}"
-    gpgkey: "{{ rke2_repo_common_gpg_key }}"
+    baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/7/noarch"
+    gpgcheck: true
+    gpgkey: "https://rpm.rancher.io/public.key"
     enabled: yes
   when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '7'
 
@@ -21,35 +57,35 @@
   ansible.builtin.yum_repository:
     name: rke2-common
     description: Rancher RKE2 Common Latest
-    baseurl: "{{ rke2_repo_common_baseurl_rhel8 }}"
-    gpgcheck: "{{ rke2_repo_common_gpg_check }}"
-    gpgkey: "{{ rke2_repo_common_gpg_key }}"
+    baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/8/noarch"
+    gpgcheck: true
+    gpgkey: "https://rpm.rancher.io/public.key"
     enabled: yes
   when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '8'
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
   stat:
-    path: '/etc/yum.repos.d/rke2-v{{rke2_version}}.repo'  # noqa var-spacing
+    path: '/etc/yum.repos.d/rke2-v{{ rke2_version.stdout }}.repo'  # noqa var-spacing
   register: stat_rke2_versioned_repo
 
 # Add RKE2 versioned repo if it doesn't exist
 - name: Add the rke2 versioned repo CentOS/RHEL 7
   ansible.builtin.yum_repository:
-    name: "rke2-v{{rke2_version}}"  # noqa var-spacing
-    description: Rancher RKE2 Latest
-    baseurl: "{{ rke2_repo_package_baseurl_rhel7 }}"
-    gpgcheck: "{{ rke2_repo_package_gpg_check }}"
-    gpgkey: "{{ rke2_repo_package_gpg_key }}"
+    name: "rke2-v{{ rke2_version.stdout }}"  # noqa var-spacing
+    description: Rancher RKE2 Version
+    baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version.stdout }}/centos/7/x86_64"
+    gpgcheck: true
+    gpgkey: "https://rpm.rancher.io/public.key"
     enabled: yes
   when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '7')
 
 - name: add the rke2 versioned repo CentOS/RHEL 8
   ansible.builtin.yum_repository:
-    name: "rke2-v{{rke2_version}}"  # noqa var-spacing
-    description: Rancher RKE2 Latest
-    baseurl: "{{ rke2_repo_package_baseurl_rhel8 }}"
-    gpgcheck: "{{ rke2_repo_package_gpg_check }}"
-    gpgkey: "{{ rke2_repo_package_gpg_key }}"
+    name: "rke2-v{{ rke2_version.stdout }}"  # noqa var-spacing
+    description: Rancher RKE2 Version
+    baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version.stdout }}/centos/8/x86_64"
+    gpgcheck: true
+    gpgkey: "https://rpm.rancher.io/public.key"
     enabled: yes
   when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '8')
