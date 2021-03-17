@@ -20,6 +20,7 @@
   become: yes
   roles:
     - role: agent
+      when: groups["agent"] is defined
 
 - hosts: server[1:]
   become: yes
