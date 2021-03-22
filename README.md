@@ -108,6 +108,25 @@ Server Configurations
 These variables can be modified in the specific roles (`{role}/vars/main.yml`) or can be set in your `inventory/cluster/group_vars/all.yml`
 
 
+Uninstall RKE2
+---------------
+    Note: Uninstalling RKE2 deletes the cluster data and all of the scripts.
+The offical documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
+
+If you used this module to created the cluster and RKE2 was installed via yum, then you can attempt to run this command to remove all cluster data and all RKE2 scripts.
+
+Replace `ec2-user` with your ansible user.
+```bash
+ansible -i 18.217.113.10, all -u ec2-user -a "/usr/bin/rke2-uninstall.sh"
+```
+
+If the tarball method was used then you can attempt to use the following command:
+```bash
+ansible -i 18.217.113.10, all -u ec2-user -a "/usr/local/bin/rke2-uninstall.sh"
+```
+On rare occasions you may have to run the uninstall commands a second time.
+
+
 Author Information
 ------------------
 
