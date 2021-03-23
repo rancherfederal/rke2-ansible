@@ -1,0 +1,95 @@
+---
+# Based off of https://get.rke2.io 's do_install_tar functon
+
+# do_install_tar() {
+#     setup_tmp
+#     get_release_version
+#     info "using ${INSTALL_RKE2_VERSION:-commit $INSTALL_RKE2_COMMIT} as release"
+#     download_checksums
+#     download_tarball
+#     verify_tarball
+#     unpack_tarball
+# }
+
+
+- name: TARBALL | Get Release Version
+  block:
+    - name: Stop if the provided channel is not valid
+      fail:
+        msg: "Provided channel is not valid"
+      when: rke2_channel not in channels
+
+    - name: TARBALL | Get full version name url
+      uri:
+        url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
+        follow_redirects: all
+      register: rke2_version_url
+      delegate_to: 127.0.0.1
+
+    - name: Set full version name
+      shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+      register: rke2_full_version
+      changed_when: false
+      args:
+        executable: /bin/bash
+      delegate_to: 127.0.0.1
+
+    - name: Set dot version
+      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
+      register: rke2_version_dot
+      changed_when: false
+      args:
+        executable: /bin/bash
+      delegate_to: 127.0.0.1
+
+    - name: Set Maj.Min version
+      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+      register: rke2_version
+      changed_when: false
+      args:
+        executable: /bin/bash
+      delegate_to: 127.0.0.1
+
+    - name: Describe versions
+      debug:
+        msg:
+          - "Full version: {{ rke2_full_version.stdout }}"
+          - "dot version: {{ rke2_version_dot.stdout }}"
+          - "Maj.Min version: {{ rke2_version.stdout }}"
+
+- name: TARBALL | Check Target Mountpoint
+  command: mountpoint -q {{ tarball_dir }}
+  register: tarball_dir_stat
+  failed_when: false
+  changed_when: false
+
+- name: TARBALL | tarball_dir is a mountpoint setting dir to /opt/rke2
+  set_fact:
+    tarball_dir: "/opt/rke2"
+  when: tarball_dir_stat.rc == 0
+
+- name: TARBALL | Using /opt/rke2
+  debug: msg="Using /opt/rke2 for install directory"
+  when: tarball_dir_stat.rc == 0
+
+- name: TARBALL | Make temp dir
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: rke2-install.XXXXXXXXXX
+  register: temp_dir
+
+- name: TARBALL | Download the tarball
+  get_url:
+    url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version.stdout }}/rke2.linux-amd64.tar.gz
+    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+
+- name: TARBALL | Extract the tarball  # noqa command-instead-of-module
+  command:
+    cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
+  changed_when: false
+
+- name: TARBALL | Use the registered var and the file module to remove the temporary file
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+  when: temp_dir.path is defined
