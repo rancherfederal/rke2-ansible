@@ -31,6 +31,8 @@ The RKE2 Ansible role only supports CentOS and Red Hat, but will eventually supp
 
 Supported Operating Systems:
 ```yaml
+SLES:
+  - 15 SP2 (amd64)
 CentOS:
   - 7.8 (amd64)
   - 8.2 (amd64)
@@ -40,8 +42,6 @@ Red Hat:
 Ubuntu:
   - bionic/18.04 (amd64)
   - focal/20.04 (amd64)
-SLES:
-  - 15 SP2 (amd64)
 ```
 
 
