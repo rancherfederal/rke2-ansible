@@ -3,17 +3,20 @@
   yum:
     name: rke2-server
     state: latest  # noqa package-latest
-  when: ansible_os_family == 'RedHat'
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - got_rke2_install_ball.stat.exists == false
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   ansible.builtin.copy:
     src: /usr/local/lib/systemd/system/rke2-server.service
     dest: /etc/systemd/system/rke2-server.service
-    mode: '0755'
+    mode: '0644'
     owner: root
     group: root
     remote_src: yes
-  when: ansible_os_family != 'RedHat'
+  when:
+    - ansible_facts['os_family'] != 'RedHat'
 
 - name: Add write-kubeconfig-mode to config.yaml
   lineinfile:

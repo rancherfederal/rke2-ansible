@@ -27,7 +27,7 @@ See the [docs](https://docs.rke2.io/) more information about [RKE Government](ht
 
 Platforms
 ---------
-The RKE2 Ansible role only supports CentOS and Red Hat, but will eventually support all [RKE2 Supported Operating Systems](https://docs.rke2.io/install/requirements/#operating-systems)
+The RKE2 Ansible playbook supports all [RKE2 Supported Operating Systems](https://docs.rke2.io/install/requirements/#operating-systems)
 
 Supported Operating Systems:
 ```yaml
@@ -82,6 +82,13 @@ Start provisioning of the cluster using the following command:
 ```bash
 ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
 ```
+
+Tarball Install/Air-Gap Install
+-------------------------------
+Added the neeed files to the [tarball_install](tarball_install]/) directory.
+
+Further info can be found [here](tarball_install/README.md)
+
 
 Kubeconfig
 ----------
