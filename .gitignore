@@ -4,3 +4,8 @@
 venv/
 
 test_inventory**
+
+rke2-images.linux-amd64.tar.gz
+rke2.linux-amd64.tar.gz
+tarball_install/rke2-images.linux-amd64.tar.gz
+tarball_install/rke2.linux-amd64.tar.gz

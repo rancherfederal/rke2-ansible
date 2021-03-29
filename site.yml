@@ -15,19 +15,3 @@
   become: yes
   roles:
     - role: rke2_agent
-
-# - hosts: server[1:]
-#   become: yes
-#   serial: 1
-#   tasks:
-#     - name: Restart rke2-server
-#       ansible.builtin.systemd:
-#         name: rke2-server
-#         state: restarted
-
-# - hosts: rke2_cluster
-#   gather_facts: yes
-#   become: yes
-#   serial: 1
-#   roles:
-#     - role: hardening
