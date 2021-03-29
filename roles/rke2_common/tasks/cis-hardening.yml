@@ -1,6 +1,4 @@
 ---
-# https://docs.rke2.io/security/hardening_guide/
-
 - name: CIS MODE
   block:
     - name: Enable CIS-MODE 1.5

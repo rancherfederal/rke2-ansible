@@ -1,5 +1,5 @@
 ---
-server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+kubernetes_api_server_host: "{{ hostvars[groups['rke2_servers'][0]]['ansible_host'] | default(groups['rke2_servers'][0]) }}"
 
 rke2_config_token: ""
 

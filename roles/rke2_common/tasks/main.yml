@@ -9,7 +9,7 @@
 
 - name: Is the images tarball in the tarball_install/ diretory
   stat:
-    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
+    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
   register: got_images
   delegate_to: 127.0.0.1
   become: no
@@ -55,5 +55,6 @@
 # Setup needed directories, touch config file
 - include: config.yml
 
+- include: cis-hardening.yml
+
 - include: airgap.yml
-  when: got_images.stat.exists == true or got_rke2_install_ball.stat.exists == true

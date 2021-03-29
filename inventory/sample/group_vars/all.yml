@@ -7,9 +7,8 @@ rke2_config_token: ""
 rke2_write_kubeconfig_mode: "0644"
 rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
 tls_san: ["compute.internal"]
-server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+kubernetes_api_server_host: "{{ hostvars[groups['rke2_servers'][0]]['ansible_host'] | default(groups['rke2_servers'][0]) }}"
 cis_15_enabled: true
 rke2_selinux: true
 rke2_airgap_mode: false
 
-tarball_dir: "/usr/local"

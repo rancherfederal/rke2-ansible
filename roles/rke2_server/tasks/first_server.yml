@@ -15,8 +15,8 @@
     owner: root
     group: root
     remote_src: yes
-  when:
-    - ansible_facts['os_family'] != 'RedHat'
+  when: 
+    - ansible_facts['os_family'] != 'RedHat' or got_rke2_install_ball.stat.exists
 
 - name: Add write-kubeconfig-mode to config.yaml
   lineinfile:
@@ -67,7 +67,4 @@
       set_fact:
         rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
 
-- name: "Add RKE2 Token to dummy host called RKE2_TOKEN_HOLDER"
-  add_host:
-    name: "RKE2_TOKEN_HOLDER"
-    token: "{{ rke2_config_token }}"
+

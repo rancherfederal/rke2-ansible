@@ -1,6 +1,0 @@
----
-
-rke2_write_kubeconfig_mode: "0644"
-rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
-
-tls_san: ["compute.internal"]

@@ -4,36 +4,30 @@
   gather_facts: yes
   become: yes
   roles:
-    - role: prereqs
+    - role: rke2_common
 
-- hosts: server[0]
+- hosts: rke2_servers
   become: yes
   roles:
-    - role: first_server
+    - role: rke2_server
 
-- hosts: server[1:]
+- hosts: rke2_agents
   become: yes
   roles:
-    - role: server
+    - role: rke2_agent
 
-- hosts: agent
-  become: yes
-  roles:
-    - role: agent
-      when: groups["agent"] is defined
+# - hosts: server[1:]
+#   become: yes
+#   serial: 1
+#   tasks:
+#     - name: Restart rke2-server
+#       ansible.builtin.systemd:
+#         name: rke2-server
+#         state: restarted
 
-- hosts: server[1:]
-  become: yes
-  serial: 1
-  tasks:
-    - name: Restart rke2-server
-      ansible.builtin.systemd:
-        name: rke2-server
-        state: restarted
-
-- hosts: rke2_cluster
-  gather_facts: yes
-  become: yes
-  serial: 1
-  roles:
-    - role: hardening
+# - hosts: rke2_cluster
+#   gather_facts: yes
+#   become: yes
+#   serial: 1
+#   roles:
+#     - role: hardening
