@@ -20,7 +20,6 @@
         src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
         dest: /var/lib/rancher/rke2/agent/images/
         mode: '0644'
-  
 
 - name: Air-Gap Tarball Install
   become: yes
