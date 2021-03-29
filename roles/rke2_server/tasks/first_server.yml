@@ -15,7 +15,7 @@
     owner: root
     group: root
     remote_src: yes
-  when: 
+  when:
     - ansible_facts['os_family'] != 'RedHat' or got_rke2_install_ball.stat.exists
 
 - name: Add write-kubeconfig-mode to config.yaml
@@ -66,5 +66,3 @@
     - name: Store Master node-token
       set_fact:
         rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
-
-

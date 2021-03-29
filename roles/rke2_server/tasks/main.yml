@@ -1,3 +1,4 @@
+---
 - name: Setup initial server
   include_tasks: first_server.yml
   when: inventory_hostname in groups['rke2_servers'][0]
