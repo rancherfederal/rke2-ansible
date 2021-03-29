@@ -21,10 +21,6 @@
   delegate_to: 127.0.0.1
   become: no
 
-- name: Debug
-  ansible.builtin.debug:
-    msg: "{{got_rke2_install_ball}}"
-
 - name: RHEL/CentOS requirements
   block:
     # For use with ansible_lsb
