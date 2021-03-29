@@ -5,7 +5,7 @@
     state: latest  # noqa package-latest
   when:
     - ansible_facts['os_family'] == 'RedHat'
-    - got_rke2_install_ball.stat.exists
+    - not got_rke2_install_ball.stat.exists
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   ansible.builtin.copy:

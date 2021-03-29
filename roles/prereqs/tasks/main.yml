@@ -12,12 +12,18 @@
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
   register: got_images
   delegate_to: 127.0.0.1
+  become: no
 
 - name: Is the install tarball in the tarball_install/ diretory
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
   register: got_rke2_install_ball
   delegate_to: 127.0.0.1
+  become: no
+
+- name: Debug
+  ansible.builtin.debug:
+    msg: "{{got_rke2_install_ball}}"
 
 - name: RHEL/CentOS requirements
   block:
