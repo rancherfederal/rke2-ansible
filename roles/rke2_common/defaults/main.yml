@@ -1,2 +1,3 @@
 ---
 tarball_dir: "/usr/local"
+rke2_channel: stable

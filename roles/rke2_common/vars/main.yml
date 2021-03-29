@@ -6,12 +6,3 @@ channels:
   - v1.19
   - v1.18
 
-# config.yml configuration
-rke2_write_kubeconfig_mode: "0644"
-rke2_write_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
-rke2_selinux: true
-
-rke2_airgap_mode: false
-
-cis_15_enabled: false
-cis_16_enabled: false  #  coming soon https://github.com/rancher/rke2/issues/350

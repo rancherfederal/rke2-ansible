@@ -4,3 +4,8 @@
   service:
     state: restarted
     name: systemd-sysctl
+
+- name: restart rke2-server
+  service:
+    state: restarted
+    name: rke2-server

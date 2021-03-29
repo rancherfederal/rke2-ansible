@@ -1,5 +1,7 @@
 ---
 - name: CIS MODE
+  become: yes
+  when: rke2_config.profile | default("") | string == "cis-1.5"
   block:
     - name: Enable CIS-MODE 1.5
       ansible.builtin.lineinfile:
@@ -25,7 +27,10 @@
         src: /usr/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: yes
-      notify:
-        - restart systemd-sysctl
-  become: yes
-  when: cis_15_enabled | bool == true
+      register: sysctl_operation
+
+    - name: restart systemd-sysctl
+      service:
+        state: restarted
+        name: systemd-sysctl
+      when: sysctl_operation.changed

@@ -55,6 +55,6 @@
 # Setup needed directories, touch config file
 - include: config.yml
 
-- include: cis-hardening.yml
+# - include: cis-hardening.yml
 
 - include: airgap.yml
