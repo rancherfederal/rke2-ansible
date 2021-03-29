@@ -1,0 +1,4 @@
+---
+rke2_config:
+  selinux: true
+  profile: cis-1.5

@@ -1,0 +1,5 @@
+---
+rke2_config:
+  selinux: true
+  write-kubeconfig-mode: "0640"
+  profile: cis-1.5

@@ -3,7 +3,7 @@
 
 venv/
 
-test_inventory**
+test_inventory*
 
 rke2-images.linux-amd64.tar.gz
 rke2.linux-amd64.tar.gz
