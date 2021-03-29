@@ -1,16 +1,25 @@
 ---
 
-# This role installs the prerequisites of RKE2 on control plane
-# (aka server) nodes and on worker (aka agent)   nodes that are
-# RHEL/CentOS 7/8 based.
-# TODO: Add Ubuntu 18/20 support
-
 - name: Populate service facts
   ansible.builtin.service_facts:
 
 - name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
+
+- name: Is the images tarball in the tarball_install/ diretory
+  stat:
+    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
+  register: got_images
+  delegate_to: 127.0.0.1
+  become: no
+
+- name: Is the install tarball in the tarball_install/ diretory
+  stat:
+    path: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
+  register: got_rke2_install_ball
+  delegate_to: 127.0.0.1
+  become: no
 
 - name: RHEL/CentOS requirements
   block:
@@ -24,11 +33,15 @@
 
     # Setup Yum repos
     - include: yum.yml
-  when: ansible_os_family == 'RedHat'
+  when:
+    - ansible_os_family == 'RedHat'
+    - got_rke2_install_ball.stat.exists == false
 
 - name: Tarball install for SLES and Ubuntu
   include: tarball_install.yml
-  when: ansible_os_family != 'RedHat'
+  when:
+    - ansible_facts['os_family'] != 'RedHat'
+    - got_rke2_install_ball.stat.exists == false
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19, firewalld must be turned off.
@@ -43,4 +56,4 @@
 - include: config.yml
 
 - include: airgap.yml
-  when: rke2_airgap_mode | bool
+  when: got_images.stat.exists == true or got_rke2_install_ball.stat.exists == true

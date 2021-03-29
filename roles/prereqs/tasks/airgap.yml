@@ -1,5 +1,5 @@
 ---
-- name: Air Gap Setup
+- name: Air-Gap Images
   become: yes
   block:
     - name: Does the airgap images folder exist?
@@ -14,16 +14,37 @@
         recurse: yes
       when: not rke2_agent_images.stat.exists
 
-    - name: WGET | download rke2 images to disk (just to speed up repeated testing)
-      get_url:
-        url: "{{ rke2_image_file_url }}"
-        dest: /opt/rke2-images.linux-amd64.tar.gz
-
-    # copy the container-image tar to the airgap image. we have to do this every time because rke2 will delete the
-    # file on disk after the images are ingested into the containerd store
-    - name: COPY | airgap images to /var/lib/rancher/rke2/agent/images
+    - name: Add images to needed directory if provided
       copy:
-        src: /opt/rke2-images.linux-amd64.tar.gz
-        dest: /var/lib/rancher/rke2/agent/images/rke2-images.linux-amd64.tar.gz
+        src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
+        dest: /var/lib/rancher/rke2/agent/images/
         mode: '0644'
-  when: rke2_airgap_mode | bool
+  when: got_images.stat.exists == true
+
+- name: Air-Gap Tarball Install
+  become: yes
+  block:
+    - name: TARBALL | Make temp dir
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: rke2-install.XXXXXXXXXX
+      register: temp_dir
+
+    - name: Add tarball to needed directory if provided
+      copy:
+        src: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
+        dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+        mode: '0644'
+
+    - name: TARBALL | Extract the tarball  # noqa command-instead-of-module
+      command:
+        cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
+      changed_when: false
+
+    - name: TARBALL | Remove the temp_dir
+      ansible.builtin.file:
+        path: "{{ temp_dir.path }}"
+        state: absent
+      when: temp_dir.path is defined
+
+  when: got_rke2_install_ball.stat.exists == true
