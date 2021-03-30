@@ -1,0 +1,7 @@
+---
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  # Log changes at RequestResponse level
+  # See https://kubernetes.io/docs/tasks/debug-application-cluster/audit/
+  - level: RequestResponse

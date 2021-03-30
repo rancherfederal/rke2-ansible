@@ -1,5 +1,32 @@
----
+# Primary RKE2 server configuration parameters. See https://docs.rke2.io/install/install_options/server_config/ for more information.
+
 rke2_config:
   selinux: true
   write-kubeconfig-mode: "0640"
   profile: cis-1.5
+
+# node-label
+rke2_node_labels:
+- "ansible-provisioned-server=true"
+
+# kube-apiserver-arg
+rke2_kube_api_server_args:
+- "tls-min-version=VersionTLS12"
+
+# kube-scheduler-arg
+rke2_kube_scheduler_args:
+- "tls-min-version=VersionTLS12"
+
+# kube-controller-manager-arg
+rke2_kube_controller_manager_args:
+- "tls-min-version=VersionTLS12"
+
+# kubelet-arg
+rke2_kubelet_args:
+- "feature-gates=DynamicKubeletConfig=false"
+
+# See https://kubernetes.io/docs/tasks/debug-application-cluster/audit/
+# audit_policy_config_file_path: "{{ playbook_dir }}/sample_files/audit-policy.yaml"
+
+# See https://docs.rke2.io/install/containerd_registry_configuration/
+# registry_config_file_path: "{{ playbook_dir }}/sample_files/registries.yaml"

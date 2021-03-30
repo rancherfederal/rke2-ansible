@@ -101,12 +101,8 @@ ssh ec2-user@kubernetes_api_server_host "sudo /var/lib/rancher/rke2/bin/kubectl 
 
 Available configurations
 ------------------------
-Server Configurations
 
-| Options | Descriptions|
-|---------|-------------|
-
-These variables can be modified in the specific roles (`{role}/vars/main.yml`) or can be set in your `inventory/cluster/group_vars/all.yml`
+Variables should be set in `inventory/cluster/group_vars/rke2_agents.yml` and `inventory/cluster/group_vars/rke2_servers.yml`. See sample variables in `inventory/sample/group_vars` for reference.
 
 
 Uninstall RKE2

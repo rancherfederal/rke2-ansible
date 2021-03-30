@@ -44,7 +44,7 @@
     - got_rke2_install_ball.stat.exists == false
 
 # Disable Firewalld
-# We recommend disabling firewalld. For Kubernetes 1.19, firewalld must be turned off.
+# We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
 - name: disable FIREWALLD
   ansible.builtin.systemd:
     name: firewalld
@@ -52,9 +52,12 @@
     enabled: no
   when: ansible_facts.services["firewalld.service"] is defined
 
-# Setup needed directories, touch config file
 - include: config.yml
 
-# - include: cis-hardening.yml
+- include: add-audit-policy-config.yml
+  when: audit_policy_config_file_path != ""
+
+- include: add-registry-config.yml
+  when: registry_config_file_path != ""
 
 - include: airgap.yml
