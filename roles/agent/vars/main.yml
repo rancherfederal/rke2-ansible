@@ -1,3 +1,0 @@
----
-
-server_ip: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"

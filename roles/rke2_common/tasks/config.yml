@@ -1,0 +1,58 @@
+---
+
+- name: Create the /etc/rancher/rke2 config dir
+  ansible.builtin.file:
+    path: /etc/rancher/rke2
+    state: directory
+    recurse: yes
+
+- name: create the /etc/rancher/rke2/config.yaml file
+  ansible.builtin.file:
+    path: /etc/rancher/rke2/config.yaml
+    state: touch
+    mode: "0640"
+    owner: root
+    group: root
+
+- name: Add primary configuration items
+  copy:
+    content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
+    dest: /etc/rancher/rke2/config.yaml
+    mode: "0640"
+    owner: root
+    group: root
+
+- name: Add rke2_kube_api_server_args
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: "kube-apiserver-arg: {{ item }}"
+  with_items:
+    - "{{ rke2_kube_api_server_args | default([]) }}"
+
+- name: Add rke2_kube_scheduler_args
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: "kube-scheduler-arg: {{ item }}"
+  with_items:
+    - "{{ rke2_kube_scheduler_args | default([]) }}"
+
+- name: Add rke2_kube_controller_manager_args
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: "kube-controller-manager-arg: {{ item }}"
+  with_items:
+    - "{{ rke2_kube_controller_manager_args | default([]) }}"
+
+- name: Add rke2_kubelet_args
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: "kubelet-arg: {{ item }}"
+  with_items:
+    - "{{ rke2_kubelet_args | default([]) }}"
+
+- name: Add node-labels
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: "node-label: {{ item }}"
+  with_items:
+    - "{{ rke2_node_labels | default([]) }}"

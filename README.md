@@ -96,22 +96,13 @@ Kubeconfig
 To get access to your **Kubernetes** cluster just
 
 ```bash
-ssh ec2-user@server_ip "sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes"
+ssh ec2-user@kubernetes_api_server_host "sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes"
 ```
 
 Available configurations
 ------------------------
-Server Configurations
 
-| Options | Descriptions|
-|---------|-------------|
-| cis_15_enabled | Validate system configuration against the CIS 1.5 benchmark (default: false) |
-| rke2_channel | Channel to use for fetching the desired RKE2 version.  (default: stable, available: latest, stable, v1.19, v1.18)
-| rke2_config_token | Shared secret used to join a server or agent to a cluster. (default: Automatically created) |
-| rke2_write_kubeconfig_mode | Write kubeconfig with this mode (default: "0644" ) |
-| tls_san | Add additional hostname or IP as a Subject Alternative Name in the TLS cert ie. ["compute.internal", "branch.mil"] |
-
-These variables can be modified in the specific roles (`{role}/vars/main.yml`) or can be set in your `inventory/cluster/group_vars/all.yml`
+Variables should be set in `inventory/cluster/group_vars/rke2_agents.yml` and `inventory/cluster/group_vars/rke2_servers.yml`. See sample variables in `inventory/sample/group_vars` for reference.
 
 
 Uninstall RKE2

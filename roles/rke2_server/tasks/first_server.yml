@@ -1,0 +1,25 @@
+---
+
+- name: Install
+  include_tasks: install.yml
+
+- name: Start rke2-server
+  ansible.builtin.systemd:
+    name: rke2-server
+    state: started
+    enabled: yes
+
+- name: Add generated Token if none provided
+  block:
+    - name: Wait for node-token
+      wait_for:
+        path: /var/lib/rancher/rke2/server/node-token
+
+    - name: Read node-token from master
+      slurp:
+        src: /var/lib/rancher/rke2/server/node-token
+      register: node_token
+
+    - name: Store Master node-token
+      set_fact:
+        rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"

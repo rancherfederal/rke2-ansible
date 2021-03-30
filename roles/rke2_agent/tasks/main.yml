@@ -1,0 +1,39 @@
+---
+- name: YUM-Based | Install rke2-agent
+  yum:
+    name: rke2-agent
+    state: latest  # noqa package-latest
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - not got_rke2_install_ball.stat.exists
+
+- name: TARBALL | Moving Systemd units to /etc/systemd/system
+  ansible.builtin.copy:
+    src: /usr/local/lib/systemd/system/rke2-agent.service
+    dest: /etc/systemd/system/rke2-agent.service
+    mode: '0644'
+    owner: root
+    group: root
+    remote_src: yes
+  when: ansible_facts['os_family'] != 'RedHat' or got_rke2_install_ball.stat.exists
+
+- name: Add server url to config file
+  lineinfile:
+    dest: /etc/rancher/rke2/config.yaml
+    line: "server: https://{{ kubernetes_api_server_host }}:9345"
+
+- name: Add token to config.yaml
+  lineinfile:
+    dest: /etc/rancher/rke2/config.yaml
+    line: "token: {{ hostvars[groups['rke2_servers'][0]].rke2_config_token }}"
+
+- name: Run CIS-Hardening Tasks
+  include_role:
+    name: rke2_common
+    tasks_from: cis-hardening
+
+- name: Start rke2-agent
+  ansible.builtin.systemd:
+    name: rke2-agent
+    state: started
+    enabled: yes

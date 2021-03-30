@@ -1,0 +1,7 @@
+---
+# Possible RKE2 Channels
+channels:
+  - stable
+  - latest
+  - v1.19
+  - v1.18

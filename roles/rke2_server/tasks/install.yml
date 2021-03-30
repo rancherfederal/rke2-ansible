@@ -1,0 +1,25 @@
+---
+
+- name: YUM-Based | Install rke2-server
+  yum:
+    name: rke2-server
+    state: latest  # noqa package-latest
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - not got_rke2_install_ball.stat.exists
+
+- name: TARBALL | Moving Systemd units to /etc/systemd/system
+  ansible.builtin.copy:
+    src: /usr/local/lib/systemd/system/rke2-server.service
+    dest: /etc/systemd/system/rke2-server.service
+    mode: '0644'
+    owner: root
+    group: root
+    remote_src: yes
+  when:
+    - ansible_facts['os_family'] != 'RedHat' or got_rke2_install_ball.stat.exists
+
+- name: Run CIS-Hardening Tasks
+  include_role:
+    name: rke2_common
+    tasks_from: cis-hardening
