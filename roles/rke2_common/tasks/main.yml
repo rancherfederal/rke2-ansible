@@ -55,9 +55,9 @@
 - include: config.yml
 
 - include: add-audit-policy-config.yml
-  when: audit_policy_config_file_path != ""
+  when: audit_policy_config_file_path | length > 0
 
 - include: add-registry-config.yml
-  when: registry_config_file_path != ""
+  when: registry_config_file_path | length > 0
 
 - include: airgap.yml
