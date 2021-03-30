@@ -2,7 +2,7 @@
 
 - name: Install
   include_tasks: install.yml
-  
+
 - name: Add server url to config file
   lineinfile:
     dest: /etc/rancher/rke2/config.yaml

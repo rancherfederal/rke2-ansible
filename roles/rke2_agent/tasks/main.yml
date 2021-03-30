@@ -31,7 +31,7 @@
   include_role:
     name: rke2_common
     tasks_from: cis-hardening
-    
+
 - name: Start rke2-agent
   ansible.builtin.systemd:
     name: rke2-agent
