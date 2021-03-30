@@ -1,5 +1,5 @@
 ---
-# Primary RKE2 agent configuration parameters. 
+# Primary RKE2 agent configuration parameters.
 # See https://docs.rke2.io/install/install_options/agent_config/ for more information.
 
 rke2_config:

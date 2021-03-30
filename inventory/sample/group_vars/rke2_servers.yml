@@ -1,5 +1,5 @@
 ---
-# Primary RKE2 server configuration parameters. 
+# Primary RKE2 server configuration parameters.
 # See https://docs.rke2.io/install/install_options/server_config/ for more information.
 
 rke2_config:

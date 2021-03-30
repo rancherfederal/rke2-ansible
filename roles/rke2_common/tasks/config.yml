@@ -36,7 +36,7 @@
     line: "kube-controller-manager-arg: {{ item }}"
   with_items:
     - "{{ rke2_kube_controller_manager_args | default([]) }}"
-  
+
 - name: Add rke2_kubelet_args
   lineinfile:
     path: /etc/rancher/rke2/config.yaml
@@ -50,5 +50,3 @@
     line: "node-label: {{ item }}"
   with_items:
     - "{{ rke2_node_labels | default([]) }}"
-
-    
