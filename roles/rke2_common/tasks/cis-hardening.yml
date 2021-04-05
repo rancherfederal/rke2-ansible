@@ -40,16 +40,11 @@
       register: sysctl_operation_tarball
       when: ansible_facts['os_family'] != 'RedHat' or got_rke2_install_ball.stat.exists
 
-    - debug: msg={{ sysctl_operation_yum }}
-    - debug: msg={{ sysctl_operation_tarball }}
-
     - name: restart systemd-sysctl
       service:
         state: restarted
         name: systemd-sysctl
       when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
-
-    - pause:
 
     - name: Reboot the machine (Wait for 5 min)
       reboot:
