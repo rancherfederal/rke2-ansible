@@ -43,7 +43,7 @@
       delegate_to: 127.0.0.1
 
     - name: Set Maj.Min version
-      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
       register: rke2_version
       changed_when: false
       args:
