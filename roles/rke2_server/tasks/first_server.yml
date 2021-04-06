@@ -13,6 +13,7 @@
   include_role:
     name: rke2_common
     tasks_from: add-manifest-addons.yml
+  when: manifest_config_file_path is defined
 
 - name: Add generated Token if none provided
   block:
