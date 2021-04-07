@@ -60,4 +60,7 @@
 - include: add-registry-config.yml
   when: registry_config_file_path | length > 0
 
+- include: add-rke2-env.yml
+  when: rke2_env_file_path | length > 0
+
 - include: airgap.yml

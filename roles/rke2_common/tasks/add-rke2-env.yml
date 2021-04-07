@@ -1,0 +1,8 @@
+---
+- name: Add rke2 env file
+  copy:
+    src: "{{ rke2_env_file_path }}"
+    dest: "/etc/default/rke2-server"
+    mode: '0644'
+    owner: root
+    group: root
