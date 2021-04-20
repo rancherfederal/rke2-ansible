@@ -56,3 +56,14 @@
     line: "node-label: {{ item }}"
   with_items:
     - "{{ rke2_node_labels | default([]) }}"
+
+- name: Get specific node label key
+  set_fact:
+    specific_node_labels: "{{ hostvars[inventory_hostname] | select('match','node_label_.*') | list }}"
+
+- name: Add specific node-labels
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: "node-label: {{ item [11:] }}={{ lookup('vars', item) }}"
+  with_items:
+  - "{{ specific_node_labels | default([]) }}"
