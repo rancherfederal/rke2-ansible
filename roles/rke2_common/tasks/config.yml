@@ -66,4 +66,4 @@
     path: /etc/rancher/rke2/config.yaml
     line: "node-label: {{ item [11:] }}={{ lookup('vars', item) }}"
   with_items:
-  - "{{ specific_node_labels | default([]) }}"
+    - "{{ specific_node_labels | default([]) }}"
