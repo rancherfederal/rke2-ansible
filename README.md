@@ -64,18 +64,18 @@ cp -R inventory/sample inventory/my-cluster
 Second, edit `inventory/my-cluster/hosts.ini` to match the system information gathered above. For example:
 
 ```bash
-[server]
+[rke2_servers]
 192.16.35.12
 
-[agent]
+[rke2_agents]
 192.16.35.[10:11]
 
 [rke2_cluster:children]
-server
-agent
+rke2_servers
+rke2_agents
 ```
 
-If needed, you can also edit `inventory/my-cluster/group_vars/all.yml` to match your environment.
+If needed, you can also edit `inventory/my-cluster/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
 
 Start provisioning of the cluster using the following command:
 
