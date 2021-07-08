@@ -1,0 +1,28 @@
+# See https://docs.rke2.io/helm/
+# In this directory "manifest" you can add every kubernetes .yaml file that you will add to your rke2 cluster.
+# "kubectl apply" every file on this directory
+
+# See https://docs.rke2.io/install/network_options/#canal-options
+# You can also override pre-install helm chart like canal, nginx-ingress, etc.
+
+# Example from https://docs.rke2.io/helm/#using-the-helm-crd
+
+# apiVersion: helm.cattle.io/v1
+# kind: HelmChart
+# metadata:
+#   name: grafana
+#   namespace: kube-system
+# spec:
+#   chart: stable/grafana
+#   targetNamespace: monitoring
+#   set:
+#     adminPassword: "NotVerySafePassword"
+#   valuesContent: |-
+#     image:
+#       tag: master
+#     env:
+#       GF_EXPLORE_ENABLED: true
+#     adminUser: admin
+#     sidecar:
+#       datasources:
+#         enabled: true
