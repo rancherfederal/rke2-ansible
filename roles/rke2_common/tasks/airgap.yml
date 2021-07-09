@@ -1,7 +1,7 @@
 ---
 - name: Air-Gap Images
   become: yes
-  when: got_images_gz.stat.exists == true or got_images_zst.stat.exists == true
+  when: got_images_gz.stat.exists or got_images_zst.stat.exists
   block:
     - name: Does the airgap images folder exist?
       stat:
@@ -20,14 +20,14 @@
         src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
         dest: /var/lib/rancher/rke2/agent/images/
         mode: '0644'
-      when: got_images_gz.stat.exists == true
+      when: got_images_gz.stat.exists
 
     - name: Add images tar.zst to needed directory if provided
       copy:
         src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
         dest: /var/lib/rancher/rke2/agent/images/
         mode: '0644'
-      when: got_images_zst.stat.exists == true
+      when: got_images_zst.stat.exists
 
 - name: Air-Gap Tarball Install
   become: yes
