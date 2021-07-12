@@ -7,10 +7,17 @@
   ansible.builtin.package_facts:
     manager: auto
 
-- name: Is the images tarball in the tarball_install/ diretory
+- name: Is the images tar.gz in the tarball_install/ diretory
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
-  register: got_images
+  register: got_images_gz
+  delegate_to: 127.0.0.1
+  become: no
+
+- name: Is the images tar.zst in the tarball_install/ diretory
+  stat:
+    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
+  register: got_images_zst
   delegate_to: 127.0.0.1
   become: no
 
