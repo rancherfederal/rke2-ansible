@@ -59,6 +59,9 @@
     enabled: no
   when: ansible_facts.services["firewalld.service"] is defined
 
+- name: NetworkManager fixes
+  include: networkmanager-fix.yml
+
 - include: config.yml
 
 - include: add-audit-policy-config.yml
