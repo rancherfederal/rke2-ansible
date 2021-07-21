@@ -7,6 +7,12 @@ rke2_config:
   write-kubeconfig-mode: "0640"
   profile: cis-1.5
 
+# etcd-snapshot-schedule-cron
+# etcd_snapshot_schedule_cron: " */6 * * *"
+
+# etcd-snapshot-retention
+# etcd_snapshot_retention: 56
+
 # node-label
 rke2_node_labels:
   - "ansible-provisioned-server=true"
