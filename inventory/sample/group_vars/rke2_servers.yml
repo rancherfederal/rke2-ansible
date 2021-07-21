@@ -18,6 +18,13 @@ rke2_config:
 #  - "k8s.mydomain.intra"
 #  - "172.17.9.10"
 
+# cni:
+#  - cilium
+
+# disable:
+#  - rke2-canal
+#  - rke2-kube-proxy
+
 # node-label
 rke2_node_labels:
   - "ansible-provisioned-server=true"
