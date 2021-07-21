@@ -56,3 +56,16 @@
     line: "node-label: {{ item }}"
   with_items:
     - "{{ rke2_node_labels | default([]) }}"
+
+- name: Add etcd-snapshot-schedule-cron
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: 'etcd-snapshot-schedule-cron: "{{ etcd_snapshot_schedule_cron }}"'
+  when: etcd_snapshot_schedule_cron is defined
+
+
+- name: Add etcd-snapshot-retention
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: 'etcd-snapshot-retention: {{ etcd_snapshot_retention }}'
+  when: etcd_snapshot_retention is defined
