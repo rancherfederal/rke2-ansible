@@ -90,3 +90,33 @@
   with_items:
     - "{{ tls_san }}"
   when: tls_san is defined
+
+- name: cni line
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: 'cni:'
+  when: cni is defined
+
+- name: Add cni lines
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    insertafter: 'cni:'
+    line: "  - {{ item }}"
+  with_items:
+    - "{{ cni }}"
+  when: cni is defined
+
+- name: disable line
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: 'disable:'
+  when: disable is defined
+
+- name: Add disable lines
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    insertafter: 'disable:'
+    line: "  - {{ item }}"
+  with_items:
+    - "{{ disable }}"
+  when: disable is defined
