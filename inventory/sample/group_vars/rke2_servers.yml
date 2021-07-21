@@ -38,6 +38,9 @@ rke2_kube_controller_manager_args:
 rke2_kubelet_args:
   - "feature-gates=DynamicKubeletConfig=false"
 
+# See https://docs.rke2.io/helm/#automatically-deploying-manifests-and-helm-charts
+# manifest_config_file_path: "{{ playbook_dir }}/sample_files/manifest/"
+
 # See https://kubernetes.io/docs/tasks/debug-application-cluster/audit/
 # audit_policy_config_file_path: "{{ playbook_dir }}/sample_files/audit-policy.yaml"
 
