@@ -69,3 +69,24 @@
     path: /etc/rancher/rke2/config.yaml
     line: 'etcd-snapshot-retention: {{ etcd_snapshot_retention }}'
   when: etcd_snapshot_retention is defined
+
+- name: Add node-ip
+  lineinfile:
+    dest: /etc/rancher/rke2/config.yaml
+    line: "node-ip: {{ hostvars[inventory_hostname].node_ip }}"
+  when: hostvars[inventory_hostname].node_ip is not undefined
+
+- name: Add tls-san line
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    line: 'tls-san:'
+  when: tls_san is defined
+
+- name: Add tls-san lines
+  lineinfile:
+    path: /etc/rancher/rke2/config.yaml
+    insertafter: 'tls-san:'
+    line: "  - {{ item }}"
+  with_items:
+    - "{{ tls_san }}"
+  when: tls_san is defined
