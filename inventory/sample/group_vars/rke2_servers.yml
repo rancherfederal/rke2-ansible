@@ -7,12 +7,6 @@ rke2_config:
   write-kubeconfig-mode: "0640"
   profile: cis-1.5
 
-# etcd-snapshot-schedule-cron
-# etcd_snapshot_schedule_cron: " */6 * * *"
-
-# etcd-snapshot-retention
-# etcd_snapshot_retention: 56
-
 # tls-san
 # tls_san:
 #  - "k8s.mydomain.intra"
