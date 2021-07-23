@@ -10,3 +10,5 @@ rules:
 
 ignore: |
   .github/
+  inventory/sample/group_vars/rke2_servers.yml
+  inventory/sample/group_vars/rke2_agents.yml

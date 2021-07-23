@@ -27,18 +27,20 @@
         src: /usr/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: yes
+        mode: 0600
       register: sysctl_operation_yum
       when:
         - ansible_os_family == 'RedHat'
-        - not got_rke2_install_ball.stat.exists
+        - not rke2_binary_tarball_check.stat.exists
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
       ansible.builtin.copy:
         src: /usr/local/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: yes
+        mode: 0600
       register: sysctl_operation_tarball
-      when: ansible_facts['os_family'] != 'RedHat' or got_rke2_install_ball.stat.exists
+      when: ansible_facts['os_family'] != 'RedHat' or rke2_binary_tarball_check.stat.exists
 
     - name: restart systemd-sysctl
       service:

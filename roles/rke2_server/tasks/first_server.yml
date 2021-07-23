@@ -1,13 +1,34 @@
 ---
 
-- name: Install
-  include_tasks: install.yml
+- name: Add manifest files
+  include_role:
+    name: rke2_common
+    tasks_from: add-manifest-addons.yml
+  when: manifest_config_file_path is defined
 
 - name: Start rke2-server
   ansible.builtin.systemd:
     name: rke2-server
     state: started
     enabled: yes
+
+- name: Wait for k8s apiserver
+  wait_for:
+    host: "{{ kubernetes_api_server_host }}"
+    port: "6443"
+    state: present
+    timeout: 300
+
+- name: Wait for node to show Ready status
+  ansible.builtin.shell: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 get no {{ inventory_hostname }}
+    -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+  register: status_result
+  until: status_result.stdout.find("True") != -1
+  retries: 20
+  delay: 10
+  changed_when: false
 
 - name: Add generated Token if none provided
   block:

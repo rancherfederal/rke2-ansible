@@ -11,8 +11,21 @@
 #     unpack_tarball
 # }
 
+- name: TARBALL | Make temp dir
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: rke2-install.XXXXXXXXXX
+  register: temp_dir
 
-- name: TARBALL | Get Release Version
+- name: Send provided tarball if available
+  copy:
+    src: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
+    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+    mode: '0644'
+  when: rke2_binary_tarball_check.stat.exists
+
+- name: Download tarball
+  when: rke2_binary_tarball_check.stat.exists == false
   block:
     - name: Stop if the provided channel is not valid
       fail:
@@ -43,7 +56,9 @@
       delegate_to: 127.0.0.1
 
     - name: Set Maj.Min version
-      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+      shell: >-
+        set -o pipefail && echo {{ rke2_full_version.stdout }}
+        | awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
       register: rke2_version
       changed_when: false
       args:
@@ -57,6 +72,22 @@
           - "dot version: {{ rke2_version_dot.stdout }}"
           - "Maj.Min version: {{ rke2_version.stdout }}"
 
+    - name: TARBALL | Download the tarball
+      get_url:
+        url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version.stdout }}/rke2.linux-amd64.tar.gz
+        dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+
+- name: TARBALL | Extract the tarball  # noqa command-instead-of-module
+  command:
+    cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
+  changed_when: false
+
+- name: TARBALL | Remove the temp_dir
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+  when: temp_dir.path is defined
+
 - name: TARBALL | Check Target Mountpoint
   command: mountpoint -q {{ tarball_dir }}
   register: tarball_dir_stat
@@ -69,27 +100,6 @@
   when: tarball_dir_stat.rc == 0
 
 - name: TARBALL | Using /opt/rke2
-  debug: msg="Using /opt/rke2 for install directory"
+  debug:
+    msg: "Using /opt/rke2 for install directory"
   when: tarball_dir_stat.rc == 0
-
-- name: TARBALL | Make temp dir
-  ansible.builtin.tempfile:
-    state: directory
-    suffix: rke2-install.XXXXXXXXXX
-  register: temp_dir
-
-- name: TARBALL | Download the tarball
-  get_url:
-    url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version.stdout }}/rke2.linux-amd64.tar.gz
-    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
-
-- name: TARBALL | Extract the tarball  # noqa command-instead-of-module
-  command:
-    cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
-  changed_when: false
-
-- name: TARBALL | Use the registered var and the file module to remove the temporary file
-  ansible.builtin.file:
-    path: "{{ temp_dir.path }}"
-    state: absent
-  when: temp_dir.path is defined

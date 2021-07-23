@@ -7,48 +7,33 @@
   ansible.builtin.package_facts:
     manager: auto
 
-- name: Is the images tar.gz in the tarball_install/ diretory
-  stat:
-    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
-  register: got_images_gz
-  delegate_to: 127.0.0.1
-  become: no
+- include: images_tarball_install.yml
 
-- name: Is the images tar.zst in the tarball_install/ diretory
-  stat:
-    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
-  register: got_images_zst
-  delegate_to: 127.0.0.1
-  become: no
-
-- name: Is the install tarball in the tarball_install/ diretory
+- name: "Check for binary tarball in {{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
-  register: got_rke2_install_ball
+  register: rke2_binary_tarball_check
   delegate_to: 127.0.0.1
   become: no
 
-- name: RHEL/CentOS requirements
+- name: SLES/Ubuntu/Tarball Installation
+  include: tarball_install.yml
+  when:
+    - ansible_facts['os_family'] != 'RedHat'
+    - rke2_binary_tarball_check.stat.exists == true
+
+- name: RHEL/CentOS Installation
   block:
-    # For use with ansible_lsb
     - name: Install redhat-lsb-core
       ansible.builtin.yum: name=redhat-lsb-core state=present
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - name: Reread ansible_lsb facts
       ansible.builtin.setup: filter=ansible_lsb*
       when: "'redhat-lsb-core' not in ansible_facts.packages"
-
-    # Setup Yum repos
-    - include: yum.yml
+    - include: rpm_install.yml
   when:
     - ansible_os_family == 'RedHat'
-    - got_rke2_install_ball.stat.exists == false
-
-- name: Tarball install for SLES and Ubuntu
-  include: tarball_install.yml
-  when:
-    - ansible_facts['os_family'] != 'RedHat'
-    - got_rke2_install_ball.stat.exists == false
+    - rke2_binary_tarball_check.stat.exists == false
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
@@ -59,7 +44,15 @@
     enabled: no
   when: ansible_facts.services["firewalld.service"] is defined
 
+- include: network_manager_fix.yaml
+
 - include: config.yml
+
+- name: Add server iptables rules
+  include_tasks: iptables_rules.yml
+  when:
+    - ansible_facts.services["iptables.service"] is defined
+    - add_iptables_rules is true
 
 - include: add-audit-policy-config.yml
   when: audit_policy_config_file_path | length > 0
@@ -67,4 +60,7 @@
 - include: add-registry-config.yml
   when: registry_config_file_path | length > 0
 
-- include: airgap.yml
+- name: Run CIS-Hardening Tasks
+  include_role:
+    name: rke2_common
+    tasks_from: cis-hardening
