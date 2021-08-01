@@ -1,25 +1,13 @@
 ---
 
-- hosts: all
-  pre_tasks:
-    - name: Verify Ansible meets minimum requirements.
-      assert:
-        that: "ansible_version.full is version_compare('2.9.8', '>=')"
-        msg: >
-          "You must upgrade Ansible to at least 2.9.8 for this script to function properly."
-
-- hosts: rke2_cluster
-  gather_facts: yes
-  become: yes
-  roles:
-    - role: rke2_common
-
 - hosts: rke2_servers
   become: yes
   roles:
     - role: rke2_server
+  serial: 3
 
 - hosts: rke2_agents
   become: yes
   roles:
     - role: rke2_agent
+  serial: 3
