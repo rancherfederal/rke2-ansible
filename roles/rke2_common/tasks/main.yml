@@ -19,8 +19,7 @@
 - name: SLES/Ubuntu/Tarball Installation
   include: tarball_install.yml
   when:
-    - ansible_facts['os_family'] != 'RedHat'
-    - rke2_binary_tarball_check.stat.exists == true
+    - ansible_facts['os_family'] != 'RedHat' or rke2_binary_tarball_check.stat.exists == true
 
 - name: RHEL/CentOS Installation
   block:
