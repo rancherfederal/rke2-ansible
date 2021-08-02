@@ -1,4 +1,10 @@
 ---
+
+- name: RKE2 agent and server tasks
+  include_role:
+    name: rke2_common
+    tasks_from: main
+
 - name: Setup initial server
   include_tasks: first_server.yml
   when: inventory_hostname in groups['rke2_servers'][0]

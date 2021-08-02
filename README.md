@@ -132,3 +132,5 @@ Author Information
 [Brandon Gulla](https://github.com/bgulla)
 
 [Rancher Federal](https://rancherfederal.com/)
+
+[Mike D'Amato](https://github.com/mdamato)

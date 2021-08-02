@@ -1,18 +1,10 @@
 ---
-# Primary RKE2 agent configuration parameters.
-# See https://docs.rke2.io/install/install_options/agent_config/ for more information.
 
-rke2_config:
-  selinux: true
-  profile: cis-1.5
-
-# node-label
-rke2_node_labels:
-  - "ansible-provisioned-agent=true"
-
-# kubelet-arg
-rke2_kubelet_args:
-  - "feature-gates=DynamicKubeletConfig=false"
+# Primary RKE2 agent configuration parameters. Remove the curly braces ( {} ) and add your configuration.
+# See https://docs.rke2.io/install/install_options/linux_agent_config/ for all configuration options.
+rke2_config: {}
+  # debug: false
 
 # See https://docs.rke2.io/install/containerd_registry_configuration/
+# Add a registry configuration file by specifying the file path on the control host
 # registry_config_file_path: "{{ playbook_dir }}/sample_files/registries.yaml"
