@@ -77,17 +77,6 @@
         url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version.stdout }}/rke2.linux-amd64.tar.gz
         dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
 
-- name: TARBALL | Extract the tarball  # noqa command-instead-of-module
-  command:
-    cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
-  changed_when: false
-
-- name: TARBALL | Remove the temp_dir
-  ansible.builtin.file:
-    path: "{{ temp_dir.path }}"
-    state: absent
-  when: temp_dir.path is defined
-
 - name: TARBALL | Check Target Mountpoint
   command: mountpoint -q {{ tarball_dir }}
   register: tarball_dir_stat
@@ -103,3 +92,32 @@
   debug:
     msg: "Using /opt/rke2 for install directory"
   when: tarball_dir_stat.rc == 0
+
+- name: TARBALL | Extract the tarball  # noqa command-instead-of-module
+  command:
+    cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
+  changed_when: false
+
+- name: TARBALL | Remove the temp_dir
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+  when: temp_dir.path is defined
+
+- name: TARBALL | Moving Systemd units to /etc/systemd/system
+  ansible.builtin.copy:
+    src: /usr/local/lib/systemd/system/rke2-server.service
+    dest: /etc/systemd/system/rke2-server.service
+    mode: '0644'
+    owner: root
+    group: root
+    remote_src: yes
+
+- name: TARBALL | Moving Systemd units to /etc/systemd/system
+  ansible.builtin.copy:
+    src: /usr/local/lib/systemd/system/rke2-server.env
+    dest: /etc/systemd/system/rke2-server.env
+    mode: '0644'
+    owner: root
+    group: root
+    remote_src: yes
