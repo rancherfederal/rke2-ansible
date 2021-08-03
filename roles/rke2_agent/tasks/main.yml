@@ -17,6 +17,7 @@
 
 - name: Start rke2-agent
   ansible.builtin.systemd:
-    name: rke2-agent
+    name: rke2-agent.service
     state: started
     enabled: yes
+    daemon_reload: yes
