@@ -30,7 +30,7 @@
         mode: 0600
       register: sysctl_operation_yum
       when:
-        - ansible_os_family == 'RedHat'
+        - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
         - not rke2_binary_tarball_check.stat.exists
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
@@ -40,7 +40,7 @@
         remote_src: yes
         mode: 0600
       register: sysctl_operation_tarball
-      when: ansible_facts['os_family'] != 'RedHat' or rke2_binary_tarball_check.stat.exists
+      when: ansible_facts['os_family'] != 'RedHat' or ansible_facts['os_family'] != 'Rocky' or rke2_binary_tarball_check.stat.exists
 
     - name: restart systemd-sysctl
       service:
