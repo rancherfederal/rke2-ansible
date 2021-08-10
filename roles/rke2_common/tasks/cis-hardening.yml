@@ -40,7 +40,7 @@
         remote_src: yes
         mode: 0600
       register: sysctl_operation_tarball
-      when: ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Rocky' or rke2_binary_tarball_check.stat.exists
+      when: (ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Rocky') or rke2_binary_tarball_check.stat.exists
 
     - name: restart systemd-sysctl
       service:
