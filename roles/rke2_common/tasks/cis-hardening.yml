@@ -1,20 +1,14 @@
 ---
 - name: CIS MODE
   become: yes
-  when: rke2_config.profile | default("") | string == "cis-1.5"
+  when: rke2_config.profile | default("") | regex_search('cis-\\d+.\\d+')
   block:
-    - name: Enable CIS-MODE 1.5
-      ansible.builtin.lineinfile:
-        dest: /etc/rancher/rke2/config.yaml
-        line: "profile: cis-1.5"
 
-    # create etcd group
     - name: Create etcd group
       ansible.builtin.group:
         name: etcd
         state: present
 
-    # create etcd user
     - name: Create etcd user
       ansible.builtin.user:
         name: etcd
