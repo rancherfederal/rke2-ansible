@@ -14,20 +14,103 @@
     owner: root
     group: root
 
-- name: Set a fact
+# --node-label value                     (agent/node) Registering and starting kubelet with set of labels
+# --node-taint value                     (agent/node) Registering kubelet with set of taints
+- name: Combine rke2_config node labels and hostvar node labels
   ansible.builtin.set_fact:
-    all_node_labels: "{{ rke2_config['node-label'] | default([]) }} + {{ extra_node_labels | default([]) }}"
+    all_node_labels: "{{ rke2_config['node-label'] | default([]) }} + {{ node_labels | default([]) }}"
+
+- name: Combine rke2_config node taints and hostvar node taints
+  ansible.builtin.set_fact:
+    all_node_taints: "{{ rke2_config['node-taint'] | default([]) }} + {{ node_taints | default([]) }}"
 
 - name: Add node labels to rke2_config
   ansible.utils.update_fact:
     updates:
       - path: rke2_config["node-label"]
         value: "{{ all_node_labels }}"
+      - path: rke2_config["node-taint"]
+        value: "{{ all_node_taints }}"
   register: updated_rke2_config
 
-- name: Add primary configuration items
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+
+# --node-ip value, -i value (agent/networking) IPv4/IPv6 addresses to advertise for node
+- name: Add node-ip to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["node-ip"]
+        value: "{{ node_ip }}"
+  when: (node_ip is defined) and (node_ip|length > 0)
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: updated_rke2_config.changed
+
+# --node-name value (agent/node) Node name [$RKE2_NODE_NAME]
+- name: Add node-name to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["node-name"]
+        value: "{{ node_name }}"
+  when: (node_name is defined) and (node_name|length > 0)
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: updated_rke2_config.changed
+
+# --bind-address value (listener) rke2 bind address (default: 0.0.0.0)
+- name: Add bind-address to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["bind-address"]
+        value: "{{ bind_address }}"
+  when: (bind_address is defined) and (bind_address|length > 0)
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: updated_rke2_config.changed
+
+# --advertise-address value (listener) IPv4 address that apiserver uses
+# to advertise to members of the cluster (default: node-external-ip/node-ip)
+- name: Add advertise-address to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["advertise-address"]
+        value: "{{ advertise_address }}"
+  when: (advertise_address is defined) and (advertise_address|length > 0)
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: updated_rke2_config.changed
+
+# --node-external-ip value (agent/networking) IPv4/IPv6 external IP addresses to advertise for node
+- name: Add node-external-ip to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["node-external-ip"]
+        value: "{{ node_external_ip }}"
+  when: (node_external_ip is defined) and (node_external_ip|length > 0)
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: updated_rke2_config.changed
+
+- name: Drop in final /etc/rancher/rke2/config.yaml
   copy:
-    content: "{{ updated_rke2_config.rke2_config | to_nice_yaml(indent=0) }}"
+    content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
     dest: /etc/rancher/rke2/config.yaml
     mode: "0640"
     owner: root
