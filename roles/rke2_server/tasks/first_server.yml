@@ -4,7 +4,9 @@
   include_role:
     name: rke2_common
     tasks_from: add-manifest-addons.yml
-  when: manifest_config_file_path is defined
+  when:
+    - manifest_config_file_path is defined
+    - manifest_config_file_path | length > 0
 
 - name: Start rke2-server
   systemd:
