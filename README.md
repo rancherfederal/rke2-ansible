@@ -55,7 +55,13 @@ Server and agent nodes must have passwordless SSH access
 Usage
 -----
 
-First create a new directory based on the `sample` directory within the `inventory` directory:
+This playbook requires ansible.utils to run properly. Please see https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-a-collection-from-galaxy for more information about how to install this.
+
+```
+ansible-galaxy collection install -r requirements.yml
+```
+
+Create a new directory based on the `sample` directory within the `inventory` directory:
 
 ```bash
 cp -R inventory/sample inventory/my-cluster

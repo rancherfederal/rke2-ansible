@@ -1,6 +1,6 @@
 ---
 - name: Create the /etc/rancher/rke2 config dir
-  ansible.builtin.file:
+  file:
     path: /etc/rancher/rke2
     state: directory
     recurse: yes
