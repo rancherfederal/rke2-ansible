@@ -19,7 +19,10 @@
 - name: SLES/Ubuntu/Tarball Installation
   include: tarball_install.yml
   when:
-    - ansible_facts['os_family'] != 'RedHat' or rke2_binary_tarball_check.stat.exists == true
+    - |-
+      (ansible_facts['os_family'] != 'RedHat' and 
+      ansible_facts['os_family'] != 'Rocky') or 
+      rke2_binary_tarball_check.stat.exists == true
 
 - name: RHEL/CentOS Installation
   block:
@@ -31,7 +34,7 @@
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - include: rpm_install.yml
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
     - rke2_binary_tarball_check.stat.exists == false
 
 # Disable Firewalld
