@@ -1,13 +1,13 @@
 ---
 
 - name: Create the /etc/rancher/rke2 config dir
-  ansible.builtin.file:
+  file:
     path: /etc/rancher/rke2
     state: directory
     recurse: yes
 
 - name: create the /etc/rancher/rke2/config.yaml file
-  ansible.builtin.file:
+  file:
     path: /etc/rancher/rke2/config.yaml
     state: touch
     mode: "0640"
@@ -17,11 +17,11 @@
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
 - name: Combine rke2_config node labels and hostvar node labels
-  ansible.builtin.set_fact:
+  set_fact:
     all_node_labels: "{{ rke2_config['node-label'] | default([]) }} + {{ node_labels | default([]) }}"
 
 - name: Combine rke2_config node taints and hostvar node taints
-  ansible.builtin.set_fact:
+  set_fact:
     all_node_taints: "{{ rke2_config['node-taint'] | default([]) }} + {{ node_taints | default([]) }}"
 
 - name: Add node labels to rke2_config

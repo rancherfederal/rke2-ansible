@@ -5,19 +5,19 @@
   block:
 
     - name: Create etcd group
-      ansible.builtin.group:
+      group:
         name: etcd
         state: present
 
     - name: Create etcd user
-      ansible.builtin.user:
+      user:
         name: etcd
         comment: etcd user
         shell: /bin/nologin
         group: etcd
 
     - name: Copy systemctl file for kernel hardening for yum installs
-      ansible.builtin.copy:
+      copy:
         src: /usr/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: yes
@@ -28,7 +28,7 @@
         - not rke2_binary_tarball_check.stat.exists
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
-      ansible.builtin.copy:
+      copy:
         src: /usr/local/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: yes

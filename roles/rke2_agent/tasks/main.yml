@@ -16,7 +16,7 @@
     line: "token: {{ hostvars[groups['rke2_servers'][0]].rke2_config_token }}"
 
 - name: Start rke2-agent
-  ansible.builtin.systemd:
+  systemd:
     name: rke2-agent.service
     state: started
     enabled: yes

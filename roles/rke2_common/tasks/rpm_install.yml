@@ -45,7 +45,7 @@
 
 # Add RKE2 Common repo if it doesn't exist
 - name: add the rke2-common repo RHEL/CentOS 7
-  ansible.builtin.yum_repository:
+  yum_repository:
     name: rke2-common
     description: Rancher RKE2 Common Latest
     baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/7/noarch"
@@ -55,7 +55,7 @@
   when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '7'
 
 - name: add the rke2-common repo RHEL/CentOS 8
-  ansible.builtin.yum_repository:
+  yum_repository:
     name: rke2-common
     description: Rancher RKE2 Common Latest
     baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/8/noarch"
@@ -72,7 +72,7 @@
 
 # Add RKE2 versioned repo if it doesn't exist
 - name: Add the rke2 versioned repo CentOS/RHEL 7
-  ansible.builtin.yum_repository:
+  yum_repository:
     name: "rke2-v{{ rke2_version.stdout }}"  # noqa var-spacing
     description: Rancher RKE2 Version
     baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version.stdout }}/centos/7/x86_64"
@@ -82,7 +82,7 @@
   when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '7')
 
 - name: add the rke2 versioned repo CentOS/RHEL 8
-  ansible.builtin.yum_repository:
+  yum_repository:
     name: "rke2-v{{ rke2_version.stdout }}"  # noqa var-spacing
     description: Rancher RKE2 Version
     baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version.stdout }}/centos/8/x86_64"

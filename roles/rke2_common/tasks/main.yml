@@ -1,10 +1,10 @@
 ---
 
 - name: Populate service facts
-  ansible.builtin.service_facts:
+  service_facts:
 
 - name: Gather the package facts
-  ansible.builtin.package_facts:
+  package_facts:
     manager: auto
 
 - include: images_tarball_install.yml
@@ -24,10 +24,10 @@
 - name: RHEL/CentOS Installation
   block:
     - name: Install redhat-lsb-core
-      ansible.builtin.yum: name=redhat-lsb-core state=present
+      yum: name=redhat-lsb-core state=present
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - name: Reread ansible_lsb facts
-      ansible.builtin.setup: filter=ansible_lsb*
+      setup: filter=ansible_lsb*
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - include: rpm_install.yml
   when:
@@ -37,7 +37,7 @@
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
 - name: disable FIREWALLD
-  ansible.builtin.systemd:
+  systemd:
     name: firewalld
     state: stopped
     enabled: no
@@ -54,7 +54,15 @@
     - add_iptables_rules is true
 
 - include: add-audit-policy-config.yml
-  when: audit_policy_config_file_path | length > 0
+  when:
+    - audit_policy_config_file_path | length > 0
+    - inventory_hostname in groups['rke2_servers']
+
+- include: add-manifest-addons.yml
+  when:
+    - manifest_config_file_path is defined
+    - manifest_config_file_path | length > 0
+    - inventory_hostname in groups['rke2_servers']
 
 - include: add-registry-config.yml
   when: registry_config_file_path | length > 0

@@ -12,7 +12,7 @@
 # }
 
 - name: TARBALL | Make temp dir
-  ansible.builtin.tempfile:
+  tempfile:
     state: directory
     suffix: rke2-install.XXXXXXXXXX
   register: temp_dir
@@ -99,13 +99,13 @@
   changed_when: false
 
 - name: TARBALL | Remove the temp_dir
-  ansible.builtin.file:
+  file:
     path: "{{ temp_dir.path }}"
     state: absent
   when: temp_dir.path is defined
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  ansible.builtin.copy:
+  copy:
     src: /usr/local/lib/systemd/system/rke2-server.service
     dest: /etc/systemd/system/rke2-server.service
     mode: '0644'
@@ -116,7 +116,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  ansible.builtin.copy:
+  copy:
     src: /usr/local/lib/systemd/system/rke2-server.env
     dest: /etc/systemd/system/rke2-server.env
     mode: '0644'
@@ -127,7 +127,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  ansible.builtin.copy:
+  copy:
     src: /usr/local/lib/systemd/system/rke2-agent.service
     dest: /etc/systemd/system/rke2-agent.service
     mode: '0644'
@@ -138,7 +138,7 @@
     - inventory_hostname in groups['rke2_agents']
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  ansible.builtin.copy:
+  copy:
     src: /usr/local/lib/systemd/system/rke2-agent.env
     dest: /etc/systemd/system/rke2-agent.env
     mode: '0644'

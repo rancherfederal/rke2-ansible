@@ -77,28 +77,28 @@
     jump: ACCEPT
 
 - name: "Allow cluster-cidr forward"
-  ansible.builtin.iptables:
+  iptables:
     action: insert
     chain: FORWARD
     source: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: "Allow cluster-cidr forward"
-  ansible.builtin.iptables:
+  iptables:
     action: insert
     chain: FORWARD
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: "Allow cluster-cidr input"
-  ansible.builtin.iptables:
+  iptables:
     action: insert
     chain: INPUT
     source: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: "Allow cluster-cidr input"
-  ansible.builtin.iptables:
+  iptables:
     action: insert
     chain: INPUT
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
