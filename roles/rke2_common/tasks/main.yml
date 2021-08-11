@@ -59,7 +59,6 @@
 - include: add-audit-policy-config.yml
   when:
     - audit_policy_config_file_path | length > 0
-    - inventory_hostname in groups['rke2_servers']
 
 - include: add-registry-config.yml
   when: registry_config_file_path | length > 0
