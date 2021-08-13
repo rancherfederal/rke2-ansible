@@ -3,23 +3,8 @@ name: CI
 
 on:
   pull_request:
-    inputs:
-      region:
-        description: "AWS Region"
-        required: true
-        default: "us-gov-west-1"
   push:
-    inputs:
-      region:
-        description: "AWS Region"
-        required: true
-        default: "us-gov-west-1"
   workflow_dispatch:
-    inputs:
-      region:
-        description: "AWS Region"
-        required: true
-        default: "us-gov-west-1"
 
 jobs:
 
@@ -62,7 +47,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ github.event.inputs.region }}
+          aws-region: us-gov-west-1
 
       - name: Deploy CloudFormation Stacks
         id: rke2-ansible-cf-stack
