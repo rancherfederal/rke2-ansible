@@ -1,3 +1,4 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Template for testing rke2-ansible playbook
 
@@ -9,17 +10,15 @@ Resources:
       ImageId: ami-04e3d865
       InstanceType: t3.large
       BlockDeviceMappings:
-      - DeviceName: /dev/sda1
-        Ebs:
-          VolumeSize: 32
-          DeleteOnTermination: "true"
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
       Tags:
-      - Key: "Name"
-        Value: "rke2-ansible-automated-test-0"
-      - Key: "Owner"
-        Value: "rke2-ansible-github-actions"
-
-
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
 
   UBUNTU2004:
     Type: AWS::EC2::Instance
@@ -27,12 +26,12 @@ Resources:
       ImageId: ami-84556de5
       InstanceType: t3.large
       BlockDeviceMappings:
-      - DeviceName: /dev/sda1
-        Ebs:
-          VolumeSize: 32
-          DeleteOnTermination: "true"
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
       Tags:
-      - Key: "Name"
-        Value: "rke2-ansible-automated-test-0"
-      - Key: "Owner"
-        Value: "rke2-ansible-github-actions"
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
