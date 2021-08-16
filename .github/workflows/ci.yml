@@ -56,7 +56,7 @@ jobs:
         id: rke2-ansible-cf-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
         with:
-          name:  rke2-ansible-cf-stack-${{ GITHUB_JOB }}
+          name:  rke2-ansible-cf-stack-${GITHUB_JOB}
           template: testing/template.yml
 
       - uses: actions/github-script@0.9.0
@@ -67,6 +67,6 @@ jobs:
       - name: Delete Stack
         if: ${{ always() }}
         run: |
-          aws cloudformation delete-stack --stack-name rke2-ansible-cf-stack-${{ GITHUB_JOB }};
-          aws cloudformation wait stack-delete-complete --stack-name rke2-ansible-cf-stack-${{ GITHUB_JOB }};
+          aws cloudformation delete-stack --stack-name rke2-ansible-cf-stack-${GITHUB_JOB};
+          aws cloudformation wait stack-delete-complete --stack-name rke2-ansible-cf-stack-${GITHUB_JOB};
 
