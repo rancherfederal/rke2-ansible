@@ -35,3 +35,9 @@ Resources:
           Value: "rke2-ansible-automated-test-0"
         - Key: "Owner"
           Value: "rke2-ansible-github-actions"
+
+Outputs:
+  PublicIp:
+    Description: Server Public IP
+    Value: !GetAtt UBUNTU2004.PublicIp
+

@@ -59,6 +59,11 @@ jobs:
           name:  rke2-ansible-cf-stack
           template: testing/template.yml
 
+      - uses: actions/github-script@0.9.0
+        with:
+          script: |
+            echo "${{ steps.rke2-ansible-cd-stack.outcome }}"
+
       - name: Delete Stack
         if: ${{ always() }}
         run: |
