@@ -40,4 +40,3 @@ Outputs:
   PublicIp:
     Description: Server Public IP
     Value: !GetAtt UBUNTU2004.PublicIp
-
