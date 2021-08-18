@@ -84,19 +84,15 @@ jobs:
           pip install ansible-core "ansible-lint[yamllint]"
 
       - name: Run playbook
-      uses: dawidd6/action-ansible-playbook@v2
-      with:
-        # Required, playbook filepath
-        playbook: site.yml
-        # Optional, directory where playbooks live
-        directory: ./
-        # Optional, SSH private key
-        key: ${{secrets.SSH_PRIVATE_KEY}}
-        # Optional, SSH known hosts file content
-        known_hosts: .known_hosts
-        options: |
-          --inventory hosts.ini
-          --verbose
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: site.yml
+          directory: ./
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          known_hosts: .known_hosts
+          options: |
+            --inventory hosts.ini
+            --verbose
 
       - name: Delete Stack
         if: ${{ always() }}
