@@ -2,13 +2,127 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Template for testing rke2-ansible playbook
 
-Resources:
+Parameters:
+  EC2InstanceType:
+    Type: String
+    Default: t3.xlarge
+  EC2AMI:
+    Type: String
+    Default: 'ami-84556de5'
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: 'rke2-ansible-ci'
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
 
-  SUSE15SP2:
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: "rke2-ansible-automated-testing"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-gov-west-1c
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  InternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTable
+  SubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetA
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "Internet Group"
+      GroupDescription: "Allow SSH and K8s ports"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '9345'
+          ToPort: '9345'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '6443'
+          ToPort: '6443'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8472'
+          ToPort: '8472'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '10250'
+          ToPort: '10250'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '2379'
+          ToPort: '2380'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '30000'
+          ToPort: '32767'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Server01
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Server"
+
+  UBUNTU20Server01:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-04e3d865
-      InstanceType: t3.large
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -20,11 +134,193 @@ Resources:
         - Key: "Owner"
           Value: "rke2-ansible-github-actions"
 
-  UBUNTU2004:
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Server02
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Server"
+
+  UBUNTU20Server02:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-84556de5
-      InstanceType: t3.large
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Server03
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Server"
+
+  UBUNTU20Server03:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Agent04
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Agent"
+
+  UBUNTU20Agent04:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Agent05
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Agent"
+
+  UBUNTU20Agent05:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Agent06
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Agent"
+
+  UBUNTU20Agent06:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref UBUNTU20Agent07
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Agent"
+
+  UBUNTU20Agent07:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      SubnetId: !Ref SubnetA
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -37,6 +333,45 @@ Resources:
           Value: "rke2-ansible-github-actions"
 
 Outputs:
-  PublicIp:
-    Description: Server Public IP
-    Value: !GetAtt UBUNTU2004.PublicIp
+  UBUNTU20Server01PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Server01
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
+  UBUNTU20Server02PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Server02
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
+  UBUNTU20Server03PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Server03
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
+  UBUNTU20Agent04PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Agent04
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
+  UBUNTU20Agent05PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Agent05
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
+  UBUNTU20Agent06PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Agent06
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
+  UBUNTU20Agent07PublicIP:
+    Value:
+      Fn::GetAtt:
+        - UBUNTU20Agent07
+        - PublicIp
+    Description: Ubuntu 20.04 PublicIp Address
