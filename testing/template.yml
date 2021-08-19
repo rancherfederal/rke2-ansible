@@ -45,49 +45,49 @@ Resources:
         - Key: "NodeType"
           Value: "Server"
 
-  UBUNTU20Server02:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref EC2AMI
-      InstanceType: !Ref EC2InstanceType
-      SubnetId: !Ref SubnetA
-      KeyName: !Ref KeyName
-      SecurityGroupIds:
-        - Ref: InstanceSecurityGroup
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 32
-            DeleteOnTermination: "true"
-      Tags:
-        - Key: "Name"
-          Value: "rke2-ansible-automated-test-0"
-        - Key: "Owner"
-          Value: "rke2-ansible-github-actions"
-        - Key: "NodeType"
-          Value: "Server"
-
-  UBUNTU20Server03:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref EC2AMI
-      InstanceType: !Ref EC2InstanceType
-      SubnetId: !Ref SubnetA
-      KeyName: !Ref KeyName
-      SecurityGroupIds:
-        - Ref: InstanceSecurityGroup
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 32
-            DeleteOnTermination: "true"
-      Tags:
-        - Key: "Name"
-          Value: "rke2-ansible-automated-test-0"
-        - Key: "Owner"
-          Value: "rke2-ansible-github-actions"
-        - Key: "NodeType"
-          Value: "Server"
+#  UBUNTU20Server02:
+#    Type: AWS::EC2::Instance
+#    Properties:
+#      ImageId: !Ref EC2AMI
+#      InstanceType: !Ref EC2InstanceType
+#      SubnetId: !Ref SubnetA
+#      KeyName: !Ref KeyName
+#      SecurityGroupIds:
+#        - Ref: InstanceSecurityGroup
+#      BlockDeviceMappings:
+#        - DeviceName: /dev/sda1
+#          Ebs:
+#            VolumeSize: 32
+#            DeleteOnTermination: "true"
+#      Tags:
+#        - Key: "Name"
+#          Value: "rke2-ansible-automated-test-0"
+#        - Key: "Owner"
+#          Value: "rke2-ansible-github-actions"
+#        - Key: "NodeType"
+#          Value: "Server"
+#
+#  UBUNTU20Server03:
+#    Type: AWS::EC2::Instance
+#    Properties:
+#      ImageId: !Ref EC2AMI
+#      InstanceType: !Ref EC2InstanceType
+#      SubnetId: !Ref SubnetA
+#      KeyName: !Ref KeyName
+#      SecurityGroupIds:
+#        - Ref: InstanceSecurityGroup
+#      BlockDeviceMappings:
+#        - DeviceName: /dev/sda1
+#          Ebs:
+#            VolumeSize: 32
+#            DeleteOnTermination: "true"
+#      Tags:
+#        - Key: "Name"
+#          Value: "rke2-ansible-automated-test-0"
+#        - Key: "Owner"
+#          Value: "rke2-ansible-github-actions"
+#        - Key: "NodeType"
+#          Value: "Server"
 
   UBUNTU20Agent04:
     Type: AWS::EC2::Instance
@@ -111,112 +111,69 @@ Resources:
         - Key: "NodeType"
           Value: "Agent"
 
-  UBUNTU20Agent05:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref EC2AMI
-      InstanceType: !Ref EC2InstanceType
-      SubnetId: !Ref SubnetA
-      KeyName: !Ref KeyName
-      SecurityGroupIds:
-        - Ref: InstanceSecurityGroup
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 32
-            DeleteOnTermination: "true"
-      Tags:
-        - Key: "Name"
-          Value: "rke2-ansible-automated-test-0"
-        - Key: "Owner"
-          Value: "rke2-ansible-github-actions"
-        - Key: "NodeType"
-          Value: "Agent"
+#  UBUNTU20Agent05:
+#    Type: AWS::EC2::Instance
+#    Properties:
+#      ImageId: !Ref EC2AMI
+#      InstanceType: !Ref EC2InstanceType
+#      SubnetId: !Ref SubnetA
+#      KeyName: !Ref KeyName
+#      SecurityGroupIds:
+#        - Ref: InstanceSecurityGroup
+#      BlockDeviceMappings:
+#        - DeviceName: /dev/sda1
+#          Ebs:
+#            VolumeSize: 32
+#            DeleteOnTermination: "true"
+#      Tags:
+#        - Key: "Name"
+#          Value: "rke2-ansible-automated-test-0"
+#        - Key: "Owner"
+#          Value: "rke2-ansible-github-actions"
+#        - Key: "NodeType"
+#          Value: "Agent"
+#
+#  UBUNTU20Agent06:
+#    Type: AWS::EC2::Instance
+#    Properties:
+#      ImageId: !Ref EC2AMI
+#      InstanceType: !Ref EC2InstanceType
+#      SubnetId: !Ref SubnetA
+#      KeyName: !Ref KeyName
+#      SecurityGroupIds:
+#        - Ref: InstanceSecurityGroup
+#      BlockDeviceMappings:
+#        - DeviceName: /dev/sda1
+#          Ebs:
+#            VolumeSize: 32
+#            DeleteOnTermination: "true"
+#      Tags:
+#        - Key: "Name"
+#          Value: "rke2-ansible-automated-test-0"
+#        - Key: "Owner"
+#          Value: "rke2-ansible-github-actions"
+#        - Key: "NodeType"
+#          Value: "Agent"
+#
+#  UBUNTU20Agent07:
+#    Type: AWS::EC2::Instance
+#    Properties:
+#      ImageId: !Ref EC2AMI
+#      InstanceType: !Ref EC2InstanceType
+#      SubnetId: !Ref SubnetA
+#      KeyName: !Ref KeyName
+#      SecurityGroupIds:
+#        - Ref: InstanceSecurityGroup
+#      BlockDeviceMappings:
+#        - DeviceName: /dev/sda1
+#          Ebs:
+#            VolumeSize: 32
+#            DeleteOnTermination: "true"
+#      Tags:
+#        - Key: "Name"
+#          Value: "rke2-ansible-automated-test-0"
+#        - Key: "Owner"
+#          Value: "rke2-ansible-github-actions"
+#        - Key: "NodeType"
+#          Value: "Agent"
 
-  UBUNTU20Agent06:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref EC2AMI
-      InstanceType: !Ref EC2InstanceType
-      SubnetId: !Ref SubnetA
-      KeyName: !Ref KeyName
-      SecurityGroupIds:
-        - Ref: InstanceSecurityGroup
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 32
-            DeleteOnTermination: "true"
-      Tags:
-        - Key: "Name"
-          Value: "rke2-ansible-automated-test-0"
-        - Key: "Owner"
-          Value: "rke2-ansible-github-actions"
-        - Key: "NodeType"
-          Value: "Agent"
-
-  UBUNTU20Agent07:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref EC2AMI
-      InstanceType: !Ref EC2InstanceType
-      SubnetId: !Ref SubnetA
-      KeyName: !Ref KeyName
-      SecurityGroupIds:
-        - Ref: InstanceSecurityGroup
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 32
-            DeleteOnTermination: "true"
-      Tags:
-        - Key: "Name"
-          Value: "rke2-ansible-automated-test-0"
-        - Key: "Owner"
-          Value: "rke2-ansible-github-actions"
-        - Key: "NodeType"
-          Value: "Agent"
-
-Outputs:
-  UBUNTU20Server01PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Server01
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
-  UBUNTU20Server02PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Server02
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
-  UBUNTU20Server03PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Server03
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
-  UBUNTU20Agent04PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Agent04
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
-  UBUNTU20Agent05PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Agent05
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
-  UBUNTU20Agent06PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Agent06
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
-  UBUNTU20Agent07PublicIP:
-    Value:
-      Fn::GetAtt:
-        - UBUNTU20Agent07
-        - PublicIp
-    Description: Ubuntu 20.04 PublicIp Address
