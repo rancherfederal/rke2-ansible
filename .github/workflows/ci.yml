@@ -36,7 +36,7 @@ jobs:
       - name: Run ansible-lint.
         run: ansible-lint
 
-  build-test:
+  ubuntu20-test:
     name: Initial build test
     runs-on: ubuntu-latest
 
@@ -58,6 +58,11 @@ jobs:
         with:
           name:  rke2-ansible-cf-stack
           template: testing/template.yml
+
+      - name: Debug deployment
+        if: ${{ always() }}
+        run: |
+          aws cloudformation describe-stack-events --stack-name rke2-ansible-cf-stack
 
       - name: Create inventory hosts.ini
         run: |
