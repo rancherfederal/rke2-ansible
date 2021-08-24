@@ -21,7 +21,9 @@ jobs:
           python-version: '3.x'
 
       - name: Install test dependencies.
-        run: pip3 install yamllint ansible-lint ansible
+        run: |
+          pip3 install yamllint ansible-lint ansible
+          ansible-galaxy collection install -r requirements.yml
 
       - name: Version check
         run: |
