@@ -37,7 +37,7 @@
         url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
         follow_redirects: all
       register: rke2_version_url
-      delegate_to: 127.0.0.1
+      run_once: yes
 
     - name: Set full version name
       shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
@@ -45,7 +45,7 @@
       changed_when: false
       args:
         executable: /bin/bash
-      delegate_to: 127.0.0.1
+      run_once: yes
 
     - name: Set dot version
       shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
@@ -53,7 +53,7 @@
       changed_when: false
       args:
         executable: /bin/bash
-      delegate_to: 127.0.0.1
+      run_once: yes
 
     - name: Set Maj.Min version
       shell: >-
@@ -63,7 +63,7 @@
       changed_when: false
       args:
         executable: /bin/bash
-      delegate_to: 127.0.0.1
+      run_once: yes
 
     - name: Describe versions
       debug:
