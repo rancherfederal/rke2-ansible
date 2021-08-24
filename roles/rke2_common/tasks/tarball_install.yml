@@ -93,6 +93,11 @@
     msg: "Using /opt/rke2 for install directory"
   when: tarball_dir_stat.rc == 0
 
+- name: TARBALL | Install tar package
+  package:
+    name: tar
+    state: present
+
 - name: TARBALL | Extract the tarball  # noqa command-instead-of-module
   command:
     cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
