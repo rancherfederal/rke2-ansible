@@ -54,8 +54,10 @@ jobs:
 
       - name: Deploy CloudFormation Stacks
         id: deploy_stack
-        run: |
-          aws cloudformation deploy --template-file ./testing/template.yml --stack-name rke2-ansible-cf-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.4
+        with:
+          name:  rke2-ansible-cf-stack
+          template: testing/template.yml
 
       - name: Debug deployment
         if: ${{ always() }}
@@ -69,6 +71,7 @@ jobs:
           echo `aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text` >> hosts.ini
           echo "[rke2_agents]" > hosts.ini
           echo `aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text` >> hosts.ini
+          cat hosts.ini
 
       - name: Set up Python
         id: setup_python
