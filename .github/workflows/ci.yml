@@ -37,12 +37,10 @@ jobs:
       - name: Run ansible-lint.
         run: ansible-lint
 
-  build-test:
-    name: Initial build test
+  cfn-deployment:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out the codebase.
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Configure AWS credentials
@@ -51,14 +49,14 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-gov-west-1
+          aws-region: "us-gov-west-1"
 
       - name: Deploy CloudFormation Stacks
         id: rke2-ansible-cf-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
         with:
           name:  rke2-ansible-cf-stack
-          template: testing/old-template.yml
+          template: testing/template.yml
 
       - name: Delete Stack
         if: ${{ always() }}
