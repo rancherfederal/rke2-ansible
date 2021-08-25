@@ -21,7 +21,6 @@ Resources:
         SubnetId: subnet-356f8c5c
         GroupSet:
         - sg-080e91dcf485a8c82
-      IamInstanceProfile: "K8sUnrestrictedCloudProviderRole"
       Tags:
       - Key: "Name"
         Value: "rke2-ansible-automated-test-0"
@@ -45,7 +44,6 @@ Resources:
         SubnetId: subnet-356f8c5c
         GroupSet:
         - sg-080e91dcf485a8c82
-      IamInstanceProfile: "K8sUnrestrictedCloudProviderRole"
       Tags:
       - Key: "Name"
         Value: "rke2-ansible-automated-test-1"
@@ -69,7 +67,6 @@ Resources:
         SubnetId: subnet-356f8c5c
         GroupSet:
         - sg-080e91dcf485a8c82
-      IamInstanceProfile: "K8sUnrestrictedCloudProviderRole"
       Tags:
       - Key: "Name"
         Value: "rke2-ansible-automated-test-2"
@@ -93,7 +90,6 @@ Resources:
         SubnetId: subnet-356f8c5c
         GroupSet:
         - sg-080e91dcf485a8c82
-      IamInstanceProfile: "K8sUnrestrictedCloudProviderRole"
       Tags:
       - Key: "Name"
         Value: "rke2-ansible-automated-test-3"
@@ -117,7 +113,6 @@ Resources:
         SubnetId: subnet-356f8c5c
         GroupSet:
         - sg-080e91dcf485a8c82
-      IamInstanceProfile: "K8sUnrestrictedCloudProviderRole"
       Tags:
       - Key: "Name"
         Value: "rke2-ansible-automated-test-4"
