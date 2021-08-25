@@ -6,6 +6,7 @@ on:
   push:
   workflow_dispatch:
 
+
 jobs:
 
   lint-test:
@@ -36,7 +37,7 @@ jobs:
       - name: Run ansible-lint.
         run: ansible-lint
 
-  ubuntu20-test:
+  build-test:
     name: Initial build test
     runs-on: ubuntu-latest
 
@@ -53,53 +54,16 @@ jobs:
           aws-region: us-gov-west-1
 
       - name: Deploy CloudFormation Stacks
-        id: deploy_stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.4
+        id: rke2-ansible-cf-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
         with:
           name:  rke2-ansible-cf-stack
           template: testing/old-template.yml
-
-      - name: Debug deployment
-        if: ${{ always() }}
-        run: |
-          aws cloudformation describe-stack-events --stack-name rke2-ansible-cf-stack
-
-      - name: Create inventory hosts.ini
-        run: |
-          touch hosts.ini
-          echo "[rke2_servers]" > hosts.ini
-          echo `aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text` >> hosts.ini
-          echo "[rke2_agents]" > hosts.ini
-          echo `aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text` >> hosts.ini
-
-      - name: Set up Python
-        id: setup_python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install ansible-core "ansible-lint[yamllint]"
-
-      - name: Prep known hosts
-        run: for node in $(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text); do ssh-keyscan -H $node >> .known_hosts
-
-      - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: site.yml
-          directory: ./
-          key: ${{secrets.SSH_PRIVATE_KEY}}
-          known_hosts: .known_hosts
-          options: |
-            --inventory hosts.ini
-            --verbose
 
       - name: Delete Stack
         if: ${{ always() }}
         run: |
           aws cloudformation delete-stack --stack-name rke2-ansible-cf-stack
           aws cloudformation wait stack-delete-complete --stack-name rke2-ansible-cf-stack;
+
 

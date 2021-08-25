@@ -4,6 +4,22 @@ Description: Template for testing rke2-ansible playbook
 
 Resources:
 
+  SUSE15SP2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-04e3d865
+      InstanceType: t3.large
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 32
+            DeleteOnTermination: "true"
+      Tags:
+        - Key: "Name"
+          Value: "rke2-ansible-automated-test-0"
+        - Key: "Owner"
+          Value: "rke2-ansible-github-actions"
+
   UBUNTU2004:
     Type: AWS::EC2::Instance
     Properties:
@@ -19,4 +35,9 @@ Resources:
           Value: "rke2-ansible-automated-test-0"
         - Key: "Owner"
           Value: "rke2-ansible-github-actions"
+
+Outputs:
+  PublicIp:
+    Description: Server Public IP
+    Value: !GetAtt UBUNTU2004.PublicIp
 
