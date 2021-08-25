@@ -4,7 +4,6 @@ name: Deploy CloudFormation Stacks
 on:
   pull_request:
   push:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
       region:
@@ -30,7 +29,7 @@ jobs:
 
       - name: Deploy CloudFormation Stacks
         id: rke2-ansible-cf-stack
-        uses: aws-actions/aws-cloudformation-github-deploy
+        uses: aws-actions/aws-cloudformation-github-deploy@1.0.3
         with:
           name:  rke2-ansible-cf-stack
           template: testing/mike-template.yml
