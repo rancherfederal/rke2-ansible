@@ -90,7 +90,7 @@ jobs:
           pip install ansible-core "ansible-lint[yamllint]"
 
       - name: Prep known hosts
-        run: for node in $(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text); do ssh-keyscan -H $node >> .known_hosts ; done
+        run: for node in $(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" --query "Reservations[*].Instances[*].PublicIpAddress" --output text); do ssh-keyscan -H $node >> .known_hosts ; done
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
