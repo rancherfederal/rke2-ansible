@@ -19,6 +19,8 @@ Resources:
           Value: "rke2-ansible-automated-test-0"
         - Key: "Owner"
           Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Server"
 
   UBUNTU2004:
     Type: AWS::EC2::Instance
@@ -35,6 +37,8 @@ Resources:
           Value: "rke2-ansible-automated-test-0"
         - Key: "Owner"
           Value: "rke2-ansible-github-actions"
+        - Key: "NodeType"
+          Value: "Agent"
 
 Outputs:
   PublicIp:

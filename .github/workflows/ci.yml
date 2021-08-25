@@ -57,7 +57,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1.0.4
         with:
           name:  rke2-ansible-cf-stack
-          template: testing/template.yml
+          template: testing/old-template.yml
 
       - name: Debug deployment
         if: ${{ always() }}
