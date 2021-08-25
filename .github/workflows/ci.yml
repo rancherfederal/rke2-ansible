@@ -71,6 +71,11 @@ jobs:
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
           echo "[rke2_agents]" >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo >> hosts.ini
+          echo >> hosts.ini
+          echo "[all:vars]"
+          echo "ansible_ssh_user=ubuntu"
+          echo "ansible_ssh_private_key_file=${{secrets.SSH_PRIVATE_KEY}}"
           cat hosts.ini
 
       - name: Set up Python
