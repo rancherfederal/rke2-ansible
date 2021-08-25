@@ -40,5 +40,6 @@ jobs:
           aws cloudformation deploy --template-file ./testing/template.yml --stack-name rke2-ansible-cf-stack --tags owner=rke2-ansible-github-actions
 
       - name: describe-stack-events
+        if: ${{ always() }}
         run: |
           aws cloudformation describe-stack-events --stack-name rke2-ansible-cf-stack
