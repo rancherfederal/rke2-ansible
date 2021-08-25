@@ -32,9 +32,3 @@ jobs:
         with:
           name:  rke2-ansible-cf-stack
           template: testing/mike-template.yml
-
-      - name: Delete Stack
-        if: ${{ always() }}
-        run: |
-          aws cloudformation delete-stack --stack-name rke2-ansible-cf-stack;
-          aws cloudformation wait stack-delete-complete --stack-name rke2-ansible-cf-stack;
