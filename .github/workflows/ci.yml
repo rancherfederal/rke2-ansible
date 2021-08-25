@@ -54,10 +54,10 @@ jobs:
 
       - name: Deploy CloudFormation Stacks
         id: deploy_stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.4
+        uses: aws-actions/aws-cloudformation-github-deploy@master
         with:
           name:  rke2-ansible-cf-stack
-          template: testing/old-template.yml
+          template: testing/template.yml
 
       - name: Debug deployment
         if: ${{ always() }}
