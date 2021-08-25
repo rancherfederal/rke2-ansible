@@ -29,7 +29,7 @@ jobs:
 
       - name: Deploy CloudFormation Stacks
         id: rke2-ansible-cf-stack
-        uses: aws-actions/aws-cloudformation-github-deploy@1.0.3
+        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.3
         with:
           name:  rke2-ansible-cf-stack
           template: testing/mike-template.yml
