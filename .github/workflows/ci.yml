@@ -93,16 +93,8 @@ jobs:
         run: for node in $(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" --query "Reservations[*].Instances[*].PublicIpAddress" --output text); do ssh-keyscan -H $node >> .known_hosts ; done
 
       - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: site.yml
-          directory: ./
-          key: ${{secrets.SSH_PRIVATE_KEY}}
-          known_hosts: .known_hosts
-          options: |
-            --inventory hosts.ini
-            --verbose
-
+        run: |
+          ansible-playbook -i hosts.ini --verbose --key-file ${{secrets.SSH_PRIVATE_KEY}} --ssh-common-args=-o UserKnownHostsFile=.known_hosts
       - name: Delete Stack
         if: ${{ always() }}
         run: |
