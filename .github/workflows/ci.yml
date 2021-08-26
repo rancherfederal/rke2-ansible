@@ -78,7 +78,7 @@ jobs:
       - name: Terraform Apply
         run: |
           cd testing/
-          terraform apply -auto-approve
+          terraform apply  -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
 
       - run: 'echo "$SSH_KEY" > .key'
         shell: bash
@@ -114,7 +114,7 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key site.yml
 
       - name: Delete Stack
         if: ${{ always() }}
