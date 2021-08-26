@@ -114,7 +114,7 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key site.yml
 
       - name: Delete Stack
         if: ${{ always() }}
