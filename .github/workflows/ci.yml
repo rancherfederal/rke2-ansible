@@ -68,7 +68,7 @@ jobs:
         id: plan
         run: |
           cd testing/
-          terraform plan -no-color
+          terraform plan  -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -no-color
         continue-on-error: true
 
       - name: Terraform Plan Status
@@ -114,7 +114,7 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" site.yml
 
       - name: Delete Stack
         if: ${{ always() }}

@@ -28,7 +28,7 @@ resource "aws_instance" "control_node" {
     StopAtNight = "True"
     Owner       = var.tf_user
     NodeType    = "Server"
-    github_run  = "${env.GITHUB_RUN_ID}"
+    github_run  = "${var.GITHUB_RUN_ID}"
   }
 }
 
@@ -54,6 +54,6 @@ resource "aws_instance" "worker_node" {
     StopAtNight = "True"
     Owner       = var.tf_user
     NodeType    = "Agent"
-    github_run  = "${env.GITHUB_RUN_ID}"
+    github_run  = "${var.GITHUB_RUN_ID}"
   }
 }

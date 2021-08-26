@@ -69,3 +69,5 @@ variable "ansible_user" {
   description = "Username used by Ansible to run remote configuration"
   default     = "ubuntu"
 }
+
+variable "GITHUB_RUN_ID" {}
