@@ -73,3 +73,4 @@ variable "ansible_user" {
 variable "GITHUB_RUN_ID" {
   type = string
   description = "A unique number for each run within a repository"
+}
