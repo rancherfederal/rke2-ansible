@@ -105,12 +105,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible-core "ansible-lint[yamllint]"
 
-      - name: Prep known hosts
-        run: for node in $(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" --query "Reservations[*].Instances[*].PublicIpAddress" --output text); do ssh-keyscan -H $node >> .known_hosts ; done
-
       - name: Run playbook
         run: |
-          ansible-playbook -i hosts.ini --verbose --key-file ${{secrets.SSH_PRIVATE_KEY}} --ssh-common-args=-o UserKnownHostsFile=.known_hosts
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --key-file ${{secrets.SSH_PRIVATE_KEY}}
+
       - name: Delete Stack
         if: ${{ always() }}
         run: |
