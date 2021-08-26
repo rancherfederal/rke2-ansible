@@ -54,15 +54,21 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init -from-module=./testing/
+        run: |
+          cd testing/
+          terraform init -from-module=./testing/
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
+        run: |
+          cd testing/
+          terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
+        run: |
+          cd testing/
+          terraform plan -no-color
         continue-on-error: true
 
       - name: Terraform Plan Status
@@ -70,7 +76,9 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: |
+          cd testing/
+          terraform apply -auto-approve
 
       - name: Create inventory hosts.ini
         run: |
@@ -105,4 +113,6 @@ jobs:
           ansible-playbook -i hosts.ini --verbose --key-file ${{secrets.SSH_PRIVATE_KEY}} --ssh-common-args=-o UserKnownHostsFile=.known_hosts
       - name: Delete Stack
         if: ${{ always() }}
-        run: terraform destory -auto-approve
+        run: |
+          cd testing/
+          terraform destory -auto-approve
