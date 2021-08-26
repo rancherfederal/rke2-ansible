@@ -99,7 +99,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip3 install ansible
+          pip3 install ansible testinfra
 
       - name: Ansible Version check
         run: ansible --version
@@ -127,6 +127,10 @@ jobs:
       - name: Run Ansible Tests
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key testing.yml
+
+      - name: Run Python Tests
+        run: |
+          py.test --hosts=all --ansible-inventory=inventory/my-cluster/hosts.ini --connection=ansible --sudo testing/basic_tests.py
 
       - name: Delete Stack
         if: ${{ always() }}

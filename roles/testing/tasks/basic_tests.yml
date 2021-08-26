@@ -17,4 +17,3 @@
     that:
       - test_rke2_config_file.stat.exists
       - not test_is_selinux_true.failed
-
