@@ -124,6 +124,10 @@ jobs:
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key site.yml
 
+      - name: Run Ansible Tests
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key testing.yml
+
       - name: Delete Stack
         if: ${{ always() }}
         run: |
