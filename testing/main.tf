@@ -8,7 +8,7 @@ provider "aws" {
 ### SECURITY GROUPS
 ###
 resource "aws_security_group" "allow-all" {
-  name   = "${var.tf_user}-allow-all"
+  name   = "${var.tf_user}-allow-all-${var.GITHUB_RUN_ID}"
   vpc_id = "vpc-07402b459d3b18976"
 
   ingress {
@@ -52,7 +52,7 @@ resource "aws_instance" "control_node" {
   vpc_security_group_ids = [aws_security_group.allow-all.id]
 
   tags = {
-    Name        = "rke2_ansible-testing-server-${var.os}-${count.index}"
+    Name        = "rke2_ansible-testing-server-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
     StopAtNight = "True"
     Owner       = var.tf_user
     NodeType    = "Server"
@@ -90,7 +90,7 @@ resource "aws_instance" "worker_node" {
   }
 
   tags = {
-    Name        = "rke2_ansible-testing-agent-${var.os}-${count.index}"
+    Name        = "rke2_ansible-testing-agent-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
     StopAtNight = "True"
     Owner       = var.tf_user
     NodeType    = "Agent"
