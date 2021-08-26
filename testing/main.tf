@@ -62,7 +62,6 @@ resource "aws_instance" "control_node" {
   provisioner "remote-exec" {
     connection {
       host        = coalesce(self.public_ip, self.private_ip)
-      agent       = true
       type        = "ssh"
       user        = "ubuntu"
       private_key = file(pathexpand(".key"))
@@ -101,7 +100,6 @@ resource "aws_instance" "worker_node" {
   provisioner "remote-exec" {
     connection {
       host        = coalesce(self.public_ip, self.private_ip)
-      agent       = true
       type        = "ssh"
       user        = "ubuntu"
       private_key = file(pathexpand(".key"))
