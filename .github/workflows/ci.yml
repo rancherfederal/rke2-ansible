@@ -58,6 +58,11 @@ jobs:
           cd testing/
           terraform init
 
+      - run: 'echo "$SSH_KEY" > .key'
+        shell: bash
+        env:
+          SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+
       - name: Terraform Validate
         id: validate
         run: |
@@ -79,11 +84,6 @@ jobs:
         run: |
           cd testing/
           terraform apply  -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
-
-      - run: 'echo "$SSH_KEY" > .key'
-        shell: bash
-        env:
-          SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
 
       - name: Set up Python
         id: setup_python
