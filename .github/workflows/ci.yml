@@ -115,4 +115,4 @@ jobs:
         if: ${{ always() }}
         run: |
           cd testing/
-          terraform destory -auto-approve
+          terraform destroy -auto-approve
