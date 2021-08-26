@@ -80,19 +80,10 @@ jobs:
           cd testing/
           terraform apply -auto-approve
 
-      - name: Create inventory hosts.ini
-        run: |
-          touch hosts.ini
-          echo "[rke2_servers]" > hosts.ini
-          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
-          echo "[rke2_agents]" >> hosts.ini
-          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
-          echo >> hosts.ini
-          echo >> hosts.ini
-          echo "[all:vars]"
-          echo "ansible_ssh_user=ubuntu"
-          echo "ansible_ssh_private_key_file=${{secrets.SSH_PRIVATE_KEY}}"
-          cat hosts.ini
+      - run: 'echo "$SSH_KEY" > .key'
+        shell: bash
+        env:
+          SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
 
       - name: Set up Python
         id: setup_python
@@ -105,9 +96,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible-core "ansible-lint[yamllint]"
 
+      - name: Create inventory hosts.ini
+        run: |
+          touch hosts.ini
+          echo "[rke2_servers]" > hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[rke2_agents]" >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo >> hosts.ini
+          echo >> hosts.ini
+          echo "[all:vars]"
+          echo "ansible_ssh_user=ubuntu"
+          echo "ansible_ssh_private_key_file=.key"
+
+      - name: Check hosts.ini
+        run: cat hosts.ini
+
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --key-file ${{secrets.SSH_PRIVATE_KEY}}
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --key-file .key
 
       - name: Delete Stack
         if: ${{ always() }}
