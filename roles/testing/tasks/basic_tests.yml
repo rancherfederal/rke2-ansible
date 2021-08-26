@@ -12,7 +12,7 @@
   check_mode: yes
   register: test_is_selinux_true
 
-- name:
+- name: Assertions
   assert:
     that:
       - test_rke2_config_file.stat.exists

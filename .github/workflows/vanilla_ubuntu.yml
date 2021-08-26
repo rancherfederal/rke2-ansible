@@ -39,6 +39,7 @@ jobs:
   ubuntu20-test:
     name: Initial build test
     runs-on: ubuntu-latest
+    needs: ['lint-test']
 
     steps:
       - name: Check out the codebase.
@@ -130,7 +131,7 @@ jobs:
 
       - name: Run Python Tests
         run: |
-          py.test --hosts=all --ansible-inventory=inventory/my-cluster/hosts.ini --connection=ansible --sudo testing/basic_tests.py
+          py.test --hosts=all --ansible-inventory=inventory/ubuntu20/hosts.ini --connection=ansible --sudo testing/basic_tests.py
 
       - name: Delete Stack
         if: ${{ always() }}
