@@ -63,6 +63,9 @@ jobs:
         env:
           SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
 
+      - name: Terraform private key
+        run: cp .key testing/.key
+
       - name: Terraform Validate
         id: validate
         run: |
