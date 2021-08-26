@@ -63,6 +63,8 @@ jobs:
         env:
           SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
 
+      - run: chmod 400 .key
+
       - name: Terraform private key
         run: cp .key testing/.key
 
@@ -119,10 +121,6 @@ jobs:
         run: |
           cp -R inventory/sample inventory/ubuntu20
           cp hosts.ini inventory/ubuntu20/hosts.ini
-
-      - name: Sleep a bit
-        run: |
-          sleep 3m
 
       - name: Run playbook
         run: |
