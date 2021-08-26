@@ -112,9 +112,14 @@ jobs:
       - name: Check hosts.ini
         run: cat hosts.ini
 
+      - name: Prep inventory
+        run: |
+          cp -R inventory/sample inventory/ubuntu20
+          cp hosts.ini inventory/ubuntu20/hosts.ini
+
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts.ini --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini --verbose --private-key .key site.yml
 
       - name: Delete Stack
         if: ${{ always() }}
