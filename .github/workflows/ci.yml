@@ -52,17 +52,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-gov-west-1
 
-      - name: Deploy CloudFormation Stacks
-        id: deploy_stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1.0.4
-        with:
-          name:  rke2-ansible-cf-stack
-          template: testing/template.yml
+      - name: Terraform Init
+        id: init
+        run: terraform init -from-module=./testing/
 
-      - name: Debug deployment
-        if: ${{ always() }}
-        run: |
-          aws cloudformation describe-stack-events --stack-name rke2-ansible-cf-stack
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
 
       - name: Create inventory hosts.ini
         run: |
@@ -97,7 +105,4 @@ jobs:
           ansible-playbook -i hosts.ini --verbose --key-file ${{secrets.SSH_PRIVATE_KEY}} --ssh-common-args=-o UserKnownHostsFile=.known_hosts
       - name: Delete Stack
         if: ${{ always() }}
-        run: |
-          aws cloudformation delete-stack --stack-name rke2-ansible-cf-stack
-          aws cloudformation wait stack-delete-complete --stack-name rke2-ansible-cf-stack;
-
+        run: terraform destory -auto-approve
