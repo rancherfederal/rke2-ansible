@@ -1,5 +1,5 @@
 ---
-name: CI
+name: Vanilla Ubuntu
 
 on:
   pull_request:
