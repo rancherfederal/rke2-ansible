@@ -68,7 +68,7 @@ jobs:
         id: plan
         run: |
           cd testing/
-          terraform plan  -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -no-color
+          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -no-color
         continue-on-error: true
 
       - name: Terraform Plan Status
@@ -129,4 +129,4 @@ jobs:
         if: ${{ always() }}
         run: |
           cd testing/
-          terraform destroy -auto-approve
+          terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve

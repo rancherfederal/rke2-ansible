@@ -4,6 +4,34 @@ provider "aws" {
   skip_requesting_account_id  = true
 }
 
+###
+### SECURITY GROUPS
+###
+resource "aws_security_group" "allow-all" {
+  name   = "${var.tf_user}-allow-all"
+  vpc_id = "vpc-07402b459d3b18976"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name       = "allow-all"
+    Owner      = var.tf_user
+    github_run = "${var.GITHUB_RUN_ID}"
+  }
+}
 
 ###
 ### EC2 INSTANCES
@@ -21,7 +49,7 @@ resource "aws_instance" "control_node" {
     volume_size = 30
   }
 
-  vpc_security_group_ids = ["sg-03400dcf068290142"]
+  vpc_security_group_ids = [aws_security_group.allow-all.id]
 
   tags = {
     Name        = "rke2_ansible-testing-server-${var.os}-${count.index}"
@@ -29,6 +57,12 @@ resource "aws_instance" "control_node" {
     Owner       = var.tf_user
     NodeType    = "Server"
     github_run  = "${var.GITHUB_RUN_ID}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "uptime",
+    ]
   }
 }
 
@@ -42,7 +76,7 @@ resource "aws_instance" "worker_node" {
   key_name                    = "rke2-ansible-ci"
   associate_public_ip_address = true
 
-  vpc_security_group_ids = ["sg-03400dcf068290142"]
+  vpc_security_group_ids = [aws_security_group.allow-all.id]
 
   root_block_device {
     volume_type = "standard"
@@ -55,5 +89,11 @@ resource "aws_instance" "worker_node" {
     Owner       = var.tf_user
     NodeType    = "Agent"
     github_run  = "${var.GITHUB_RUN_ID}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "uptime",
+    ]
   }
 }
