@@ -56,7 +56,7 @@ jobs:
         id: init
         run: |
           cd testing/
-          terraform init -from-module=./testing/
+          terraform init
 
       - name: Terraform Validate
         id: validate
