@@ -116,6 +116,7 @@ jobs:
           echo "" >> hosts.ini
           echo "[all:vars]" >> hosts.ini
           echo "ansible_ssh_user=ubuntu" >> hosts.ini
+          echo "ansible_user=ubuntu" >> hosts.ini
 
       - name: Check hosts.ini
         run: cat hosts.ini
@@ -135,7 +136,7 @@ jobs:
 
       - name: Run Python Tests
         run: |
-          py.test --hosts=all --ansible-inventory=inventory/ubuntu20/hosts.ini --connection=ansible --sudo testing/basic_tests.py
+          pytest --hosts=all --ansible-inventory=inventory/ubuntu20/hosts.ini --connection=ansible --sudo testing/basic_tests.py
 
       - name: Delete Stack
         if: ${{ always() }}
