@@ -138,7 +138,8 @@ jobs:
       - name: Run Python Tests
         run: |
           export DEFAULT_PRIVATE_KEY_FILE=.key
-          DEFAULT_PRIVATE_KEY_FILE=.key pytest --hosts=all --ansible-inventory=inventory/ubuntu20/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_tests.py
+          pytest --hosts=rke2_servers --ansible-inventory=inventory/ubuntu20/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
+          pytest --hosts=rke2_agents --ansible-inventory=inventory/ubuntu20/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
 
       - name: Delete Stack
         if: ${{ always() }}
