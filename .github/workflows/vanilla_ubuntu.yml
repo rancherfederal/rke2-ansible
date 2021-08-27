@@ -112,6 +112,10 @@ jobs:
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
           echo "[rke2_agents]" >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "" >> hosts.ini
+          echo "" >> hosts.ini
+          echo "[all:vars]" >> hosts.ini
+          echo "ansible_ssh_user=ubuntu" >> hosts.ini
 
       - name: Check hosts.ini
         run: cat hosts.ini
