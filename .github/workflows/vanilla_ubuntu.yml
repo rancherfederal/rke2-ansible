@@ -115,6 +115,7 @@ jobs:
           echo "" >> ansible.cfg
           echo "" >> ansible.cfg
           echo "remote_user=ubuntu" >> ansible.cfg
+          echo "private_key_file=.key" >> ansible.cfg
 
       - name: Check hosts.ini and ansible.cfg
         run: |
