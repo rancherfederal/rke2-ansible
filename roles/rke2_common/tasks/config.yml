@@ -1,10 +1,21 @@
 ---
 
+- name: Does the /etc/rancher/rke2 dir exist?
+  stat:
+    path: /etc/rancher/rke2
+  register: rke2_directory
+
 - name: Create the /etc/rancher/rke2 config dir
   file:
     path: /etc/rancher/rke2
     state: directory
     recurse: yes
+  when: not rke2_directory.stat.exists
+
+- name: Does the /etc/rancher/rke2/config.yaml file exist?
+  stat:
+    path: /etc/rancher/rke2/config.yaml
+  register: rke2_config
 
 - name: create the /etc/rancher/rke2/config.yaml file
   file:
@@ -13,6 +24,7 @@
     mode: "0640"
     owner: root
     group: root
+  when: not rke2_config.stat.exists
 
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
@@ -46,7 +58,7 @@
   when: (node_ip is defined) and (node_ip|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -60,7 +72,7 @@
   when: (node_name is defined) and (node_name|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -74,7 +86,7 @@
   when: (bind_address is defined) and (bind_address|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -89,7 +101,7 @@
   when: (advertise_address is defined) and (advertise_address|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -103,10 +115,27 @@
   when: (node_external_ip is defined) and (node_external_ip|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
+
+- name: Create tmp config.yaml
+  copy:
+    content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
+    dest: /tmp/ansible-config.txt
+    mode: "0600"
+    owner: root
+    group: root
+
+- name: Stat tmp config
+  stat:
+    path: /tmp/ansible-config.txt
+  register: tmp_config
+
+- name: Get cksum of tmp config
+  set_fact:
+    tmp_sha1: "{{ tmp_config.stat.checksum }}"
 
 - name: Drop in final /etc/rancher/rke2/config.yaml
   copy:
@@ -115,3 +144,16 @@
     mode: "0640"
     owner: root
     group: root
+  when: tmp_sha1 != rke2_config.stat.checksum
+
+- name: Restart rke2-server if package installed and config changed
+  service:
+    state: restarted
+    name: rke2-server
+  when: 'rke2-server' in services and tmp_sha1 != rke2_config.stat.checksum
+
+- name: Restart rke2-agent if package installed and config changed
+  service:
+    state: restarted
+    name: rke2-agent
+  when: "'rke2-agent' in services" and tmp_sha1 != rke2_config.stat.checksum
