@@ -1,0 +1,4 @@
+---
+
+- name: Basic Infra tests
+  include_tasks: basic_tests.yml
