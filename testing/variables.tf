@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "aws_subnet" {
   description = "List of vectors of subnets and Availability Zones"
   type        = string
-  default     = "vpc-07402b459d3b18976"
+  default     = "subnet-0523d8467cf8e5cec"
 }
 
 variable "tf_user" {
