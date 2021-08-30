@@ -42,7 +42,7 @@ resource "aws_instance" "control_node" {
 
   ami           = lookup(var.amis[var.aws_region], var.os)
   instance_type = var.instance_type
-  subnet_id                   = var.aws_subnet
+  subnet_id     = var.aws_subnet
   key_name      = "rke2-ansible-ci"
   root_block_device {
     volume_type = "standard"

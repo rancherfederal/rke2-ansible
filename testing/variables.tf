@@ -23,17 +23,17 @@ variable "instance_type" {
 }
 
 # OS Options
-#  rhel8
-#  rhel7
-#  opensuse
-#  ubuntu20
-#  centos8
-#  centos7
-#  rocky8
+#  rhel-8.4
+#  rhel-7.8
+#  opensuse-15-SP2
+#  ubuntu-20.04
+#  ubuntu-18.04
+#  centos-8.2
+#  centos-7.8
 variable "os" {
   type        = string
   description = "AWS AMI OS"
-  default     = "ubuntu20"
+  default     = "ubuntu-20.04"
 }
 
 variable "amis" {
@@ -41,13 +41,13 @@ variable "amis" {
   type        = map(map(string))
   default = {
     "us-gov-west-1" = {
-      "rhel8"    = "ami-0ac4e06a69870e5be"
-      "rhel7"    = "ami-e9d5ec88"
-      "opensuse" = "ami-04e3d865"
-      "ubuntu20" = "ami-84556de5"
-      "centos8"  = "ami-967158f7"
-      "centos7"  = "ami-bbba86da"
-      "rocky8"   = "ami-06370d1e5ddbf1f76"
+      "rhel-8.4"        = "ami-0ac4e06a69870e5be"
+      "rhel-7.8"        = "ami-e9d5ec88"
+      "opensuse-15-SP2" = "ami-04e3d865"
+      "ubuntu-20.04"    = "ami-84556de5"
+      "ubuntu-18.04"    = "ami-0086246041e9dbd36"
+      "centos-8.2"      = "ami-967158f7"
+      "centos-7.8"      = "ami-03f2d3b9602dcc98d"
     }
   }
 }
