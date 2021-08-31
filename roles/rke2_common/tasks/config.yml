@@ -15,7 +15,7 @@
 - name: Does the /etc/rancher/rke2/config.yaml file exist?
   stat:
     path: /etc/rancher/rke2/config.yaml
-  register: rke2_config
+  register: previous_rke2_config
 
 - name: create the /etc/rancher/rke2/config.yaml file
   file:
@@ -24,17 +24,19 @@
     mode: "0640"
     owner: root
     group: root
-  when: not rke2_config.stat.exists
+  when: not previous_rke2_config.stat.exists
 
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
 - name: Combine rke2_config node labels and hostvar node labels
   set_fact:
     all_node_labels: "{{ rke2_config['node-label'] | default([]) }} + {{ node_labels | default([]) }}"
+  changed_when: false
 
 - name: Combine rke2_config node taints and hostvar node taints
   set_fact:
     all_node_taints: "{{ rke2_config['node-taint'] | default([]) }} + {{ node_taints | default([]) }}"
+  changed_when: false
 
 - name: Add node labels to rke2_config
   ansible.utils.update_fact:
@@ -44,10 +46,12 @@
       - path: rke2_config["node-taint"]
         value: "{{ all_node_taints }}"
   register: updated_rke2_config
+  changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  changed_when: false
 
 # --node-ip value, -i value (agent/networking) IPv4/IPv6 addresses to advertise for node
 - name: Add node-ip to rke2_config
@@ -57,11 +61,13 @@
         value: "{{ node_ip }}"
   when: (node_ip is defined) and (node_ip|length > 0)
   register: updated_rke2_config
+  changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
+  changed_when: false
 
 # --node-name value (agent/node) Node name [$RKE2_NODE_NAME]
 - name: Add node-name to rke2_config
@@ -71,11 +77,13 @@
         value: "{{ node_name }}"
   when: (node_name is defined) and (node_name|length > 0)
   register: updated_rke2_config
+  changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
+  changed_when: false
 
 # --bind-address value (listener) rke2 bind address (default: 0.0.0.0)
 - name: Add bind-address to rke2_config
@@ -85,11 +93,13 @@
         value: "{{ bind_address }}"
   when: (bind_address is defined) and (bind_address|length > 0)
   register: updated_rke2_config
+  changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
+  changed_when: false
 
 # --advertise-address value (listener) IPv4 address that apiserver uses
 # to advertise to members of the cluster (default: node-external-ip/node-ip)
@@ -100,11 +110,13 @@
         value: "{{ advertise_address }}"
   when: (advertise_address is defined) and (advertise_address|length > 0)
   register: updated_rke2_config
+  changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
+  changed_when: false
 
 # --node-external-ip value (agent/networking) IPv4/IPv6 external IP addresses to advertise for node
 - name: Add node-external-ip to rke2_config
@@ -114,11 +126,13 @@
         value: "{{ node_external_ip }}"
   when: (node_external_ip is defined) and (node_external_ip|length > 0)
   register: updated_rke2_config
+  changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
+  changed_when: false
 
 - name: Create tmp config.yaml
   copy:
@@ -127,15 +141,21 @@
     mode: "0600"
     owner: root
     group: root
+  when: previous_rke2_config.stat.exists
+  changed_when: false
 
 - name: Stat tmp config
   stat:
     path: /tmp/ansible-config.txt
   register: tmp_config
+  when: previous_rke2_config.stat.exists
+  changed_when: false
 
 - name: Get cksum of tmp config
   set_fact:
     tmp_sha1: "{{ tmp_config.stat.checksum }}"
+  when: previous_rke2_config.stat.exists
+  changed_when: false
 
 - name: Drop in final /etc/rancher/rke2/config.yaml
   copy:
@@ -144,16 +164,21 @@
     mode: "0640"
     owner: root
     group: root
-  when: tmp_sha1 != rke2_config.stat.checksum
+    backup: yes
+  when: not previous_rke2_config.stat.exists or (tmp_sha1 != previous_rke2_config.stat.checksum)
 
 - name: Restart rke2-server if package installed and config changed
   service:
     state: restarted
     name: rke2-server
-  when: 'rke2-server' in services and tmp_sha1 != rke2_config.stat.checksum
+  when:
+    - ansible_facts.services["rke2-server.service"] is defined
+    - tmp_sha1 != previous_rke2_config.stat.checksum
 
 - name: Restart rke2-agent if package installed and config changed
   service:
     state: restarted
     name: rke2-agent
-  when: "rke2-agent' in services" and tmp_sha1 != rke2_config.stat.checksum
+  when:
+    - ansible_facts.services["rke2-agent.service"] is defined
+    - tmp_sha1 != previous_rke2_config.stat.checksum

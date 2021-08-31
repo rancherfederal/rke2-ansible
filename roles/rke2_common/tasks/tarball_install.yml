@@ -16,6 +16,7 @@
     state: directory
     suffix: rke2-install.XXXXXXXXXX
   register: temp_dir
+  when: "'rke2-server' not in services or 'rke2-agent' not in services"
 
 - name: Send provided tarball if available
   copy:

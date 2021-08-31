@@ -25,9 +25,9 @@
   include: tarball_install.yml
   when:
     - |-
-      (ansible_facts['os_family'] != 'RedHat' and
+      ((ansible_facts['os_family'] != 'RedHat' and
       ansible_facts['os_family'] != 'Rocky') or
-      rke2_binary_tarball_check.stat.exists == true
+      rke2_binary_tarball_check.stat.exists == true)
       and not installed
 
 - name: RHEL/CentOS Installation
@@ -39,10 +39,10 @@
       setup: filter=ansible_lsb*
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - include: rpm_install.yml
+      when: not installed
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
     - rke2_binary_tarball_check.stat.exists == false
-    - not installed
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
