@@ -156,4 +156,4 @@
   service:
     state: restarted
     name: rke2-agent
-  when: "'rke2-agent' in services" and tmp_sha1 != rke2_config.stat.checksum
+  when: "rke2-agent' in services" and tmp_sha1 != rke2_config.stat.checksum
