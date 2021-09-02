@@ -113,13 +113,13 @@
   ansible.utils.update_fact:
     updates:
       - path: rke2_config["cloud-provider-name"]
-        value: "{​​​​​​​​{​​​​​​​​ cloud_provider_name }​​​​​​​​}​​​​​​​​"
+        value: "{{ cloud_provider_name }}"
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
   register: updated_rke2_config
 
 - name: Update rke2_config to take value of updated_rke2_config
   set_fact:
-    rke2_config: "{​​​​​​​​{​​​​​​​​ updated_rke2_config.rke2_config }​​​​​​​​}​​​​​​​​"
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
 
 - name: Drop in final /etc/rancher/rke2/config.yaml
