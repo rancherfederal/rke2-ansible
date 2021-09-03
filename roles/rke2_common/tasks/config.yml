@@ -46,7 +46,7 @@
   when: (node_ip is defined) and (node_ip|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -60,7 +60,7 @@
   when: (node_name is defined) and (node_name|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -74,7 +74,7 @@
   when: (bind_address is defined) and (bind_address|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -89,7 +89,7 @@
   when: (advertise_address is defined) and (advertise_address|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -103,7 +103,7 @@
   when: (node_external_ip is defined) and (node_external_ip|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -117,7 +117,7 @@
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed

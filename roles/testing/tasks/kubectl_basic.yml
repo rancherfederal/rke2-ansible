@@ -23,7 +23,7 @@
     --server https://127.0.0.1:6443 get no {{ kubelet_hostname_override_parameter[0] }}
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
   register: status_result
-  delegate_to: "{{groups['rke2_servers'][0]}}"
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
   changed_when: false
 
 - name: Assertions
