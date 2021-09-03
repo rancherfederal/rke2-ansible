@@ -1,13 +1,32 @@
 ---
 
-- name: Wait for node to show Ready status
-  when: inventory_hostname in groups['rke2_servers'][0]
+
+- name: Ensure kubelet process is present on host
+  command: >-
+    ps -C kubelet -F -ww --no-headers
+  register: kubelet_check
+  until: kubelet_check.rc == 0
+  retries: 20
+  delay: 10
+  changed_when: false
+
+- name: Extract the hostname-override parameter from the kubelet process
+  set_fact:
+    kubelet_hostname_override_parameter: "{{ kubelet_check.stdout |\
+      regex_search('\\s--hostname-override=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))\\s',\
+      '\\1') }}"
+  changed_when: false
+
+- name: Are all nodes in Ready state?
   command: >-
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
     --server https://127.0.0.1:6443 get no {{ kubelet_hostname_override_parameter[0] }}
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
   register: status_result
-  until: status_result.stdout.find("True") != -1
-  retries: 20
-  delay: 10
+  delegate_to: "{{groups['rke2_servers'][0]}}"
   changed_when: false
+
+- name: Assertions
+  assert:
+    that:
+      - "'True' in status_result.stdout"
