@@ -16,7 +16,7 @@
     state: directory
     suffix: rke2-install.XXXXXXXXXX
   register: temp_dir
-  when: "'rke2-server' not in services or 'rke2-agent' not in services"
+  when: ansible_facts.services["rke2-server.service"] is not defined or ansible_facts.services["rke2-agent.service"] is not defined
 
 - name: Send provided tarball if available
   copy:
