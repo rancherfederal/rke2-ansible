@@ -1,28 +1,17 @@
 ---
-- name: "Check for images tar.gz in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
-  stat:
-    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
-  register: got_images_gz
-  delegate_to: 127.0.0.1
-  become: no
-
-- name: "Check for images tar.zst in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
-  stat:
-    path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
-  register: got_images_zst
+- name: "Check for images tar.zst or tar.gz in {{ playbook_dir }}/tarball_install/rke2-images*.tar.(zst|gz)"
+  find:
+    path: "{{ playbook_dir }}/tarball_install"
+    patterns:  "^rke2-images.*\\.tar\\.(gz|zst)$"
+    use_regex: yes
+  register: got_images
   delegate_to: 127.0.0.1
   become: no
 
 - name: Add images tar.gz to needed directory if provided
   copy:
-    src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
+    src: "{{ item.path }}"
     dest: /var/lib/rancher/rke2/agent/images/
     mode: '0644'
-  when: got_images_gz.stat.exists
-
-- name: Add images tar.zst to needed directory if provided
-  copy:
-    src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
-    dest: /var/lib/rancher/rke2/agent/images/
-    mode: '0644'
-  when: got_images_zst.stat.exists
+  when: (got_images.files|length>0)
+  with_items: "{{ got_images.files }}"
