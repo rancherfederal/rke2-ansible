@@ -8,7 +8,8 @@
     group: root
     mode: '0644'
 
-- debug:
+- name: Announce that we are pausing for 1 minute
+  debug:
     msg: "Pausing for 1 minute to allow for Pod deployment"
 
 - name: Pause for 1 minutes to allow Pod deployment
