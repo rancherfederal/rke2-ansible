@@ -1,10 +1,71 @@
-### Proposed changes
-Describe the use case and detail of the change. If this PR addresses an issue on GitHub, make sure to include a link to that issue using one of the [supported keywords](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue) here in this description (not in the title of the PR).
+<!--
+  This template provides some ideas of things to include in your PR description.
+  To start, try providing a short summary of your changes in the Title above.
+  If a section of the PR template does not apply to this PR, then delete that section.
+ -->
 
-### Checklist
-Before creating a PR, run through this checklist and mark each as complete.
+## What type of PR is this?
 
--   [ ] I have read the [CONTRIBUTING](https://github.com/rancherfederal/rke2-ansible/blob/main/CONTRIBUTING.md) document
--   [ ] I have added Molecule tests that prove my fix is effective or that my feature works
--   [ ] I have checked that all Molecule tests pass after adding my changes
--   [ ] I have updated any relevant documentation (`defaults/main/*.yml`, `README.md` and `CHANGELOG.md`)
+_(REQUIRED)_
+
+- [ ] bug
+- [ ] cleanup
+- [ ] documentation
+- [ ] feature
+
+## What this PR does / why we need it:
+
+_(REQUIRED)_
+
+<!--
+  What goal is this change working towards?
+  Provide a bullet pointed summary of how each file was changed.
+  Briefly explain any decisions you made with respect to the changes.
+  Include anything here that you didn't include in *Release Notes*
+  above, such as changes to CI or changes to internal methods.
+-->
+
+## Which issue(s) this PR fixes:
+
+_(REQUIRED)_
+<!--
+If this PR fixes one of more issues, list them here.
+One line each, like so:
+
+Fixes #123
+Fixes #39
+-->
+
+## Special notes for your reviewer:
+
+_(fill-in or delete this section)_
+
+<!--
+   Is there any particular feedback you would / wouldn't like?
+   Which parts of the code should reviewers focus on?
+-->
+
+## Testing
+
+_(fill-in or delete this section)_
+
+<!--
+  Describe how you tested this change.
+-->
+
+## Release Notes
+
+_(REQUIRED)_
+<!--
+  If this PR makes user facing changes, please describe them here. This
+  description will be copied into the release notes/changelog, whenever the
+  next version is released. Keep this section short, and focus on high level
+  changes.
+
+  Put your text between the block. To omit notes, use NONE within the block.
+-->
+
+```release-note
+
+```
+

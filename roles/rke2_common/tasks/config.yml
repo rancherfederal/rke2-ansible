@@ -134,6 +134,20 @@
   when: updated_rke2_config.changed
   changed_when: false
 
+# --cloud-provider-name value (agent/node) Cloud provider name
+- name: Add cloud-provider-name to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["cloud-provider-name"]
+        value: "{{ cloud_provider_name }}"
+  when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: updated_rke2_config.changed
+
 - name: Create tmp config.yaml
   copy:
     content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
