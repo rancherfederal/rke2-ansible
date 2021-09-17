@@ -17,6 +17,17 @@
     path: /etc/rancher/rke2/config.yaml
   register: previous_rke2_config
 
+- name: Read previous_rke2_config
+  slurp:
+    src: /etc/rancher/rke2/config.yaml
+  register: full_orig_rke2_config
+  when: previous_rke2_config.stat.exists
+
+- name: Decode contents of slurp
+  set_fact:
+    orig_rke2_config: "{{ full_orig_rke2_config['content'] | b64decode }}"
+  when: previous_rke2_config.stat.exists
+
 - name: create the /etc/rancher/rke2/config.yaml file
   file:
     path: /etc/rancher/rke2/config.yaml
@@ -148,6 +159,12 @@
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
 
+- name: Remove tmp config file
+  ansible.builtin.file:
+    path: /tmp/ansible-config.txt
+    state: absent
+  changed_when: false
+
 - name: Create tmp config.yaml
   copy:
     content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
@@ -155,6 +172,36 @@
     mode: "0600"
     owner: root
     group: root
+  when: previous_rke2_config.stat.exists
+  changed_when: false
+
+- name: Get original token
+  set_fact:
+    original_token: "{{ orig_rke2_config | regex_search('token: (.+)') }}"
+  when: previous_rke2_config.stat.exists
+  changed_when: false
+
+- name: Add token to config.yaml
+  lineinfile:
+    dest: /tmp/ansible-config.txt
+    line: "{{ original_token }}"
+    state: present
+    insertbefore: BOF
+  when: previous_rke2_config.stat.exists
+  changed_when: false
+
+- name: Get original server
+  set_fact:
+    original_server: "{{ orig_rke2_config | regex_search('server: https://(.*):9345') }}"
+  when: previous_rke2_config.stat.exists
+  changed_when: false
+
+- name: Add server url to config file
+  lineinfile:
+    dest: /tmp/ansible-config.txt
+    line: "{{ original_server }}"
+    state: present
+    insertbefore: BOF
   when: previous_rke2_config.stat.exists
   changed_when: false
 
@@ -181,12 +228,19 @@
     backup: yes
   when: not previous_rke2_config.stat.exists or (tmp_sha1 != previous_rke2_config.stat.checksum)
 
+- name: Remove tmp config file
+  ansible.builtin.file:
+    path: /tmp/ansible-config.txt
+    state: absent
+  changed_when: false
+
 - name: Restart rke2-server if package installed and config changed
   service:
     state: restarted
     name: rke2-server
   when:
     - ansible_facts.services["rke2-server.service"] is defined
+    - "ansible_facts.services['rke2-server.service'].state == 'running'"
     - tmp_sha1 != previous_rke2_config.stat.checksum
 
 - name: Restart rke2-agent if package installed and config changed
@@ -195,4 +249,5 @@
     name: rke2-agent
   when:
     - ansible_facts.services["rke2-agent.service"] is defined
+    - "ansible_facts.services['rke2-agent.service'].state == 'running'"
     - tmp_sha1 != previous_rke2_config.stat.checksum
