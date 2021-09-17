@@ -147,6 +147,7 @@ jobs:
 
       - name: Create new inventory hosts.ini with added hosts
         run: |
+          rm hosts.ini
           touch hosts.ini
           echo "[rke2_servers]" > hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
