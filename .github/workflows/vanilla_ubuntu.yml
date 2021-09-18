@@ -158,6 +158,7 @@ jobs:
           echo "" >> ansible.cfg
           echo "remote_user=ubuntu" >> ansible.cfg
           echo "private_key_file=.key" >> ansible.cfg
+          cp hosts.ini inventory/ubuntu20/hosts.ini
 
       - name: Run playbook again with added hosts
         run: |
