@@ -154,10 +154,6 @@ jobs:
           echo "[rke2_agents]" >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
-          echo "" >> ansible.cfg
-          echo "" >> ansible.cfg
-          echo "remote_user=ubuntu" >> ansible.cfg
-          echo "private_key_file=.key" >> ansible.cfg
           cp hosts.ini inventory/ubuntu20/hosts.ini
 
       - name: Run playbook again with added hosts
