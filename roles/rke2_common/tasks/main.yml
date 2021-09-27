@@ -7,7 +7,11 @@
   package_facts:
     manager: auto
 
+- name: Has rke2 been installed already
+  include_tasks: previous_install.yml
+
 - include: images_tarball_install.yml
+  when: not installed
 
 - name: "Check for binary tarball in {{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
   stat:
@@ -15,14 +19,16 @@
   register: rke2_binary_tarball_check
   delegate_to: 127.0.0.1
   become: no
+  when: not installed
 
 - name: SLES/Ubuntu/Tarball Installation
   include: tarball_install.yml
   when:
     - |-
-      (ansible_facts['os_family'] != 'RedHat' and
+      ((ansible_facts['os_family'] != 'RedHat' and
       ansible_facts['os_family'] != 'Rocky') or
-      rke2_binary_tarball_check.stat.exists == true
+      rke2_binary_tarball_check.stat.exists == true)
+      and not installed
 
 - name: RHEL/CentOS Installation
   block:
@@ -33,6 +39,7 @@
       setup: filter=ansible_lsb*
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - include: rpm_install.yml
+      when: not installed
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
     - rke2_binary_tarball_check.stat.exists == false

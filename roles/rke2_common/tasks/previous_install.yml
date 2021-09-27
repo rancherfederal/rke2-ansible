@@ -1,0 +1,21 @@
+---
+
+- name: Check if rke2-server is previously installed
+  ansible.builtin.debug:
+    msg: "rke2-server is already installed. Skipping installation steps."
+  when: ansible_facts.services["rke2-server.service"] is defined
+
+- name: Set fact if rke2-server was previously installed
+  set_fact:
+    installed: true
+  when: ansible_facts.services["rke2-server.service"] is defined
+
+- name: Check if rke2-agent is previously installed
+  ansible.builtin.debug:
+    msg: "rke2-agent is already installed. Skipping installation steps."
+  when: ansible_facts.services["rke2-agent.service"] is defined
+
+- name: Set fact if rke2-agent was previously installed
+  set_fact:
+    installed: true
+  when: ansible_facts.services["rke2-agent.service"] is defined

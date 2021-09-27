@@ -53,7 +53,6 @@ resource "aws_instance" "control_node" {
 
   tags = {
     Name        = "rke2_ansible-testing-server-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
-    StopAtNight = "True"
     Owner       = var.tf_user
     NodeType    = "Server"
     github_run  = "${var.GITHUB_RUN_ID}"
@@ -91,9 +90,45 @@ resource "aws_instance" "worker_node" {
 
   tags = {
     Name        = "rke2_ansible-testing-agent-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
-    StopAtNight = "True"
     Owner       = var.tf_user
     NodeType    = "Agent"
+    github_run  = "${var.GITHUB_RUN_ID}"
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      host        = coalesce(self.public_ip, self.private_ip)
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(pathexpand(".key"))
+    }
+    inline = [
+      "uptime",
+    ]
+  }
+}
+
+# EC2 Instance for RKE2 Cluster - Workers
+resource "aws_instance" "extra_worker_node" {
+  count = var.extra_worker_nodes
+
+  ami                         = lookup(var.amis[var.aws_region], var.os)
+  instance_type               = var.instance_type
+  subnet_id                   = var.aws_subnet
+  key_name                    = "rke2-ansible-ci"
+  associate_public_ip_address = true
+
+  vpc_security_group_ids = [aws_security_group.allow-all.id]
+
+  root_block_device {
+    volume_type = "standard"
+    volume_size = 60
+  }
+
+  tags = {
+    Name        = "rke2_ansible-testing-agent-idempotency-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
+    Owner       = var.tf_user
+    NodeType    = "ExtraNode"
     github_run  = "${var.GITHUB_RUN_ID}"
   }
 

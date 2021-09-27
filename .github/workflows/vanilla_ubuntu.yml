@@ -131,11 +131,40 @@ jobs:
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key site.yml
 
+      - name: Run playbook again for idempotency
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key site.yml
+
       - name: Run Ansible Tests
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key testing.yml
 
       - name: Run Python Tests
+        run: |
+          export DEFAULT_PRIVATE_KEY_FILE=.key
+          pytest --hosts=rke2_servers --ansible-inventory=inventory/ubuntu20/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
+          pytest --hosts=rke2_agents --ansible-inventory=inventory/ubuntu20/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
+
+      - name: Create new inventory hosts.ini with added hosts
+        run: |
+          rm hosts.ini
+          touch hosts.ini
+          echo "[rke2_servers]" > hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[rke2_agents]" >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          cp hosts.ini inventory/ubuntu20/hosts.ini
+
+      - name: Run playbook again with added hosts
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key site.yml
+
+      - name: Run Ansible Tests with added hosts
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key testing.yml
+
+      - name: Run Python Tests with added hosts
         run: |
           export DEFAULT_PRIVATE_KEY_FILE=.key
           pytest --hosts=rke2_servers --ansible-inventory=inventory/ubuntu20/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py

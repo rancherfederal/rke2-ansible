@@ -16,6 +16,10 @@
     state: directory
     suffix: rke2-install.XXXXXXXXXX
   register: temp_dir
+  when:
+    - |-
+      ansible_facts.services["rke2-server.service"] is not defined or
+      ansible_facts.services["rke2-agent.service"] is not defined
 
 - name: Send provided tarball if available
   copy:
@@ -37,7 +41,6 @@
         url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
         follow_redirects: all
       register: rke2_version_url
-      run_once: yes
 
     - name: Set full version name
       shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
@@ -45,7 +48,6 @@
       changed_when: false
       args:
         executable: /bin/bash
-      run_once: yes
 
     - name: Set dot version
       shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
@@ -53,7 +55,6 @@
       changed_when: false
       args:
         executable: /bin/bash
-      run_once: yes
 
     - name: Set Maj.Min version
       shell: >-
@@ -63,7 +64,6 @@
       changed_when: false
       args:
         executable: /bin/bash
-      run_once: yes
 
     - name: Describe versions
       debug:
@@ -71,6 +71,7 @@
           - "Full version: {{ rke2_full_version.stdout }}"
           - "dot version: {{ rke2_version_dot.stdout }}"
           - "Maj.Min version: {{ rke2_version.stdout }}"
+      run_once: yes
 
     - name: TARBALL | Download the tarball
       get_url:

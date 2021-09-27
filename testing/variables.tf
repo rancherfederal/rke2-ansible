@@ -61,7 +61,13 @@ variable "control_nodes" {
 variable "worker_nodes" {
   type        = number
   description = "Number of RKE2 worker nodes"
-  default     = 3
+  default     = 2
+}
+
+variable "extra_worker_nodes" {
+  type        = number
+  description = "Number of RKE2 worker nodes to add for idempotency tests"
+  default     = 2
 }
 
 variable "ansible_user" {
