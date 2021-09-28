@@ -19,7 +19,6 @@
   register: rke2_binary_tarball_check
   delegate_to: 127.0.0.1
   become: no
-  when: not installed
 
 - name: SLES/Ubuntu/Tarball Installation
   include: tarball_install.yml
