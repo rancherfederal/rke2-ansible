@@ -1,100 +1,126 @@
 ---
-- name: Stop if the provided channel is not valid
-  fail:
-    msg: "Provided channel is not valid"
-  when: rke2_channel not in channels
+- name: Calculate rke2_full_version
+  when: (install_rke2_version is not defined) or (install_rke2_version|length == 0)
+  block:
+  - name: Stop if the provided is not valid
+    fail:
+      msg: "Provided channel is not valid"
+    when: rke2_channel not in channels
 
-- name: Get full version name url
-  uri:
-    url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
-    follow_redirects: all
-  register: rke2_version_url
+  - name: Get full version name url
+    uri:
+      url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
+      follow_redirects: all
+    register: rke2_version_url
 
-- name: Set full version name
-  shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
-  register: rke2_full_version
-  changed_when: false
-  args:
-    executable: /usr/bin/bash
+  - name: Set full version name
+    shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+    register: rke2_full_version
+    changed_when: false
+    args:
+      executable: /usr/bin/bash
+
+- name: Set rke2_full_version fact
+  set_fact:
+    rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"
 
 - name: Set dot version
-  shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
+  shell: set -o pipefail && echo {{ rke2_full_version }} | /usr/bin/cut -d'+' -f1
   register: rke2_version_dot
   changed_when: false
   args:
     executable: /usr/bin/bash
 
+- name: Set rke2_version_dot fact
+  set_fact:
+    rke2_version_dot: "{{ rke2_version_dot.stdout }}"
+
 - name: Set Maj.Min version
-  shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
-  register: rke2_version
+  shell: set -o pipefail && echo {{ rke2_full_version }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+  register: rke2_version_majmin
   changed_when: false
   args:
     executable: /usr/bin/bash
 
+- name: Set rke2_version_majmin fact
+  set_fact:
+    rke2_version_majmin: "{{ rke2_version_majmin.stdout }}"
+
+- name: Set RPM version
+  shell: set -o pipefail && echo {{ rke2_full_version }} | sed -E -e "s/[\+-]/~/g" | sed -E -e "s/v(.*)/\1/"
+  register: rke2_version_rpm
+  changed_when: false
+  args:
+    executable: /usr/bin/bash
+
+- name: Set rke2_version_rpm fact
+  set_fact:
+    rke2_version_rpm: "{{ rke2_version_rpm.stdout }}"
+
 - name: Describe versions
   debug:
-    msg: >
-      Full version: {{ rke2_full_version.stdout }}, dot version: {{ rke2_version_dot.stdout }}
-      Maj.Min version: {{ rke2_version.stdout }}"
+    msg:
+    - "Full version: {{ rke2_full_version }}, dot version: {{ rke2_version_dot }}"
+    - "Maj.Min version: {{ rke2_version_majmin }}, rpm version: {{ rke2_version_rpm }}"
 
 # Does the Rancher RKE2 Common repo exist already
 - name: Check to see if rke2-common.repo exists
   stat:
     path: '/etc/yum.repos.d/rke2-common.repo'
-  register: stat_rke2_common
+  register: stat_rke2_common_repo
 
 # Add RKE2 Common repo if it doesn't exist
-- name: add the rke2-common repo RHEL/CentOS 7
+- name: Add the rke2-common repo RHEL/CentOS 7
   yum_repository:
-    name: rke2-common
-    description: Rancher RKE2 Common Latest
-    baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/7/noarch"
-    gpgcheck: true
-    gpgkey: "https://rpm.rancher.io/public.key"
-    enabled: yes
-  when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '7'
+    name: "{{ rke2_common_yum_repo.name }}"
+    description: "{{ rke2_common_yum_repo.description }}"
+    baseurl: "{{ rke2_common_yum_repo.baseurl }}"
+    gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
+    gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
+    enabled: "{{ rke2_common_yum_repo.enabled }}"
+  when: not stat_rke2_common_repo.stat.exists and ansible_lsb.major_release == '7'
 
-- name: add the rke2-common repo RHEL/CentOS 8
+- name: Add the rke2-common repo RHEL/CentOS 8
   yum_repository:
-    name: rke2-common
-    description: Rancher RKE2 Common Latest
-    baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/8/noarch"
-    gpgcheck: true
-    gpgkey: "https://rpm.rancher.io/public.key"
-    enabled: yes
-  when: not stat_rke2_common.stat.exists and ansible_lsb.major_release == '8'
+    name: "{{ rke2_common_yum_repo.name }}"
+    description: "{{ rke2_common_yum_repo.description }}"
+    baseurl: "{{ rke2_common_yum_repo.baseurl }}"
+    gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
+    gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
+    enabled: "{{ rke2_common_yum_repo.enabled }}"
+  when: not stat_rke2_common_repo.stat.exists and ansible_lsb.major_release == '8'
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
   stat:
-    path: '/etc/yum.repos.d/rke2-v{{ rke2_version.stdout }}.repo'  # noqa var-spacing
+    path: '/etc/yum.repos.d/rke2-v{{ rke2_version_majmin }}.repo'  # noqa var-spacing
   register: stat_rke2_versioned_repo
 
 # Add RKE2 versioned repo if it doesn't exist
 - name: Add the rke2 versioned repo CentOS/RHEL 7
   yum_repository:
-    name: "rke2-v{{ rke2_version.stdout }}"  # noqa var-spacing
-    description: Rancher RKE2 Version
-    baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version.stdout }}/centos/7/x86_64"
-    gpgcheck: true
-    gpgkey: "https://rpm.rancher.io/public.key"
-    enabled: yes
-  when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '7')
+    name: "{{ rke2_versioned_yum_repo.name }}"
+    description: "{{ rke2_versioned_yum_repo.description }}"
+    baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
+    gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
+    gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
+    enabled: "{{ rke2_versioned_yum_repo.enabled }}"
+  when: not stat_rke2_versioned_repo.stat.exists and ansible_lsb.major_release == '7'
 
-- name: add the rke2 versioned repo CentOS/RHEL 8
+- name: Add the rke2 versioned repo CentOS/RHEL 8
   yum_repository:
-    name: "rke2-v{{ rke2_version.stdout }}"  # noqa var-spacing
-    description: Rancher RKE2 Version
-    baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version.stdout }}/centos/8/x86_64"
-    gpgcheck: true
-    gpgkey: "https://rpm.rancher.io/public.key"
-    enabled: yes
-  when: (not stat_rke2_versioned_repo.stat.exists) and (ansible_lsb.major_release == '8')
+    name: "{{ rke2_versioned_yum_repo.name }}"
+    description: "{{ rke2_versioned_yum_repo.description }}"
+    baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
+    gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
+    gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
+    enabled: "{{ rke2_versioned_yum_repo.enabled }}"
+  when: not stat_rke2_versioned_repo.stat.exists and ansible_lsb.major_release == '8'
 
 - name: YUM-Based | Install rke2-server
   yum:
-    name: rke2-server
-    state: latest  # noqa package-latest
+    name: "rke2-server-{{ rke2_version_rpm }}"
+    state: present  # noqa package-latest
   when:
     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
@@ -102,8 +128,8 @@
 
 - name: YUM-Based | Install rke2-agent
   yum:
-    name: rke2-agent
-    state: latest  # noqa package-latest
+    name: "rke2-agent-{{ rke2_version_rpm }}"
+    state: present  # noqa package-latest
   when:
     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
