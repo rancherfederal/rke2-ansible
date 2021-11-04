@@ -23,31 +23,66 @@ variable "instance_type" {
 }
 
 # OS Options
-#  rhel-8.4
-#  rhel-7.8
-#  opensuse-15-SP2
-#  ubuntu-20.04
-#  ubuntu-18.04
-#  centos-8.2
-#  centos-7.8
+#  rhel8
+#  rhel7
+#  sles15sp2
+#  ubuntu20
+#  ubuntu18
+#  centos8
+#  centos7
+#  rocky8
 variable "os" {
   type        = string
   description = "AWS AMI OS"
-  default     = "ubuntu-20.04"
+  default     = "ubuntu20"
+}
+
+variable "aws_region" {
+  type        = string
+  description = "AWS Region the instance is launched in"
+  default     = "us-gov-west-1"
 }
 
 variable "amis" {
   description = "List of RHEL OS images based on regions"
-  type        = map(map(string))
+  type = map(map(object({
+    ami  = string
+    user = string
+  })))
   default = {
     "us-gov-west-1" = {
-      "rhel-8.4"        = "ami-0ac4e06a69870e5be"
-      "rhel-7.8"        = "ami-e9d5ec88"
-      "opensuse-15-SP2" = "ami-04e3d865"
-      "ubuntu-20.04"    = "ami-84556de5"
-      "ubuntu-18.04"    = "ami-0086246041e9dbd36"
-      "centos-8.2"      = "ami-967158f7"
-      "centos-7.8"      = "ami-03f2d3b9602dcc98d"
+      "rhel8" = {
+        ami  = "ami-0ac4e06a69870e5be"
+        user = "ec2-user"
+      }
+      "rhel7" = {
+        ami  = "ami-e9d5ec88"
+        user = "ec2-user"
+      }
+      "sles15sp2" = {
+        ami  = "ami-04e3d865"
+        user = "ec2-user"
+      }
+      "ubuntu20" = {
+        ami  = "ami-84556de5"
+        user = "ubuntu"
+      }
+      "ubuntu18" = {
+        ami  = "ami-bce9d3dd"
+        user = "ubuntu"
+      }
+      "centos8" = {
+        ami  = "ami-967158f7"
+        user = "centos"
+      }
+      "centos7" = {
+        ami  = "ami-bbba86da"
+        user = "centos"
+      }
+      "rocky8" = {
+        ami  = "ami-06370d1e5ddbf1f76"
+        user = "ec2-user"
+      }
     }
   }
 }
