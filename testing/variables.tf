@@ -37,12 +37,6 @@ variable "os" {
   default     = "ubuntu20"
 }
 
-variable "aws_region" {
-  type        = string
-  description = "AWS Region the instance is launched in"
-  default     = "us-gov-west-1"
-}
-
 variable "amis" {
   description = "List of RHEL OS images based on regions"
   type = map(map(object({
