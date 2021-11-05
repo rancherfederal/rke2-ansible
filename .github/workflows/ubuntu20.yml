@@ -85,7 +85,7 @@ jobs:
       - name: Terraform Apply
         run: |
           cd testing/
-          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=centos7" -auto-approve
+          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=ubuntu20" -auto-approve
 
       - name: Set up Python
         id: setup_python
