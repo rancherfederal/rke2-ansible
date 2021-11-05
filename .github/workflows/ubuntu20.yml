@@ -12,6 +12,34 @@ env:
 
 jobs:
 
+  lint-test:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.7.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint ansible-lint ansible
+
+      - name: Version check
+        run: |
+          ansible --version
+          ansible-lint --version
+          yamllint --version
+
+      - name: Run yamllint.
+        run: yamllint .
+
+      - name: Run ansible-lint.
+        run: ansible-lint
+
   ubuntu20-test:
     name: Initial build test
     runs-on: ubuntu-latest
