@@ -94,6 +94,10 @@
     msg: "Using /opt/rke2 for install directory"
   when: tarball_dir_stat.rc == 0
 
+- name: TARBALL | Create {{tarball_dir}}
+  command: mkdir -p {{ tarball_dir }}
+  when: tarball_dir is defined
+
 - name: TARBALL | Install tar package
   package:
     name: tar
@@ -110,9 +114,29 @@
     state: absent
   when: temp_dir.path is defined
 
+- name: TARBALL | Updating tarball contents to reflect install path
+  block:
+    - name: TARBALL | Updating rke2-server.service
+      ansible.builtin.replace:
+        path: "{{tarball_dir}}/lib/systemd/system/rke2-server.service"
+        regexp: '/usr/local'
+        replace: '{{tarball_dir}}'
+
+    - name: TARBALL | Updating rke2-agent.service
+      ansible.builtin.replace:
+        path: "{{tarball_dir}}/lib/systemd/system/rke2-agent.service"
+        regexp: '/usr/local'
+        replace: '{{tarball_dir}}'
+      
+    - name: TARBALL | Updating rke2-uninstall.sh
+      ansible.builtin.replace:
+        path: "{{tarball_dir}}/bin/rke2-uninstall.sh"
+        regexp: '/usr/local'
+        replace: '{{tarball_dir}}'
+
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   copy:
-    src: /usr/local/lib/systemd/system/rke2-server.service
+    src: "{{tarball_dir}}/lib/systemd/system/rke2-server.service"
     dest: /etc/systemd/system/rke2-server.service
     mode: '0644'
     owner: root
@@ -123,7 +147,7 @@
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   copy:
-    src: /usr/local/lib/systemd/system/rke2-server.env
+    src: "{{tarball_dir}}/lib/systemd/system/rke2-server.env"
     dest: /etc/systemd/system/rke2-server.env
     mode: '0644'
     owner: root
@@ -134,7 +158,7 @@
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   copy:
-    src: /usr/local/lib/systemd/system/rke2-agent.service
+    src: "{{tarball_dir}}/lib/systemd/system/rke2-agent.service"
     dest: /etc/systemd/system/rke2-agent.service
     mode: '0644'
     owner: root
@@ -145,7 +169,7 @@
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   copy:
-    src: /usr/local/lib/systemd/system/rke2-agent.env
+    src: "{{tarball_dir}}/lib/systemd/system/rke2-agent.env"
     dest: /etc/systemd/system/rke2-agent.env
     mode: '0644'
     owner: root
@@ -153,3 +177,7 @@
     remote_src: yes
   when:
     - inventory_hostname in groups['rke2_agents']
+
+- name: TARBALL | Refreshing systemd unit files
+  systemd:
+    daemon-reload: yes
