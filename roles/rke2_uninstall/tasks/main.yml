@@ -1,0 +1,10 @@
+---
+# https://docs.rke2.io/install/linux_uninstall/
+
+- name: Use kubectl to cordon, drain, and delete
+  include_tasks: kubectl.yml
+  when: inventory_hostname in groups['rke2_uninstall']
+
+- name: Use uninstall scripts
+  include_tasks: clean_node.yml
+  when: inventory_hostname in groups['rke2_uninstall']

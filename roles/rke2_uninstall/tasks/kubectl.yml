@@ -1,0 +1,56 @@
+- name: Ensure kubelet process is present on host
+  command: >-
+    ps -C kubelet -F -ww --no-headers
+  register: kubelet_check
+  until: kubelet_check.rc == 0
+  retries: 20
+  delay: 10
+  changed_when: false
+
+- name: Extract the hostname-override parameter from the kubelet process
+  set_fact:
+    kubelet_hostname_override_parameter: "{{ kubelet_check.stdout |\
+      regex_search('\\s--hostname-override=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))\\s',\
+      '\\1') }}"
+  changed_when: false
+
+- name: Label node as toBeDeleted
+  command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 label nodes {{ kubelet_hostname_override_parameter[0] }} toBeDeleted=true
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
+  register: added_label
+  changed_when: false
+
+- name: Use kubectl to cordon node
+  command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 cordon {{ kubelet_hostname_override_parameter[0] }}
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
+  changed_when: false
+
+- name: Verify node is cordoned
+  command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 get no {{ kubelet_hostname_override_parameter[0] }}
+    -o jsonpath='{.spec.taints[?(@.key=="node.kubernetes.io/unschedulable")].effect}'
+  until: status_result.stdout.find("NoSchedule") != -1
+  retries: 20
+  delay: 10
+  register: status_result
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
+  changed_when: false
+
+- name: Use kubectl to drain node
+  command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 drain {{ kubelet_hostname_override_parameter[0] }} --ignore-daemonsets
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
+  changed_when: false
+
+- name: Use kubectl to delete node
+  command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 delete node {{ kubelet_hostname_override_parameter[0] }}
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
+  changed_when: false

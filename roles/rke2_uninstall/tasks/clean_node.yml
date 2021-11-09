@@ -1,0 +1,67 @@
+- name: Was rke2 installed via tarball?
+  stat:
+    path: /usr/local/bin/rke2-uninstall.sh
+  register: tarball_uninstall
+
+- name: Uninstall rke2 from tarball
+  block:
+    - name: Uninstall rke2 from tarball
+      shell: set -o pipefail && /usr/local/bin/rke2-uninstall.sh
+  when: tarball_uninstall.stat.exists
+
+- name: Uninstall rke2 from RPM
+  block:
+    - name: Use rke2 binary to get full version
+      shell: set -o pipefail && rke2 --version | egrep -o "v1.[0-9]{1,4}.[0-9]{1,4}"
+      register: rke2_rpm_version
+
+    - name: Get minor version
+      shell: set -o pipefail && echo {{ rke2_rpm_version }} | /usr/bin/cut -d'.' -f2
+      register: rke2_rpm_minor_version
+
+    - name: Get patch version
+      shell: set -o pipefail && echo {{ rke2_rpm_version }} | /usr/bin/cut -d'.' -f3
+      register: rke2_rpm_patch_version
+
+    # Order of uninstall by version taken from:
+    # https://docs.rke2.io/install/linux_uninstall/#rpm-method
+    - name: Uninstall for version RKE2 v1.18.13+rke2r1 and newer
+      shell: set -o pipefail && /usr/bin/rke2-uninstall.sh
+      when: rke2_rpm_patch_version|int >= 13
+
+    - name: Uninstall for version RKE2 v1.18.12
+      shell: set -o pipefail && /usr/bin/rke2-uninstall.sh
+      when: rke2_rpm_patch_version|int == 12
+
+    - name: yum uninstall "rke2-*"
+      yum:
+        name: 'rke2-*'
+        state: absent
+        autoremove: yes
+      when: rke2_rpm_patch_version|int <= 12
+
+    - name: Remove /run/k3s
+      file:
+        path: /run/k3s
+        state: absent
+      when: rke2_rpm_patch_version|int <= 12
+
+    - name: Download rke2-uninstall.sh script
+      get_url:
+        url: https://raw.githubusercontent.com/rancher/rke2/488bab0f48b848e408ce399c32e7f5f73ce96129/bundle/bin/rke2-uninstall.sh
+        dest: /usr/local/bin/rke2-uninstall.sh
+        mode: '775'
+      when: rke2_rpm_patch_version|int <= 11
+
+    - name: Download rke2-uninstall.sh script
+      get_url:
+        url: https://raw.githubusercontent.com/rancher/rke2/488bab0f48b848e408ce399c32e7f5f73ce96129/bundle/bin/rke2-killall.sh
+        dest: /usr/local/bin/rke2-killall.sh
+        mode: '775'
+      when: rke2_rpm_patch_version|int <= 11
+
+    - name: Uninstall for versions prior to v1.18.11+rke2r1
+      shell: set -o pipefail && /usr/local/bin/rke2-uninstall.sh
+      when: rke2_rpm_patch_version|int <= 11
+
+  when: not tarball_uninstall.stat.exists
