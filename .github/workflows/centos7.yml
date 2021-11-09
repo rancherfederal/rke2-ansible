@@ -167,6 +167,22 @@ jobs:
           pytest --hosts=rke2_servers --ansible-inventory=inventory/centos7/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
           pytest --hosts=rke2_agents --ansible-inventory=inventory/centos7/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
 
+      - name: Move some worker nodes into [rke2_uninstall]
+        run: |
+          rm hosts.ini
+          touch hosts.ini
+          echo "[rke2_servers]" > hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[rke2_agents]" >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[rke2_uninstall" >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          cp hosts.ini inventory/centos7/hosts.ini
+
+      - name: Run playbook again with uninstall
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --private-key .key site.yml
+
       - name: Delete Stack
         if: ${{ always() }}
         run: |

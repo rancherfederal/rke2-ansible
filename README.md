@@ -116,19 +116,22 @@ Uninstall RKE2
     Note: Uninstalling RKE2 deletes the cluster data and all of the scripts.
 The offical documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
 
-If you used this module to created the cluster and RKE2 was installed via yum, then you can attempt to run this command to remove all cluster data and all RKE2 scripts.
+Nodes can be removed from a cluster and RKE2 uninstalled by adding the node to the [rke2_uninstall] section of the hosts file.
 
-Replace `ec2-user` with your ansible user.
 ```bash
-ansible -i 18.217.113.10, all -u ec2-user -a "/usr/bin/rke2-uninstall.sh"
-```
+[rke2_servers]
+192.16.35.12
 
-If the tarball method was used then you can attempt to use the following command:
-```bash
-ansible -i 18.217.113.10, all -u ec2-user -a "/usr/local/bin/rke2-uninstall.sh"
-```
-On rare occasions you may have to run the uninstall commands a second time.
+[rke2_agents]
+192.16.35.10
 
+[rke2_uninstall]
+192.16.35.11
+
+[rke2_cluster:children]
+rke2_servers
+rke2_agents
+```
 
 Author Information
 ------------------
