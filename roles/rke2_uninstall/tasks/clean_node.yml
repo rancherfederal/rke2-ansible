@@ -47,7 +47,7 @@
         state: absent
       when: rke2_rpm_patch_version|int <= 12
 
-# yamllint disable rule:line-length
+    # yamllint disable rule:line-length
     - name: Download rke2-uninstall.sh script
       get_url:
         url: https://raw.githubusercontent.com/rancher/rke2/488bab0f48b848e408ce399c32e7f5f73ce96129/bundle/bin/rke2-uninstall.sh
@@ -61,7 +61,7 @@
         dest: /usr/local/bin/rke2-killall.sh
         mode: '775'
       when: rke2_rpm_patch_version|int <= 11
-# yamllint enable rule:line-length
+    # yamllint enable rule:line-length
 
     - name: Uninstall for versions prior to v1.18.11+rke2r1
       shell: set -o pipefail && /usr/local/bin/rke2-uninstall.sh
