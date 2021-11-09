@@ -1,7 +1,7 @@
 ---
 
 - name: Does config file already have server token?  # noqa command-instead-of-shell
-  ansible.builtin.command: 'grep -i "^token:" /etc/rancher/rke2/config.yaml'
+  command: 'grep -i "^token:" /etc/rancher/rke2/config.yaml'
   register: server_token_check
   failed_when: server_token_check.rc >= 2
   changed_when: false
@@ -16,7 +16,7 @@
     - '"token:" not in server_token_check.stdout'
 
 - name: Does config file already have server url?  # noqa command-instead-of-shell
-  ansible.builtin.command: 'grep -i "^server:" /etc/rancher/rke2/config.yaml'
+  command: 'grep -i "^server:" /etc/rancher/rke2/config.yaml'
   register: server_url_check
   failed_when: server_url_check.rc >= 2
   changed_when: false
