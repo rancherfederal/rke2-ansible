@@ -1,0 +1,17 @@
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: automated-testing-pod
+  namespace: default
+  labels:
+    app: testing
+spec:
+  containers:
+    - name: automated-testing-pod
+      image: nginx:alpine
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP

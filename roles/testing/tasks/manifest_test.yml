@@ -1,0 +1,31 @@
+---
+
+- name: copy basic-deployment.yaml to remote machine
+  ansible.builtin.copy:
+    src: basic-deployment.yaml
+    dest: /var/lib/rancher/rke2/server/manifests/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Announce that we are pausing for 1 minute
+  debug:
+    msg: "Pausing for 1 minute to allow for Pod deployment"
+
+- name: Pause for 1 minutes to allow Pod deployment
+  pause:
+    minutes: 1
+
+- name: Did the Pod deploy as expected?
+  command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    get pod automated-testing-pod
+    -o jsonpath='{.status.phase}'
+  register: status_result
+  delegate_to: "{{ groups['rke2_servers'][0] }}"
+  changed_when: false
+
+- name: Assertions
+  assert:
+    that:
+      - "'Running' in status_result.stdout"
