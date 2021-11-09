@@ -1,9 +1,8 @@
 ---
-name: Vanilla Ubuntu
+name: Ubuntu 20.04
 
 on:
   pull_request:
-  push:
   workflow_dispatch:
 
 env:
@@ -76,7 +75,7 @@ jobs:
         id: plan
         run: |
           cd testing/
-          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -no-color
+          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=ubuntu20" -no-color
         continue-on-error: true
 
       - name: Terraform Plan Status
@@ -86,7 +85,7 @@ jobs:
       - name: Terraform Apply
         run: |
           cd testing/
-          terraform apply  -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
+          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=ubuntu20" -auto-approve
 
       - name: Set up Python
         id: setup_python
