@@ -125,15 +125,15 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ubuntu --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key site.yml
 
       - name: Run playbook again for idempotency
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ubuntu --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key site.yml
 
       - name: Run Ansible Tests
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ubuntu --verbose --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key testing.yml
 
       - name: Run Python Tests
         run: |
@@ -154,11 +154,11 @@ jobs:
 
       - name: Run playbook again with added hosts
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ubuntu --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key site.yml
 
       - name: Run Ansible Tests with added hosts
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ubuntu --verbose --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key testing.yml
 
       - name: Run Python Tests with added hosts
         run: |
