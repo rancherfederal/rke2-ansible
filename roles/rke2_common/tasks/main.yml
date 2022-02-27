@@ -54,8 +54,6 @@
 
 - include: network_manager_fix.yaml
 
-- include: config.yml
-
 - name: Add server iptables rules
   include_tasks: iptables_rules.yml
   when:
@@ -73,3 +71,25 @@
   include_role:
     name: rke2_common
     tasks_from: cis-hardening
+
+# When starting the rke2-server service for the first time, and --profile=cis-1.5
+# or --profile=cis-1.6 is specified, the auto-generated TLS certificates will
+# have "startBefore" timestamps in the future which prevents the rke2-server service
+# from starting. For more information, see https://github.com/rancher/rke2/issues/1702
+- block:
+  - name: Start rke2-server to initialize TLS certificates
+    systemd:
+      name: rke2-server
+      state: started
+      enabled: yes
+
+  - name: Wait for k8s apiserver reachability
+    wait_for:
+      host: "{{ kubernetes_api_server_host }}"
+      port: "6443"
+      state: present
+      timeout: 300
+  when:
+    - ansible_facts.services["rke2-server.service"] is defined
+
+- include: config.yml
