@@ -168,7 +168,7 @@
     group: root
     remote_src: yes
   when:
-    - inventory_hostname in groups['rke2_agents']
+    - inventory_hostname in groups.get('rke2_agents', [])
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
   copy:
@@ -179,7 +179,7 @@
     group: root
     remote_src: yes
   when:
-    - inventory_hostname in groups['rke2_agents']
+    - inventory_hostname in groups.get('rke2_agents', [])
 
 - name: TARBALL | Refreshing systemd unit files
   systemd:
