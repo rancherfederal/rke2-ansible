@@ -4,3 +4,6 @@ exclude_paths:
 - .ansible-lint
 warn_list:
   - no-handler
+  - fqcn-builtins
+skip_list:
+  - experimental

@@ -1,5 +1,0 @@
----
-warn_list:
-  - fqcn-builtins
-skip_list:
-  - experimental
