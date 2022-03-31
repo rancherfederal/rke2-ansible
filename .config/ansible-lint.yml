@@ -1,5 +1,5 @@
 ---
 warn_list:
-  - fqcn-builtins 
+  - fqcn-builtins
 skip_list:
   - experimental
