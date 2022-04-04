@@ -9,3 +9,8 @@
   service:
     state: restarted
     name: rke2-server
+
+- name: restart rke2-agent
+  service:
+    state: restarted
+    name: rke2-agent
