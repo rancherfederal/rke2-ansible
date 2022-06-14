@@ -1,6 +1,8 @@
 ---
 
 - name: RKE2 agent and server tasks
+  vars:
+    caller_role_name: server
   include_role:
     name: rke2_common
     tasks_from: main
