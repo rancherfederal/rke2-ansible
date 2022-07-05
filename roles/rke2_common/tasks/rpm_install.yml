@@ -1,6 +1,6 @@
 ---
 - name: Calculate rke2_full_version
-  when: (install_rke2_version is not defined) or (install_rke2_version|length == 0)
+  when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )
   block:
   - name: Stop if the provided is not valid
     fail:
@@ -22,7 +22,7 @@
 
 - name: Set rke2_full_version fact
   set_fact:
-    rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"
+    rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"  # yamllint disable-line rule:line-length
 
 - name: Set dot version
   shell: set -o pipefail && echo {{ rke2_full_version }} | /usr/bin/cut -d'+' -f1
@@ -60,8 +60,8 @@
 - name: Describe versions
   debug:
     msg:
-    - "Full version: {{ rke2_full_version }}, dot version: {{ rke2_version_dot }}"
-    - "Maj.Min version: {{ rke2_version_majmin }}, rpm version: {{ rke2_version_rpm }}"
+      - "Full version: {{ rke2_full_version }}, dot version: {{ rke2_version_dot }}"
+      - "Maj.Min version: {{ rke2_version_majmin }}, rpm version: {{ rke2_version_rpm }}"
 
 # Does the Rancher RKE2 Common repo exist already
 - name: Check to see if rke2-common.repo exists

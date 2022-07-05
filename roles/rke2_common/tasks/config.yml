@@ -38,15 +38,18 @@
   when: not previous_rke2_config.stat.exists
 
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
-# --node-taint value                     (agent/node) Registering kubelet with set of taints
+
+- name: get rke2_config node-labels
+  set_fact:
+    rke2_config_node_labels: "{{ rke2_config['node-label'] | default([]) }}"
+
+- name: get host var node-labels
+  set_fact:
+    host_var_node_labels: "{{ node_labels | default([]) }}"
+
 - name: Combine rke2_config node labels and hostvar node labels
   set_fact:
-    all_node_labels: "{{ rke2_config['node-label'] | default([]) }} + {{ node_labels | default([]) }}"
-  changed_when: false
-
-- name: Combine rke2_config node taints and hostvar node taints
-  set_fact:
-    all_node_taints: "{{ rke2_config['node-taint'] | default([]) }} + {{ node_taints | default([]) }}"
+    all_node_labels: "{{ rke2_config_node_labels + host_var_node_labels }}"
   changed_when: false
 
 - name: Add node labels to rke2_config
@@ -54,6 +57,26 @@
     updates:
       - path: rke2_config["node-label"]
         value: "{{ all_node_labels }}"
+  register: updated_rke2_config
+  changed_when: false
+
+# --node-taint value                     (agent/node) Registering kubelet with set of taints
+- name: get rke2_config node-taints
+  set_fact:
+    rke2_config_node_taints: "{{ rke2_config['node-taint'] | default([]) }}"
+
+- name: get host var node-taints
+  set_fact:
+    host_var_node_taints: "{{ node_taints | default([]) }}"
+
+- name: Combine rke2_config node taints and hostvar node taints
+  set_fact:
+    all_node_taints: "{{ rke2_config_node_taints + host_var_node_taints }}"
+  changed_when: false
+
+- name: Add node labels to rke2_config
+  ansible.utils.update_fact:
+    updates:
       - path: rke2_config["node-taint"]
         value: "{{ all_node_taints }}"
   register: updated_rke2_config
