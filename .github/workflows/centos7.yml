@@ -109,6 +109,8 @@ jobs:
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
           echo "[rke2_agents]" >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[all:vars]" >> hosts.ini
+          echo "kubernetes_api_server_host=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text | head -1)" >> hosts.ini
           echo "" >> ansible.cfg
           echo "" >> ansible.cfg
           echo "remote_user=centos" >> ansible.cfg
@@ -126,15 +128,15 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos -vv --private-key .key site.yml
 
       - name: Run playbook again for idempotency
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos -vv --private-key .key site.yml
 
       - name: Run Ansible Tests
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
 
       - name: Run Python Tests
         run: |
@@ -151,6 +153,8 @@ jobs:
           echo "[rke2_agents]" >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
           aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[all:vars]" >> hosts.ini
+          echo "kubernetes_api_server_host=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text | head -1)" >> hosts.ini
           cp hosts.ini inventory/centos7/hosts.ini
 
       - name: Run playbook again with added hosts
@@ -159,13 +163,18 @@ jobs:
 
       - name: Run Ansible Tests with added hosts
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
 
       - name: Run Python Tests with added hosts
         run: |
           export DEFAULT_PRIVATE_KEY_FILE=.key
           pytest --hosts=rke2_servers --ansible-inventory=inventory/centos7/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
           pytest --hosts=rke2_agents --ansible-inventory=inventory/centos7/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
+
+      - name: Run troubleshoot tasks
+        if: ${{ failure() }}
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/centos7/hosts.ini -u centos -vvv --tags "troubleshooting" --private-key .key testing.yml
 
       - name: Delete Stack
         if: ${{ always() }}

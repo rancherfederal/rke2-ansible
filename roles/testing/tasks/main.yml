@@ -1,4 +1,5 @@
 ---
+
 - name: Basic Infra tests
   include_tasks: basic_tests.yml
 
@@ -8,3 +9,8 @@
 
 - name: Basic kubectl tests
   include_tasks: kubectl_basic.yml
+
+- name: Troubleshooting
+  include_tasks: troubleshooting.yml
+  tags:
+    - troubleshooting

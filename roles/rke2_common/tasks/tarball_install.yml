@@ -29,7 +29,7 @@
   when: rke2_binary_tarball_check.stat.exists
 
 - name: Download tarball
-  when: rke2_binary_tarball_check.stat.exists == false
+  when: not rke2_binary_tarball_check.stat.exists
   block:
     - name: Stop if the provided channel is not valid
       fail:

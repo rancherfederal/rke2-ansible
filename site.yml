@@ -2,14 +2,14 @@
 
 - hosts: rke2_servers
   any_errors_fatal: true
-  become: yes
+  become: true
   roles:
     - role: rke2_server
-  serial: 3
+  serial: 1
 
 - hosts: rke2_agents
   any_errors_fatal: true
-  become: yes
+  become: true
   roles:
     - role: rke2_agent
   serial: 3

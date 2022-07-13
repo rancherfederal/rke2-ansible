@@ -1,0 +1,49 @@
+---
+
+- name: show journalctl -e
+  command: >-
+    journalctl -e --lines 200 --no-pager
+  changed_when: false
+  register: command_output
+  tags:
+    - troubleshooting
+  ignore_errors: true
+
+- name: show journalctl -e
+  debug:
+    var: command_output.stdout_lines
+  tags:
+    - troubleshooting
+  ignore_errors: true
+
+- name: show journalctl -ue rke2-server
+  command: >-
+    journalctl -eu rke2-server --lines 200 --no-pager
+  changed_when: false
+  register: command_output
+  tags:
+    - troubleshooting
+  ignore_errors: true
+
+- name: show journalctl -ue rke2-server
+  debug:
+    var: command_output.stdout_lines
+  tags:
+    - troubleshooting
+  ignore_errors: true
+
+- name: show rke2 config file
+  command: >-
+    cat /etc/rancher/rke2/config.yaml
+  changed_when: false
+  register: command_output
+  tags:
+    - troubleshooting
+  ignore_errors: true
+
+- name: show rke2 config file
+  debug:
+    var: command_output.stdout_lines
+  tags:
+    - troubleshooting
+  ignore_errors: true

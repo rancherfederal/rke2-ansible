@@ -41,7 +41,7 @@
       when: not installed
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
-    - rke2_binary_tarball_check.stat.exists == false
+    - not rke2_binary_tarball_check.stat.exists
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.

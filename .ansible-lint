@@ -4,6 +4,7 @@ exclude_paths:
 - .ansible-lint
 warn_list:
   - no-handler
-  - fqcn-builtins
+  - var-spacing
 skip_list:
   - experimental
+  - fqcn-builtins
