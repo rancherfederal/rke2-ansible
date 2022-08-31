@@ -60,6 +60,11 @@
   register: updated_rke2_config
   changed_when: false
 
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  changed_when: false
+
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
 - name: get rke2_config node-taints
   set_fact:
