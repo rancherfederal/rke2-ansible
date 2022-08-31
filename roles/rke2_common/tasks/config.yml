@@ -248,7 +248,8 @@
 
 - name: Drop in final /etc/rancher/rke2/config.yaml
   copy:
-    content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
+    src: /tmp/ansible-config.txt
+    remote_src: yes
     dest: /etc/rancher/rke2/config.yaml
     mode: "0640"
     owner: root
