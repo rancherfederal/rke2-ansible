@@ -215,7 +215,7 @@
     line: "{{ original_token }}"
     state: present
     insertbefore: BOF
-  when: previous_rke2_config.stat.exists
+  when: previous_rke2_config.stat.exists and original_token | length > 0
   changed_when: false
 
 - name: Get original server
@@ -230,7 +230,7 @@
     line: "{{ original_server }}"
     state: present
     insertbefore: BOF
-  when: previous_rke2_config.stat.exists
+  when: previous_rke2_config.stat.exists and original_server | length > 0
   changed_when: false
 
 - name: Stat tmp config
