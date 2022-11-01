@@ -1,5 +1,4 @@
 ---
-
 - name: Does the /etc/rancher/rke2 dir exist?
   stat:
     path: /etc/rancher/rke2
@@ -60,6 +59,11 @@
   register: updated_rke2_config
   changed_when: false
 
+- name: Update rke2_config to take value of updated_rke2_config
+  set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  changed_when: false
+
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
 - name: get rke2_config node-taints
   set_fact:
@@ -97,7 +101,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -113,7 +117,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -129,7 +133,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -146,7 +150,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -162,7 +166,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -177,7 +181,7 @@
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -195,7 +199,6 @@
     mode: "0600"
     owner: root
     group: root
-  when: previous_rke2_config.stat.exists
   changed_when: false
 
 - name: Get original token
@@ -210,7 +213,7 @@
     line: "{{ original_token }}"
     state: present
     insertbefore: BOF
-  when: previous_rke2_config.stat.exists
+  when: previous_rke2_config.stat.exists and original_token | length > 0
   changed_when: false
 
 - name: Get original server
@@ -225,25 +228,24 @@
     line: "{{ original_server }}"
     state: present
     insertbefore: BOF
-  when: previous_rke2_config.stat.exists
+  when: previous_rke2_config.stat.exists and original_server | length > 0
   changed_when: false
 
 - name: Stat tmp config
   stat:
     path: /tmp/ansible-config.txt
   register: tmp_config
-  when: previous_rke2_config.stat.exists
   changed_when: false
 
 - name: Get cksum of tmp config
   set_fact:
     tmp_sha1: "{{ tmp_config.stat.checksum }}"
-  when: previous_rke2_config.stat.exists
   changed_when: false
 
 - name: Drop in final /etc/rancher/rke2/config.yaml
   copy:
-    content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
+    src: /tmp/ansible-config.txt
+    remote_src: yes
     dest: /etc/rancher/rke2/config.yaml
     mode: "0640"
     owner: root
