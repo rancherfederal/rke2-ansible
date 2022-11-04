@@ -101,7 +101,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -117,7 +117,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -133,7 +133,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -150,7 +150,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -166,7 +166,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -181,7 +181,7 @@
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed

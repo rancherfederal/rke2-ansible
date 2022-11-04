@@ -50,7 +50,9 @@
     name: firewalld
     state: stopped
     enabled: no
-  when: ansible_facts.services["firewalld.service"] is defined and ansible_facts.services["firewalld.service"].status != "not-found"
+  when:
+    - ansible_facts.services["firewalld.service"] is defined
+    - ansible_facts.services["firewalld.service"].status != "not-found"
 
 - include: network_manager_fix.yaml
 
