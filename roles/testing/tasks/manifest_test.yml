@@ -1,6 +1,6 @@
 ---
 
-- name: copy basic-deployment.yaml to remote machine
+- name: Copy basic-deployment.yaml to remote machine
   ansible.builtin.copy:
     src: basic-deployment.yaml
     dest: /var/lib/rancher/rke2/server/manifests/

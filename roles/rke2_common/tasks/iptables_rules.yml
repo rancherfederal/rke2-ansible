@@ -104,7 +104,7 @@
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
-- name: save iptables
+- name: Save iptables
   shell: "iptables-save > /etc/sysconfig/iptables"
   become: true
   changed_when: false
@@ -116,7 +116,7 @@
     state: present
   when: ansible_facts['os_family'] == 'Debian'
 
-- name: save iptables
+- name: Save iptables
   shell: "iptables-save > /etc/iptables/rules.v4"
   become: true
   changed_when: false

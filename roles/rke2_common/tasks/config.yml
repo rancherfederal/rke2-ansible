@@ -27,7 +27,7 @@
     orig_rke2_config: "{{ full_orig_rke2_config['content'] | b64decode }}"
   when: previous_rke2_config.stat.exists
 
-- name: create the /etc/rancher/rke2/config.yaml file
+- name: Create the /etc/rancher/rke2/config.yaml file
   file:
     path: /etc/rancher/rke2/config.yaml
     state: touch
@@ -38,11 +38,11 @@
 
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 
-- name: get rke2_config node-labels
+- name: Get rke2_config node-labels
   set_fact:
     rke2_config_node_labels: "{{ rke2_config['node-label'] | default([]) }}"
 
-- name: get host var node-labels
+- name: Get host var node-labels
   set_fact:
     host_var_node_labels: "{{ node_labels | default([]) }}"
 
@@ -65,11 +65,11 @@
   changed_when: false
 
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
-- name: get rke2_config node-taints
+- name: Get rke2_config node-taints
   set_fact:
     rke2_config_node_taints: "{{ rke2_config['node-taint'] | default([]) }}"
 
-- name: get host var node-taints
+- name: Get host var node-taints
   set_fact:
     host_var_node_taints: "{{ node_taints | default([]) }}"
 
