@@ -10,10 +10,11 @@
 - name: Has rke2 been installed already
   include_tasks: previous_install.yml
 
-- include: images_tarball_install.yml
+- name: Include images_tarball_install.yml
+  include_tasks: images_tarball_install.yml
   when: not installed
 
-- name: "Check for binary tarball in {{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
+- name: "Check for binary tarball in {{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"  # noqa name[template]
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
   register: rke2_binary_tarball_check
@@ -21,12 +22,12 @@
   become: no
 
 - name: SLES/Ubuntu/Tarball Installation
-  include: tarball_install.yml
+  include_tasks: tarball_install.yml
   when:
     - |-
       ((ansible_facts['os_family'] != 'RedHat' and
       ansible_facts['os_family'] != 'Rocky') or
-      rke2_binary_tarball_check.stat.exists == true)
+      rke2_binary_tarball_check.stat.exists )
       and not installed
 
 - name: RHEL/CentOS Installation
@@ -37,7 +38,8 @@
     - name: Reread ansible_lsb facts
       setup: filter=ansible_lsb*
       when: "'redhat-lsb-core' not in ansible_facts.packages"
-    - include: rpm_install.yml
+    - name: Include task file rpm_install.yml
+      include_tasks: rpm_install.yml
       when: not installed
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
@@ -45,16 +47,20 @@
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
-- name: disable FIREWALLD
+- name: Disable FIREWALLD
   systemd:
     name: firewalld
     state: stopped
     enabled: no
-  when: ansible_facts.services["firewalld.service"] is defined and ansible_facts.services["firewalld.service"].status != "not-found"
+  when:
+    - ansible_facts.services["firewalld.service"] is defined
+    - ansible_facts.services["firewalld.service"].status != "not-found"
 
-- include: network_manager_fix.yaml
+- name: Include task file network_manager_fix.yaml
+  include_tasks: network_manager_fix.yaml
 
-- include: config.yml
+- name: Include task file config.yml
+  include_tasks: config.yml
 
 - name: Add server iptables rules
   include_tasks: iptables_rules.yml
@@ -62,11 +68,13 @@
     - ansible_facts.services["iptables.service"] is defined
     - add_iptables_rules is true
 
-- include: add-audit-policy-config.yml
+- name: Include task file add-audit-policy-config.yml
+  include_tasks: add-audit-policy-config.yml
   when:
     - audit_policy_config_file_path | length > 0
 
-- include: add-registry-config.yml
+- name: Include task file add-registry-config.yml
+  include_tasks: add-registry-config.yml
   when: registry_config_file_path | length > 0
 
 - name: Run CIS-Hardening Tasks

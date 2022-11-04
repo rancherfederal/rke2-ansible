@@ -27,7 +27,7 @@
     orig_rke2_config: "{{ full_orig_rke2_config['content'] | b64decode }}"
   when: previous_rke2_config.stat.exists
 
-- name: create the /etc/rancher/rke2/config.yaml file
+- name: Create the /etc/rancher/rke2/config.yaml file
   file:
     path: /etc/rancher/rke2/config.yaml
     state: touch
@@ -38,11 +38,11 @@
 
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 
-- name: get rke2_config node-labels
+- name: Get rke2_config node-labels
   set_fact:
     rke2_config_node_labels: "{{ rke2_config['node-label'] | default([]) }}"
 
-- name: get host var node-labels
+- name: Get host var node-labels
   set_fact:
     host_var_node_labels: "{{ node_labels | default([]) }}"
 
@@ -65,11 +65,11 @@
   changed_when: false
 
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
-- name: get rke2_config node-taints
+- name: Get rke2_config node-taints
   set_fact:
     rke2_config_node_taints: "{{ rke2_config['node-taint'] | default([]) }}"
 
-- name: get host var node-taints
+- name: Get host var node-taints
   set_fact:
     host_var_node_taints: "{{ node_taints | default([]) }}"
 
@@ -101,7 +101,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -117,7 +117,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -133,7 +133,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -150,7 +150,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -166,7 +166,7 @@
   register: updated_rke2_config
   changed_when: false
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed
@@ -181,7 +181,7 @@
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
   register: updated_rke2_config
 
-- name: Update rke2_config to take value of updated_rke2_config # noqa no-handler
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
   set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: updated_rke2_config.changed

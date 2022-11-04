@@ -10,7 +10,7 @@
   delay: 10
   changed_when: false
 
-- name: Extract the hostname-override parameter from the kubelet process
+- name: Extract the hostname-override parameter from the kubelet process  # noqa var-spacing
   set_fact:
     kubelet_hostname_override_parameter: "{{ kubelet_check.stdout |\
       regex_search('\\s--hostname-override=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))\\s',\

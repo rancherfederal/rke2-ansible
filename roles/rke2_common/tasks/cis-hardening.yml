@@ -39,7 +39,7 @@
         ansible_facts['os_family'] != 'Rocky') or
         rke2_binary_tarball_check.stat.exists
 
-    - name: restart systemd-sysctl
+    - name: Restart systemd-sysctl
       service:
         state: restarted
         name: systemd-sysctl
