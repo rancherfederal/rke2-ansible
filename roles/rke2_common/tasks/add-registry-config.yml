@@ -13,7 +13,7 @@
     owner: root
     group: root
   when: caller_role_name == "server"
-  notify: restart rke2-server
+  notify: Restart rke2-server
 
 - name: Add registry configuration file
   copy:
@@ -23,4 +23,4 @@
     owner: root
     group: root
   when: caller_role_name == "agent"
-  notify: restart rke2-agent
+  notify: Restart rke2-agent
