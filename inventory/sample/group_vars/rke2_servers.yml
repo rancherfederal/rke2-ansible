@@ -1,7 +1,32 @@
 ---
 # Primary RKE2 server configuration parameters. Remove the curly braces ( {} ) and add your configuration.
 # See https://docs.rke2.io/install/install_options/server_config/ for all configuration options.
-rke2_config: {}
+rke2_config:
+  profile: cis-1.6
+  selinux: true
+  secrets-encryption: true
+  write-kubeconfig-mode: 0640
+  streaming-connection-idle-timeout: 5m
+  kube-controller-manager-arg:
+  - bind-address=127.0.0.1
+  - use-service-account-credentials=true
+  - tls-min-version=VersionTLS12
+  - tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  kube-scheduler-arg:
+  - tls-min-version=VersionTLS12
+  - tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  kube-apiserver-arg:
+  - tls-min-version=VersionTLS12
+  - tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  - authorization-mode=RBAC,Node
+  - anonymous-auth=false
+  - audit-policy-file=/etc/rancher/rke2/audit-policy.yaml
+  - audit-log-mode=blocking-strict
+  - audit-log-maxage=30
+  kubelet-arg:
+  - protect-kernel-defaults=true
+  - read-only-port=0
+  - authorization-mode=Webhook
 
 # Example of possible rke2_config.
 #rke2_config:
