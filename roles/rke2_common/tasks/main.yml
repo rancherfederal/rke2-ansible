@@ -40,7 +40,6 @@
       when: "'redhat-lsb-core' not in ansible_facts.packages"
     - name: Include task file rpm_install.yml
       include_tasks: rpm_install.yml
-      when: not installed
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
