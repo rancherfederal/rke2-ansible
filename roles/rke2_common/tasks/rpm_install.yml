@@ -121,7 +121,7 @@
 - name: YUM-Based | Install rke2-server
   yum:
     name: "rke2-server-{{ rke2_version_rpm }}"
-    state: present  # noqa package-latest
+    state: latest  # noqa package-latest
   when:
     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
@@ -130,7 +130,7 @@
 - name: YUM-Based | Install rke2-agent
   yum:
     name: "rke2-agent-{{ rke2_version_rpm }}"
-    state: present  # noqa package-latest
+    state: latest  # noqa package-latest
   when:
     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
