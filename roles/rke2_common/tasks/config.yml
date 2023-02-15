@@ -27,176 +27,25 @@
     orig_rke2_config: "{{ full_orig_rke2_config['content'] | b64decode }}"
   when: previous_rke2_config.stat.exists
 
-- name: Create the /etc/rancher/rke2/config.yaml file
-  file:
-    path: /etc/rancher/rke2/config.yaml
-    state: touch
-    mode: "0640"
-    owner: root
-    group: root
-  when: not previous_rke2_config.stat.exists
-
-# --node-label value                     (agent/node) Registering and starting kubelet with set of labels
-
-- name: Get rke2_config node-labels
+- name: Get rke2_config node-labels/taints and host var node-labels/taints
   set_fact:
     rke2_config_node_labels: "{{ rke2_config['node-label'] | default([]) }}"
-
-- name: Get host var node-labels
-  set_fact:
+    rke2_config_node_taints: "{{ rke2_config['node-taint'] | default([]) }}"
     host_var_node_labels: "{{ node_labels | default([]) }}"
+    host_var_node_taints: "{{ node_taints | default([]) }}"
+  changed_when: false
 
-- name: Combine rke2_config node labels and hostvar node labels
+- name: Combine rke2_config node-labels/taints and hostvar node-labels/taints
   set_fact:
     all_node_labels: "{{ rke2_config_node_labels + host_var_node_labels }}"
-  changed_when: false
-
-- name: Add node labels to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["node-label"]
-        value: "{{ all_node_labels }}"
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  changed_when: false
-
-# --node-taint value                     (agent/node) Registering kubelet with set of taints
-- name: Get rke2_config node-taints
-  set_fact:
-    rke2_config_node_taints: "{{ rke2_config['node-taint'] | default([]) }}"
-
-- name: Get host var node-taints
-  set_fact:
-    host_var_node_taints: "{{ node_taints | default([]) }}"
-
-- name: Combine rke2_config node taints and hostvar node taints
-  set_fact:
     all_node_taints: "{{ rke2_config_node_taints + host_var_node_taints }}"
   changed_when: false
 
-- name: Add node labels to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["node-taint"]
-        value: "{{ all_node_taints }}"
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  changed_when: false
-
-# --node-ip value, -i value (agent/networking) IPv4/IPv6 addresses to advertise for node
-- name: Add node-ip to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["node-ip"]
-        value: "{{ node_ip }}"
-  when: (node_ip is defined) and (node_ip|length > 0)
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  when: updated_rke2_config.changed
-  changed_when: false
-
-# --node-name value (agent/node) Node name [$RKE2_NODE_NAME]
-- name: Add node-name to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["node-name"]
-        value: "{{ node_name }}"
-  when: (node_name is defined) and (node_name|length > 0)
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  when: updated_rke2_config.changed
-  changed_when: false
-
-# --bind-address value (listener) rke2 bind address (default: 0.0.0.0)
-- name: Add bind-address to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["bind-address"]
-        value: "{{ bind_address }}"
-  when: (bind_address is defined) and (bind_address|length > 0)
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  when: updated_rke2_config.changed
-  changed_when: false
-
-# --advertise-address value (listener) IPv4 address that apiserver uses
-# to advertise to members of the cluster (default: node-external-ip/node-ip)
-- name: Add advertise-address to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["advertise-address"]
-        value: "{{ advertise_address }}"
-  when: (advertise_address is defined) and (advertise_address|length > 0)
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  when: updated_rke2_config.changed
-  changed_when: false
-
-# --node-external-ip value (agent/networking) IPv4/IPv6 external IP addresses to advertise for node
-- name: Add node-external-ip to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["node-external-ip"]
-        value: "{{ node_external_ip }}"
-  when: (node_external_ip is defined) and (node_external_ip|length > 0)
-  register: updated_rke2_config
-  changed_when: false
-
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  when: updated_rke2_config.changed
-  changed_when: false
-
-# --cloud-provider-name value (agent/node) Cloud provider name
-- name: Add cloud-provider-name to rke2_config
-  ansible.utils.update_fact:
-    updates:
-      - path: rke2_config["cloud-provider-name"]
-        value: "{{ cloud_provider_name }}"
-  when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
-  register: updated_rke2_config
-
-- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
-    rke2_config: "{{ updated_rke2_config.rke2_config }}"
-  when: updated_rke2_config.changed
-
-- name: Remove tmp config file
-  ansible.builtin.file:
-    path: /tmp/ansible-config.txt
-    state: absent
-  changed_when: false
-
-- name: Create tmp config.yaml
-  copy:
-    content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
+- name: Template a temporary config file
+  ansible.builtin.template:
+    src: config.yml.j2
     dest: /tmp/ansible-config.txt
-    mode: "0600"
+    mode: '0600'
     owner: root
     group: root
   changed_when: false

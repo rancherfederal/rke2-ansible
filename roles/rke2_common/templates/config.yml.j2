@@ -1,0 +1,28 @@
+{% if advertise_address is defined and advertise_address %}
+advertise-address: {{ addvertise_adress }}
+{% endif %}
+{% if bind_address is defined and bind_address %}
+bind-address: {{ bind_address }}
+{% endif %}
+{% if cloud_provider_name is defined and cloud_provider_name %}
+cloud-provider-name: {{ cloud_provider_name }}
+{% endif %}
+{% if node_external_ip is defined and node_external_ip %}
+node-external-ip: {{ node_external_ip }}
+{% endif %}
+{% if node_ip is defined and node_ip %}
+node-ip: {{ node_ip }}
+{% endif %}
+node-label: {% if not all_node_labels %}[]{% endif %}
+
+{% if all_node_labels %}{% for label in all_node_labels %}
+- {{ label }}
+{% endfor %}{% endif %}
+{% if node_name is defined and node_name %}
+node-name: {{ node_name }}
+{% endif %}
+node-taint: {% if not all_node_taints %}[]{% endif %}
+
+{% if all_node_taints %}{% for taint in all_node_taints %}
+- {{ taint }}
+{% endfor %}{% endif %}
