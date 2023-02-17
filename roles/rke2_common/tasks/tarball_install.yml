@@ -51,6 +51,7 @@
       changed_when: false
       args:
         executable: /bin/bash
+      ignore_errors: "{{ ansible_check_mode }}"
 
     - name: Set dot version
       shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
