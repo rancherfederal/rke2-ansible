@@ -23,7 +23,6 @@
     changed_when: false
     args:
       executable: /usr/bin/bash
-    ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Set rke2_full_version fact  # noqa var-spacing
   set_fact:
