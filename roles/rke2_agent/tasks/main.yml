@@ -7,6 +7,10 @@
     name: rke2_common
     tasks_from: main
 
+- name: Include mount tasks
+  include_tasks: mounts.yml
+  when: agent_mounts | length > 0
+
 - name: Does config file already have server token?  # noqa command-instead-of-shell
   command: 'grep -i "^token:" /etc/rancher/rke2/config.yaml'
   register: server_token_check

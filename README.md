@@ -20,7 +20,7 @@ Ansible RKE2 (RKE Government) Playbook
 ---------
 [![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml)
 
-RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible  playbook installs RKE2 for both the control plane and workers.
+RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible playbook installs RKE2 for both the control plane and workers.
 
 See the [docs](https://docs.rke2.io/) more information about [RKE Government](https://docs.rke2.io/).
 

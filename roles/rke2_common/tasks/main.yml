@@ -55,6 +55,21 @@
     - ansible_facts.services["firewalld.service"] is defined
     - ansible_facts.services["firewalld.service"].status != "not-found"
 
+- name: Disable swap
+  ansible.builtin.command: swapoff -a
+  when: not installed
+
+- name: Disable swap in fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+  when: not installed
+
+- name: Include mount tasks
+  include_tasks: mounts.yml
+  when: cluster_mounts | length > 0
+
 - name: Include task file network_manager_fix.yaml
   include_tasks: network_manager_fix.yaml
 

@@ -7,6 +7,10 @@
     name: rke2_common
     tasks_from: main
 
+- name: Include mount tasks
+  include_tasks: mounts.yml
+  when: server_mounts | length > 0
+
 - name: Setup initial server
   include_tasks: first_server.yml
   when: inventory_hostname in groups['rke2_servers'][0]
