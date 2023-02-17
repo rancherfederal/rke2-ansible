@@ -12,6 +12,9 @@
     uri:
       url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
       follow_redirects: all
+    environment:
+      - http_proxy: "{{ http_proxy | default(omit) }}"
+      - https_proxy: "{{ https_proxy | default(omit) }}"
     register: rke2_version_url
 
   - name: Set full version name
