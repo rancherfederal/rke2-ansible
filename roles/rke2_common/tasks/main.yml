@@ -68,7 +68,7 @@
 
 - name: Include mount tasks
   include_tasks: mounts.yml
-  when: cluster_mounts | length > 0
+  when: mounts | length > 0
 
 - name: Include task file network_manager_fix.yaml
   include_tasks: network_manager_fix.yaml

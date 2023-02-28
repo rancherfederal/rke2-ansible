@@ -9,7 +9,7 @@
 
 - name: Include mount tasks
   include_tasks: mounts.yml
-  when: server_mounts | length > 0
+  when: mounts | length > 0
 
 - name: Setup initial server
   include_tasks: first_server.yml
