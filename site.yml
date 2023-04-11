@@ -1,13 +1,15 @@
 ---
 
-- hosts: rke2_servers
+- name: Server play
+  hosts: rke2_servers
   any_errors_fatal: true
   become: true
   roles:
     - role: rke2_server
   serial: 1
 
-- hosts: rke2_agents
+- name: Agent play
+  hosts: rke2_agents
   any_errors_fatal: true
   become: true
   roles:
