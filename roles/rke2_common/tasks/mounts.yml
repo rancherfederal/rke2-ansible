@@ -1,0 +1,10 @@
+---
+
+- name: Set up mount points for additional disks
+  ansible.posix.mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: "{{ item.fstype }}"
+    state: present
+  with_items:
+    - "{{ mounts }}"
