@@ -31,18 +31,23 @@
       and not installed
 
 - name: RHEL/CentOS Installation
-  block:
-    - name: Install redhat-lsb-core
-      yum: name=redhat-lsb-core state=present
-      when: "'redhat-lsb-core' not in ansible_facts.packages"
-    - name: Reread ansible_lsb facts
-      setup: filter=ansible_lsb*
-      when: "'redhat-lsb-core' not in ansible_facts.packages"
-    - name: Include task file rpm_install.yml
-      include_tasks: rpm_install.yml
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
+  block:
+    - name: Install redhat-lsb-core
+      when: "'redhat-lsb-core' not in ansible_facts.packages"
+      yum:
+        name: redhat-lsb-core
+        state: present
+
+    - name: Reread ansible_lsb facts
+      when: "'redhat-lsb-core' not in ansible_facts.packages"
+      setup:
+        filter: ansible_lsb*
+
+    - name: Include task file rpm_install.yml
+      include_tasks: rpm_install.yml
 
 # Disable Firewalld
 # We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
