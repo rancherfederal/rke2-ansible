@@ -2,16 +2,18 @@
 - name: "Check for images tar.gz in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"  # noqa name[template] yaml[line-length]
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
+    get_checksum: false
   register: got_images_gz
   delegate_to: 127.0.0.1
-  become: no
+  become: false
 
 - name: "Check for images tar.zst in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"  # noqa name[template] yaml[line-length]
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
+    get_checksum: false
   register: got_images_zst
   delegate_to: 127.0.0.1
-  become: no
+  become: false
 
 - name: Add images tar.gz to needed directory if provided
   copy:
