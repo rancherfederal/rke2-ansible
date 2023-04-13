@@ -20,7 +20,7 @@ RKE2 can be installed in an air-gapped environment with two different methods. Y
 
 All files mentioned in the steps can be obtained from the assets of the desired released rke2 version [here](https://github.com/rancher/rke2/releases).
 
-If running on an SELinux enforcing air-gapped node, you must first install the necessary SELinux policy RPM before performing these steps. See our [RPM Documentation](https://github.com/rancher/rke2#rpm-repositories) to determine what you need.
+If running on an SELinux enforcing air-gapped node, you must first install the necessary SELinux policy RPM before performing these steps. See our [RPM Documentation](https://docs.rke2.io/install/methods/#rpm) to determine what you need.
 
 # Tarball Method
 This ansible playbook will detect if the `rke2-images.linux-amd64.tar.zst` and `rke2.linux-amd64.tar.gz` files are in the tarball_install/ directory. If the files are in the directory then the install process will skip both the yum install and the need to download the tarball.

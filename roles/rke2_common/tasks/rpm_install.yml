@@ -3,23 +3,23 @@
 - name: "Calculate rke2 full version "
   when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )  # noqa var-spacing
   block:
-  - name: Stop if the provided is not valid
-    fail:
-      msg: "Provided channel is not valid"
-    when: rke2_channel not in channels
+    - name: Stop if the provided is not valid
+      fail:
+        msg: "Provided channel is not valid"
+      when: rke2_channel not in channels
 
-  - name: Get full version name url
-    uri:
-      url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
-      follow_redirects: all
-    register: rke2_version_url
+    - name: Get full version name url
+      uri:
+        url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
+        follow_redirects: all
+      register: rke2_version_url
 
-  - name: Set full version name
-    shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
-    register: rke2_full_version
-    changed_when: false
-    args:
-      executable: /usr/bin/bash
+    - name: Set full version name
+      shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+      register: rke2_full_version
+      changed_when: false
+      args:
+        executable: /usr/bin/bash
 
 - name: Set rke2_full_version fact  # noqa var-spacing
   set_fact:

@@ -1,0 +1,40 @@
+---
+name: CentOS 7
+
+on:
+  push:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-gov-west-1
+
+jobs:
+
+  lint-test:
+    name: Lint for push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+
+      - name: Set up Python.
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint ansible-lint ansible
+
+      - name: Version check
+        run: |
+          ansible --version
+          ansible-lint --version
+          yamllint --version
+
+      - name: Run yamllint.
+        run: yamllint .
+
+      - name: Run ansible-lint.
+        run: ansible-lint
