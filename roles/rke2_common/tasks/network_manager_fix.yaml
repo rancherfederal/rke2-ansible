@@ -39,3 +39,10 @@
     state: stopped
     enabled: no
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
+
+- name: Reload NetworkManager
+  systemd:
+    name: NetworkManager
+    state: reloaded
+  when: (ansible_facts.services["NetworkManager.service"] is defined) and
+        (ansible_facts.services["NetworkManager.service"].status == "running")
