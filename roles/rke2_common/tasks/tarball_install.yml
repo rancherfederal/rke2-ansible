@@ -102,6 +102,7 @@
   package:
     name: tar
     state: present
+  ignore_errors: true
 
 - name: TARBALL | Extract the tarball  # noqa command-instead-of-module
   command:
