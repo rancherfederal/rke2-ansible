@@ -91,7 +91,7 @@ ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
 
 Tarball Install/Air-Gap Install
 -------------------------------
-Added the neeed files to the [tarball_install](tarball_install]/) directory.
+Added the neeed files to the [tarball_install](tarball_install/) directory.
 
 Further info can be found [here](tarball_install/README.md)
 
