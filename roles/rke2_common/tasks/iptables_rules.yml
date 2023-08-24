@@ -1,7 +1,7 @@
 ---
 
 - name: Allow 9345
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -11,7 +11,7 @@
   when: inventory_hostname in groups['rke2_servers']
 
 - name: Allow 6443
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -21,7 +21,7 @@
   when: inventory_hostname in groups['rke2_servers']
 
 - name: Allow udp 8472
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: udp
@@ -30,7 +30,7 @@
     jump: ACCEPT
 
 - name: Allow 10250
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -39,7 +39,7 @@
     jump: ACCEPT
 
 - name: Allow 2379
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -49,7 +49,7 @@
   when: inventory_hostname in groups['rke2_servers']
 
 - name: Allow 2380
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -59,7 +59,7 @@
   when: inventory_hostname in groups['rke2_servers']
 
 - name: Allow 30000:32767
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -68,7 +68,7 @@
     jump: ACCEPT
 
 - name: Allow 443
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     protocol: tcp
@@ -77,47 +77,47 @@
     jump: ACCEPT
 
 - name: "Allow cluster-cidr forward"
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: FORWARD
     source: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: "Allow cluster-cidr forward"
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: FORWARD
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: "Allow cluster-cidr input"
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     source: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: "Allow cluster-cidr input"
-  iptables:
+  ansible.builtin.iptables:
     action: insert
     chain: INPUT
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
 
 - name: Save iptables
-  shell: "iptables-save > /etc/sysconfig/iptables"
+  ansible.builtin.shell: "iptables-save > /etc/sysconfig/iptables"
   become: true
   changed_when: false
   when: ansible_facts['os_family'] == 'RedHat'
 
 - name: Install iptables-persistent
-  apt:
+  ansible.builtin.apt:
     name: iptables-persistent
     state: present
   when: ansible_facts['os_family'] == 'Debian'
 
 - name: Save iptables
-  shell: "iptables-save > /etc/iptables/rules.v4"
+  ansible.builtin.shell: "iptables-save > /etc/iptables/rules.v4"
   become: true
   changed_when: false
   when: ansible_facts['os_family'] == 'Debian'

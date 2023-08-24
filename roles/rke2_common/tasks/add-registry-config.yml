@@ -1,12 +1,12 @@
 ---
 - name: Create the /etc/rancher/rke2 config dir
-  file:
+  ansible.builtin.file:
     path: /etc/rancher/rke2
     state: directory
     recurse: yes
 
 - name: Add registry configuration file
-  copy:
+  ansible.builtin.copy:
     src: "{{ registry_config_file_path }}"
     dest: "/etc/rancher/rke2/registries.yaml"
     mode: '0640'
@@ -16,7 +16,7 @@
   notify: Restart rke2-server
 
 - name: Add registry configuration file
-  copy:
+  ansible.builtin.copy:
     src: "{{ registry_config_file_path }}"
     dest: "/etc/rancher/rke2/registries.yaml"
     mode: '0640'

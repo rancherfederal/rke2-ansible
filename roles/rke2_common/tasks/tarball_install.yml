@@ -12,13 +12,13 @@
 # }
 
 - name: TARBALL | Make temp dir
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
     suffix: rke2-install.XXXXXXXXXX
   register: temp_dir
 
 - name: Send provided tarball if available
-  copy:
+  ansible.builtin.copy:
     src: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
     dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
     mode: '0644'
@@ -28,32 +28,32 @@
   when: not rke2_binary_tarball_check.stat.exists
   block:
     - name: Stop if the provided channel is not valid
-      fail:
+      ansible.builtin.fail:
         msg: "Provided channel is not valid"
       when: rke2_channel not in channels
 
     - name: TARBALL | Get full version name url
-      uri:
+      ansible.builtin.uri:
         url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
         follow_redirects: all
       register: rke2_version_url
 
     - name: Set full version name
-      shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+      ansible.builtin.shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
       register: rke2_full_version
       changed_when: false
       args:
         executable: /bin/bash
 
     - name: Set dot version
-      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
+      ansible.builtin.shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
       register: rke2_version_dot
       changed_when: false
       args:
         executable: /bin/bash
 
     - name: Set Maj.Min version
-      shell: >-
+      ansible.builtin.shell: >-
         set -o pipefail && echo {{ rke2_full_version.stdout }}
         | awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
       register: rke2_version
@@ -62,7 +62,7 @@
         executable: /bin/bash
 
     - name: Describe versions
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Full version: {{ rke2_full_version.stdout }}"
           - "dot version: {{ rke2_version_dot.stdout }}"
@@ -70,47 +70,47 @@
       run_once: yes
 
     - name: TARBALL | Download the tarball
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version.stdout }}/rke2.linux-amd64.tar.gz
         dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
         mode: "0644"
 
 - name: TARBALL | Check Target Mountpoint
-  command: mountpoint -q {{ tarball_dir }}
+  ansible.builtin.command: mountpoint -q {{ tarball_dir }}
   register: tarball_dir_stat
   failed_when: false
   changed_when: false
 
 - name: TARBALL | tarball_dir is a mountpoint setting dir to /opt/rke2
-  set_fact:
+  ansible.builtin.set_fact:
     tarball_dir: "/opt/rke2"
   when: tarball_dir_stat.rc == 0
 
 - name: TARBALL | Using /opt/rke2
-  debug:
+  ansible.builtin.debug:
     msg: "Using /opt/rke2 for install directory"
   when: tarball_dir_stat.rc == 0
 
 - name: TARBALL | Create {{ tarball_dir }}
-  file:
+  ansible.builtin.file:
     path: "{{ tarball_dir }}"
     state: directory
     recurse: true
   when: tarball_dir is defined
 
 - name: TARBALL | Install tar package
-  package:
+  ansible.builtin.package:
     name: tar
     state: present
   ignore_errors: true
 
 - name: TARBALL | Extract the tarball  # noqa command-instead-of-module
-  command:
+  ansible.builtin.command:
     cmd: tar -xf "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz" -C "{{ tarball_dir }}"
   changed_when: false
 
 - name: TARBALL | Remove the temp_dir
-  file:
+  ansible.builtin.file:
     path: "{{ temp_dir.path }}"
     state: absent
   when: temp_dir.path is defined
@@ -136,7 +136,7 @@
         replace: '{{ tarball_dir }}'
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  copy:
+  ansible.builtin.copy:
     src: "{{ tarball_dir }}/lib/systemd/system/rke2-server.service"
     dest: /etc/systemd/system/rke2-server.service
     mode: '0644'
@@ -147,7 +147,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  copy:
+  ansible.builtin.copy:
     src: "{{ tarball_dir }}/lib/systemd/system/rke2-server.env"
     dest: /etc/systemd/system/rke2-server.env
     mode: '0644'
@@ -158,7 +158,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  copy:
+  ansible.builtin.copy:
     src: "{{ tarball_dir }}/lib/systemd/system/rke2-agent.service"
     dest: /etc/systemd/system/rke2-agent.service
     mode: '0644'
@@ -169,7 +169,7 @@
     - inventory_hostname in groups.get('rke2_agents', [])
 
 - name: TARBALL | Moving Systemd units to /etc/systemd/system
-  copy:
+  ansible.builtin.copy:
     src: "{{ tarball_dir }}/lib/systemd/system/rke2-agent.env"
     dest: /etc/systemd/system/rke2-agent.env
     mode: '0644'
@@ -180,5 +180,5 @@
     - inventory_hostname in groups.get('rke2_agents', [])
 
 - name: TARBALL | Refreshing systemd unit files
-  systemd:
+  ansible.builtin.systemd:
     daemon-reload: yes

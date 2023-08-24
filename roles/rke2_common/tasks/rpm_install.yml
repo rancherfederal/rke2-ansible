@@ -4,75 +4,77 @@
   when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )  # noqa var-spacing
   block:
     - name: Stop if the provided is not valid
-      fail:
+      ansible.builtin.fail:
         msg: "Provided channel is not valid"
       when: rke2_channel not in channels
 
     - name: Get full version name url
-      uri:
+      ansible.builtin.uri:
         url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
         follow_redirects: all
       register: rke2_version_url
 
     - name: Set full version name
-      shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+      ansible.builtin.shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
       register: rke2_full_version
       changed_when: false
       args:
         executable: /usr/bin/bash
 
 - name: Set rke2_full_version fact  # noqa var-spacing
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"  # yamllint disable-line rule:line-length
 
 - name: Set dot version
-  shell: set -o pipefail && echo {{ rke2_full_version }} | /usr/bin/cut -d'+' -f1
+  ansible.builtin.shell: set -o pipefail && echo {{ rke2_full_version }} | /usr/bin/cut -d'+' -f1
   register: rke2_version_dot
   changed_when: false
   args:
     executable: /usr/bin/bash
 
 - name: Set rke2_version_dot fact
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_version_dot: "{{ rke2_version_dot.stdout }}"
 
 - name: Set Maj.Min version
-  shell: set -o pipefail && echo {{ rke2_full_version }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+  ansible.builtin.shell:
+    cmd: set -o pipefail && echo {{ rke2_full_version }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
   register: rke2_version_majmin
   changed_when: false
   args:
     executable: /usr/bin/bash
 
 - name: Set rke2_version_majmin fact
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_version_majmin: "{{ rke2_version_majmin.stdout }}"
 
 - name: Set RPM version
-  shell: set -o pipefail && echo {{ rke2_full_version }} | sed -E -e "s/[\+-]/~/g" | sed -E -e "s/v(.*)/\1/"
+  ansible.builtin.shell:
+    cmd: set -o pipefail && echo {{ rke2_full_version }} | sed -E -e "s/[\+-]/~/g" | sed -E -e "s/v(.*)/\1/"
   register: rke2_version_rpm
   changed_when: false
   args:
     executable: /usr/bin/bash
 
 - name: Set rke2_version_rpm fact
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_version_rpm: "{{ rke2_version_rpm.stdout }}"
 
 - name: Describe versions
-  debug:
+  ansible.builtin.debug:
     msg:
       - "Full version: {{ rke2_full_version }}, dot version: {{ rke2_version_dot }}"
       - "Maj.Min version: {{ rke2_version_majmin }}, rpm version: {{ rke2_version_rpm }}"
 
 # Does the Rancher RKE2 Common repo exist already
 - name: Check to see if rke2-common.repo exists
-  stat:
+  ansible.builtin.stat:
     path: '/etc/yum.repos.d/rke2-common.repo'
   register: stat_rke2_common_repo
 
 # Add RKE2 Common repo if it doesn't exist
 - name: Add the rke2-common repo RHEL/CentOS 7
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_common_yum_repo.name }}"
     description: "{{ rke2_common_yum_repo.description }}"
     baseurl: "{{ rke2_common_yum_repo.baseurl }}"
@@ -82,7 +84,7 @@
   when: not stat_rke2_common_repo.stat.exists and ansible_lsb.major_release == '7'
 
 - name: Add the rke2-common repo RHEL/CentOS 8
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_common_yum_repo.name }}"
     description: "{{ rke2_common_yum_repo.description }}"
     baseurl: "{{ rke2_common_yum_repo.baseurl }}"
@@ -93,13 +95,13 @@
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
-  stat:
+  ansible.builtin.stat:
     path: '/etc/yum.repos.d/rke2-v{{ rke2_version_majmin }}.repo'  # noqa var-spacing
   register: stat_rke2_versioned_repo
 
 # Add RKE2 versioned repo if it doesn't exist
 - name: Add the rke2 versioned repo CentOS/RHEL 7
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_versioned_yum_repo.name }}"
     description: "{{ rke2_versioned_yum_repo.description }}"
     baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
@@ -109,7 +111,7 @@
   when: not stat_rke2_versioned_repo.stat.exists and ansible_lsb.major_release == '7'
 
 - name: Add the rke2 versioned repo CentOS/RHEL 8
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_versioned_yum_repo.name }}"
     description: "{{ rke2_versioned_yum_repo.description }}"
     baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
@@ -119,7 +121,7 @@
   when: not stat_rke2_versioned_repo.stat.exists and ansible_lsb.major_release == '8'
 
 - name: YUM-Based | Install rke2-server
-  yum:
+  ansible.builtin.yum:
     name: "rke2-server-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
   when:
@@ -128,7 +130,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: YUM-Based | Install rke2-agent
-  yum:
+  ansible.builtin.yum:
     name: "rke2-agent-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
   when:

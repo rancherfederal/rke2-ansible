@@ -1,34 +1,34 @@
 ---
 - name: Does the /etc/rancher/rke2 dir exist?
-  stat:
+  ansible.builtin.stat:
     path: /etc/rancher/rke2
   register: rke2_directory
 
 - name: Create the /etc/rancher/rke2 config dir
-  file:
+  ansible.builtin.file:
     path: /etc/rancher/rke2
     state: directory
     recurse: yes
   when: not rke2_directory.stat.exists
 
 - name: Does the /etc/rancher/rke2/config.yaml file exist?
-  stat:
+  ansible.builtin.stat:
     path: /etc/rancher/rke2/config.yaml
   register: previous_rke2_config
 
 - name: Read previous_rke2_config
-  slurp:
+  ansible.builtin.slurp:
     src: /etc/rancher/rke2/config.yaml
   register: full_orig_rke2_config
   when: previous_rke2_config.stat.exists
 
 - name: Decode contents of slurp
-  set_fact:
+  ansible.builtin.set_fact:
     orig_rke2_config: "{{ full_orig_rke2_config['content'] | b64decode }}"
   when: previous_rke2_config.stat.exists
 
 - name: Create the /etc/rancher/rke2/config.yaml file
-  file:
+  ansible.builtin.file:
     path: /etc/rancher/rke2/config.yaml
     state: touch
     mode: "0640"
@@ -39,15 +39,15 @@
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 
 - name: Get rke2_config node-labels
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config_node_labels: "{{ rke2_config['node-label'] | default([]) }}"
 
 - name: Get host var node-labels
-  set_fact:
+  ansible.builtin.set_fact:
     host_var_node_labels: "{{ node_labels | default([]) }}"
 
 - name: Combine rke2_config node labels and hostvar node labels
-  set_fact:
+  ansible.builtin.set_fact:
     all_node_labels: "{{ rke2_config_node_labels + host_var_node_labels }}"
   changed_when: false
 
@@ -60,21 +60,21 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   changed_when: false
 
 # --node-taint value                     (agent/node) Registering kubelet with set of taints
 - name: Get rke2_config node-taints
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config_node_taints: "{{ rke2_config['node-taint'] | default([]) }}"
 
 - name: Get host var node-taints
-  set_fact:
+  ansible.builtin.set_fact:
     host_var_node_taints: "{{ node_taints | default([]) }}"
 
 - name: Combine rke2_config node taints and hostvar node taints
-  set_fact:
+  ansible.builtin.set_fact:
     all_node_taints: "{{ rke2_config_node_taints + host_var_node_taints }}"
   changed_when: false
 
@@ -87,7 +87,7 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   changed_when: false
 
@@ -102,7 +102,7 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (node_ip is defined) and (node_ip|length > 0)
   changed_when: false
@@ -118,7 +118,7 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (node_name is defined) and (node_name|length > 0)
   changed_when: false
@@ -134,7 +134,7 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (bind_address is defined) and (bind_address|length > 0)
   changed_when: false
@@ -151,7 +151,7 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (advertise_address is defined) and (advertise_address|length > 0)
   changed_when: false
@@ -167,7 +167,7 @@
   changed_when: false
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (node_external_ip is defined) and (node_external_ip|length > 0)
   changed_when: false
@@ -182,7 +182,7 @@
   register: updated_rke2_config
 
 - name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
-  set_fact:
+  ansible.builtin.set_fact:
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
 
@@ -193,7 +193,7 @@
   changed_when: false
 
 - name: Create tmp config.yaml
-  copy:
+  ansible.builtin.copy:
     content: "{{ rke2_config | to_nice_yaml(indent=0) }}"
     dest: /tmp/ansible-config.txt
     mode: "0600"
@@ -202,13 +202,13 @@
   changed_when: false
 
 - name: Get original token
-  set_fact:
+  ansible.builtin.set_fact:
     original_token: "{{ orig_rke2_config | regex_search('token: (.+)') }}"
   when: previous_rke2_config.stat.exists
   changed_when: false
 
 - name: Add token to config.yaml
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /tmp/ansible-config.txt
     line: "{{ original_token }}"
     state: present
@@ -217,13 +217,13 @@
   changed_when: false
 
 - name: Get original server
-  set_fact:
+  ansible.builtin.set_fact:
     original_server: "{{ orig_rke2_config | regex_search('server: https://(.*):9345') }}"
   when: previous_rke2_config.stat.exists
   changed_when: false
 
 - name: Add server url to config file
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /tmp/ansible-config.txt
     line: "{{ original_server }}"
     state: present
@@ -232,18 +232,18 @@
   changed_when: false
 
 - name: Stat tmp config
-  stat:
+  ansible.builtin.stat:
     path: /tmp/ansible-config.txt
   register: tmp_config
   changed_when: false
 
 - name: Get cksum of tmp config
-  set_fact:
+  ansible.builtin.set_fact:
     tmp_sha1: "{{ tmp_config.stat.checksum }}"
   changed_when: false
 
 - name: Drop in final /etc/rancher/rke2/config.yaml
-  copy:
+  ansible.builtin.copy:
     src: /tmp/ansible-config.txt
     remote_src: yes
     dest: /etc/rancher/rke2/config.yaml
@@ -260,7 +260,7 @@
   changed_when: false
 
 - name: Restart rke2-server if package installed and config changed
-  service:
+  ansible.builtin.service:
     state: restarted
     name: rke2-server
   when:
@@ -269,7 +269,7 @@
     - tmp_sha1 != previous_rke2_config.stat.checksum
 
 - name: Restart rke2-agent if package installed and config changed
-  service:
+  ansible.builtin.service:
     state: restarted
     name: rke2-agent
   when:
