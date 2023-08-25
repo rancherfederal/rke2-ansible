@@ -24,7 +24,7 @@
     mode: '0644'
   when: rke2_binary_tarball_check.stat.exists
 
-- name: Download tarball  # noqa var-spacing
+- name: Download tarball  # noqa jinja[spacing]
   when: not rke2_binary_tarball_check.stat.exists
   block:
     - name: Stop if the provided channel is not valid
