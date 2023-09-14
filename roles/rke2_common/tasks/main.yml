@@ -12,7 +12,6 @@
 
 - name: Include images_tarball_install.yml
   include_tasks: images_tarball_install.yml
-  when: not installed
 
 - name: "Check for binary tarball in {{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"  # noqa name[template]
   stat:
@@ -21,6 +20,26 @@
   delegate_to: 127.0.0.1
   become: no
 
+- name: Check for the rke2 binary
+  stat:
+    path: /usr/local/bin/rke2
+  register: rke2_binary
+
+- name: If the rke2 binary exists, determine if the version is changing
+  when: rke2_binary.stat.exists
+  block:
+    - name: Get current RKE2 version
+      shell: set -o pipefail && /usr/local/bin/rke2 -v | head -n 1 | cut -d ' ' -f 3
+      register: installed_rke2_version
+      changed_when: false
+      args:
+        executable: /usr/bin/bash
+
+    - name: Determine if current version differs what what is being installed
+      set_fact:
+        rke2_version_changed: true
+      when: "'stdout' in installed_rke2_version and installed_rke2_version['stdout'] != install_rke2_version"
+
 - name: SLES/Ubuntu/Tarball Installation
   include_tasks: tarball_install.yml
   when:
@@ -28,7 +47,6 @@
       ((ansible_facts['os_family'] != 'RedHat' and
       ansible_facts['os_family'] != 'Rocky') or
       rke2_binary_tarball_check.stat.exists )
-      and not installed
 
 - name: RHEL/CentOS Installation
   when:
