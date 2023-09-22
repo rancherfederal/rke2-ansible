@@ -11,7 +11,8 @@
     - name: Get full version name url
       uri:
         url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
-        follow_redirects: all
+        follow_redirects: safe
+        remote_src: true
       register: rke2_version_url
 
     - name: Set full version name
@@ -57,7 +58,6 @@
 - name: Set rke2_version_rpm fact
   set_fact:
     rke2_version_rpm: "{{ rke2_version_rpm_tmp.stdout }}"
-
 
 - name: Describe versions
   debug:
