@@ -18,28 +18,12 @@
     path: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
   register: rke2_binary_tarball_check
   delegate_to: 127.0.0.1
-  become: no
+  become: False
 
-- name: Check for the rke2 binary
-  stat:
-    path: /usr/local/bin/rke2
-  register: rke2_binary
-
-- name: If the rke2 binary exists, determine if the version is changing
-  when: rke2_binary.stat.exists
-  block:
-    - name: Get current RKE2 version
-      shell: set -o pipefail && /usr/local/bin/rke2 -v | head -n 1 | cut -d ' ' -f 3
-      register: installed_rke2_version
-      changed_when: false
-      args:
-        executable: /usr/bin/bash
-
-    - name: Determine if current version differs what what is being installed
-      set_fact:
-        rke2_version_changed: true
-      when: "'stdout' in installed_rke2_version and installed_rke2_version['stdout'] != install_rke2_version"
-
+- name: Include calculate_rke2_version.yml
+  include_tasks: calculate_rke2_version.yml
+  when: not rke2_binary_tarball_check.stat.exists
+  
 - name: SLES/Ubuntu/Tarball Installation
   include_tasks: tarball_install.yml
   when:
