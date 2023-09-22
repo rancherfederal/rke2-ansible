@@ -30,7 +30,7 @@
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
   stat:
-    path: '/etc/yum.repos.d/rke2-v{{ rke2_version_majmin }}.repo'  # noqa var-spacing
+    path: '/etc/yum.repos.d/rke2-v{{ rke2_version_majmin }}.repo'
   register: stat_rke2_versioned_repo
 
 # Add RKE2 versioned repo if it doesn't exist

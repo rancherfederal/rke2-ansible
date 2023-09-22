@@ -13,17 +13,17 @@
 - name: Include images_tarball_install.yml
   include_tasks: images_tarball_install.yml
 
-- name: "Check for binary tarball in {{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"  # noqa name[template]
+- name: "Check for binary tarball in tarball_install/rke2.linux-amd64.tar.gz"
   stat:
     path: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
   register: rke2_binary_tarball_check
   delegate_to: 127.0.0.1
-  become: False
+  become: false
 
 - name: Include calculate_rke2_version.yml
   include_tasks: calculate_rke2_version.yml
   when: not rke2_binary_tarball_check.stat.exists
-  
+
 - name: SLES/Ubuntu/Tarball Installation
   include_tasks: tarball_install.yml
   when:

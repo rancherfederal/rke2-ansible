@@ -1,5 +1,7 @@
-- name: "Calculate rke2 full version "
-  when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )  # noqa var-spacing
+---
+
+- name: "Calculate rke2 full version"
+  when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )
   block:
     - name: Stop if the provided is not valid
       fail:
@@ -19,7 +21,7 @@
       args:
         executable: /usr/bin/bash
 
-- name: Set rke2_full_version fact  # noqa var-spacing
+- name: Set rke2_full_version fact
   set_fact:
     rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"  # yamllint disable-line rule:line-length
 
