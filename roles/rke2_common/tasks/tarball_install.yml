@@ -45,8 +45,12 @@
       args:
         executable: /bin/bash
 
+    - name: Set rke2_full_version fact  # noqa var-spacing
+      set_fact:
+        rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"  # yamllint disable-line rule:line-length
+
     - name: Set dot version
-      shell: set -o pipefail && echo {{ rke2_full_version.stdout }} | /usr/bin/cut -d'+' -f1
+      shell: set -o pipefail && echo {{ rke2_full_version }} | /usr/bin/cut -d'+' -f1
       register: rke2_version_dot
       changed_when: false
       args:
@@ -54,7 +58,7 @@
 
     - name: Set Maj.Min version
       shell: >-
-        set -o pipefail && echo {{ rke2_full_version.stdout }}
+        set -o pipefail && echo {{ rke2_full_version }}
         | awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
       register: rke2_version
       changed_when: false
@@ -64,14 +68,14 @@
     - name: Describe versions
       debug:
         msg:
-          - "Full version: {{ rke2_full_version.stdout }}"
+          - "Full version: {{ rke2_full_version }}"
           - "dot version: {{ rke2_version_dot.stdout }}"
           - "Maj.Min version: {{ rke2_version.stdout }}"
       run_once: yes
 
     - name: TARBALL | Download the tarball
       get_url:
-        url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version.stdout }}/rke2.linux-amd64.tar.gz
+        url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version }}/rke2.linux-amd64.tar.gz
         dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
         mode: "0644"
 
