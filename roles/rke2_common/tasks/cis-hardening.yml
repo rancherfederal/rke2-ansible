@@ -15,6 +15,7 @@
         comment: etcd user
         shell: /bin/nologin
         group: etcd
+        create_home: false
 
     - name: Copy systemctl file for kernel hardening for yum installs
       copy:
