@@ -2,7 +2,7 @@
 
 - name: RKE2 agent and server tasks
   vars:
-    rke2_common_name: server
+    caller_role_name: server
   ansible.builtin.include_role:
     name: rke2_common
     tasks_from: main
