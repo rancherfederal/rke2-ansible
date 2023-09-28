@@ -74,8 +74,8 @@ variable "amis" {
         user = "centos"
       }
       "rocky8" = {
-        ami  = "ami-06370d1e5ddbf1f76"
-        user = "ec2-user"
+        ami  = "ami-01c3e8e014e8b0c7a"
+        user = "centos"
       }
     }
   }
