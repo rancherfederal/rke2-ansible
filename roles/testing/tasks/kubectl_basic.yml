@@ -2,7 +2,7 @@
 
 
 - name: Ensure kubelet process is present on host
-  command: >-
+  ansible.builtin.command: >-
     ps -C kubelet -F -ww --no-headers
   register: kubelet_check
   until: kubelet_check.rc == 0
@@ -11,14 +11,14 @@
   changed_when: false
 
 - name: Extract the hostname-override parameter from the kubelet process  # noqa jinja[spacing]
-  set_fact:
+  ansible.builtin.set_fact:
     kubelet_hostname_override_parameter: "{{ kubelet_check.stdout |\
       regex_search('\\s--hostname-override=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))\\s',\
       '\\1') }}"
   changed_when: false
 
 - name: Are all nodes in Ready state?
-  command: >-
+  ansible.builtin.command: >-
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
     --server https://127.0.0.1:6443 get no {{ kubelet_hostname_override_parameter[0] }}
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
@@ -30,6 +30,6 @@
   changed_when: false
 
 - name: Assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - "'True' in status_result.stdout"

@@ -8,7 +8,7 @@
 
 # Add RKE2 Common repo if it doesn't exist
 - name: Add the rke2-common repo RHEL/CentOS/Rocky
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_common_yum_repo.name }}"
     description: "{{ rke2_common_yum_repo.description }}"
     baseurl: "{{ rke2_common_yum_repo.baseurl }}"
@@ -18,7 +18,7 @@
   when: not stat_rke2_common_repo.stat.exists and ansible_lsb.major_release == '7'
 
 - name: Add the rke2-common repo RHEL/CentOS 8
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_common_yum_repo.name }}"
     description: "{{ rke2_common_yum_repo.description }}"
     baseurl: "{{ rke2_common_yum_repo.baseurl }}"
@@ -29,13 +29,13 @@
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
-  stat:
+  ansible.builtin.stat:
     path: '/etc/yum.repos.d/rke2-v{{ rke2_version_majmin }}.repo'
   register: stat_rke2_versioned_repo
 
 # Add RKE2 versioned repo if it doesn't exist
 - name: Add the rke2 versioned repo CentOS/RHEL/Rocky
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_versioned_yum_repo.name }}"
     description: "{{ rke2_versioned_yum_repo.description }}"
     baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"

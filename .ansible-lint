@@ -8,4 +8,3 @@ warn_list:
   - var-naming
 skip_list:
   - experimental
-  - fqcn-builtins

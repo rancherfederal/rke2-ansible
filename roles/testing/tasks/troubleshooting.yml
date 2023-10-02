@@ -1,7 +1,7 @@
 ---
 
 - name: Show journalctl -e
-  command: >-
+  ansible.builtin.command: >-
     journalctl -e --lines 200 --no-pager
   changed_when: false
   register: command_output
@@ -10,14 +10,14 @@
   ignore_errors: true
 
 - name: Show journalctl -e
-  debug:
+  ansible.builtin.debug:
     var: command_output.stdout_lines
   tags:
     - troubleshooting
   ignore_errors: true
 
 - name: Show journalctl -ue rke2-server
-  command: >-
+  ansible.builtin.command: >-
     journalctl -eu rke2-server --lines 200 --no-pager
   changed_when: false
   register: command_output
@@ -26,14 +26,14 @@
   ignore_errors: true
 
 - name: Show journalctl -ue rke2-server
-  debug:
+  ansible.builtin.debug:
     var: command_output.stdout_lines
   tags:
     - troubleshooting
   ignore_errors: true
 
 - name: Show rke2 config file
-  command: >-
+  ansible.builtin.command: >-
     cat /etc/rancher/rke2/config.yaml
   changed_when: false
   register: command_output
@@ -42,7 +42,7 @@
   ignore_errors: true
 
 - name: Show rke2 config file
-  debug:
+  ansible.builtin.debug:
     var: command_output.stdout_lines
   tags:
     - troubleshooting
