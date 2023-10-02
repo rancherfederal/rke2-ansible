@@ -1,5 +1,5 @@
 ---
-name: CentOS 7
+name: Lint Test
 
 on:
   push:

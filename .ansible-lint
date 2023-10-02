@@ -1,10 +1,11 @@
 exclude_paths:
-- .github/
-- molecule/
-- .ansible-lint
+  - .github/
+  - molecule/
+  - .ansible-lint
 warn_list:
   - no-handler
-  - jinja[spacing]
+  - var-spacing
+  - var-naming
 skip_list:
   - experimental
   - fqcn-builtins
