@@ -15,17 +15,10 @@
     gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
     gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
     enabled: "{{ rke2_common_yum_repo.enabled }}"
-  when: not stat_rke2_common_repo.stat.exists and ansible_lsb.major_release == '7'
-
-- name: Add the rke2-common repo RHEL/CentOS 8
-  ansible.builtin.yum_repository:
-    name: "{{ rke2_common_yum_repo.name }}"
-    description: "{{ rke2_common_yum_repo.description }}"
-    baseurl: "{{ rke2_common_yum_repo.baseurl }}"
-    gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
-    gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
-    enabled: "{{ rke2_common_yum_repo.enabled }}"
-  when: not stat_rke2_common_repo.stat.exists and ansible_lsb.major_release == '8'
+  when:
+    - not stat_rke2_common_repo.stat.exists
+    - ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Rocky"
+    - ansible_facts['distribution_major_version'] == "7" or ansible_facts['distribution_major_version'] == "8"
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
