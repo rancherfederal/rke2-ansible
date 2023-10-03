@@ -1,16 +1,16 @@
 ---
 
 - name: Restart systemd-sysctl
-  service:
+  ansible.builtin.service:
     state: restarted
     name: systemd-sysctl
 
 - name: Restart rke2-server
-  service:
+  ansible.builtin.service:
     state: restarted
     name: rke2-server
 
 - name: Restart rke2-agent
-  service:
+  ansible.builtin.service:
     state: restarted
     name: rke2-agent

@@ -5,22 +5,23 @@
   block:
 
     - name: Create etcd group
-      group:
+      ansible.builtin.group:
         name: etcd
         state: present
 
     - name: Create etcd user
-      user:
+      ansible.builtin.user:
         name: etcd
         comment: etcd user
         shell: /bin/nologin
         group: etcd
+        create_home: false
 
     - name: Copy systemctl file for kernel hardening for yum installs
-      copy:
+      ansible.builtin.copy:
         src: /usr/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
-        remote_src: yes
+        remote_src: true
         mode: 0600
       register: sysctl_operation_yum
       when:
@@ -28,7 +29,7 @@
         - not rke2_binary_tarball_check.stat.exists
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
-      copy:
+      ansible.builtin.copy:
         src: /usr/local/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: yes
@@ -40,12 +41,12 @@
         rke2_binary_tarball_check.stat.exists
 
     - name: Restart systemd-sysctl
-      service:
+      ansible.builtin.service:
         state: restarted
         name: systemd-sysctl
       when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
 
     - name: Reboot the machine (Wait for 5 min)
-      reboot:
+      ansible.builtin.reboot:
         reboot_timeout: 300
       when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed

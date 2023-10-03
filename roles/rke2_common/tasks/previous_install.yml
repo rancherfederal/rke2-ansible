@@ -8,7 +8,7 @@
     and not ansible_facts.services["rke2-server.service"].status == 'disabled'
 
 - name: Set fact if rke2-server was previously installed
-  set_fact:
+  ansible.builtin.set_fact:
     installed: true
   when: >
     ansible_facts.services["rke2-server.service"] is defined
@@ -22,19 +22,19 @@
     and not ansible_facts.services["rke2-agent.service"].status == 'disabled'
 
 - name: Set fact if rke2-agent was previously installed
-  set_fact:
+  ansible.builtin.set_fact:
     installed: true
   when: >
     ansible_facts.services["rke2-agent.service"] is defined
     and not ansible_facts.services["rke2-agent.service"].status == 'disabled'
 
 - name: Check for the rke2 binary
-  stat:
+  ansible.builtin.stat:
     path: /usr/local/bin/rke2
   register: rke2_binary
 
 - name: Get current RKE2 version if already installed
-  shell: set -o pipefail && /usr/local/bin/rke2 -v | head -n 1 | cut -d ' ' -f 3
+  ansible.builtin.shell: set -o pipefail && /usr/local/bin/rke2 -v | head -n 1 | cut -d ' ' -f 3
   register: installed_rke2_version_tmp
   changed_when: false
   args:
@@ -42,6 +42,6 @@
   when: rke2_binary.stat.exists
 
 - name: Determine if current version differs what what is being installed
-  set_fact:
+  ansible.builtin.set_fact:
     installed_rke2_version: "{{installed_rke2_version_tmp.stdout}}"
   when: rke2_binary.stat.exists

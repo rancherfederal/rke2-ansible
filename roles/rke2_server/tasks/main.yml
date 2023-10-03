@@ -3,14 +3,14 @@
 - name: RKE2 agent and server tasks
   vars:
     caller_role_name: server
-  include_role:
+  ansible.builtin.include_role:
     name: rke2_common
     tasks_from: main
 
 - name: Setup initial server
-  include_tasks: first_server.yml
+  ansible.builtin.include_tasks: first_server.yml
   when: inventory_hostname in groups['rke2_servers'][0]
 
 - name: Setup other servers
-  include_tasks: other_servers.yml
+  ansible.builtin.include_tasks: other_servers.yml
   when: inventory_hostname in groups['rke2_servers'][1:]

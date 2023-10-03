@@ -9,15 +9,15 @@
     mode: '0644'
 
 - name: Announce that we are pausing for 1 minute
-  debug:
+  ansible.builtin.debug:
     msg: "Pausing for 1 minute to allow for Pod deployment"
 
 - name: Pause for 1 minutes to allow Pod deployment
-  pause:
+  ansible.builtin.pause:
     minutes: 1
 
 - name: Did the Pod deploy as expected?
-  command: >-
+  ansible.builtin.command: >-
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
     get pod automated-testing-pod
     -o jsonpath='{.status.phase}'
@@ -26,6 +26,6 @@
   changed_when: false
 
 - name: Assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Running' in status_result.stdout"

@@ -1,16 +1,16 @@
 ---
 
 - name: Basic Infra tests
-  include_tasks: basic_tests.yml
+  ansible.builtin.include_tasks: basic_tests.yml
 
 - name: Manifest test
-  include_tasks: manifest_test.yml
+  ansible.builtin.include_tasks: manifest_test.yml
   when: inventory_hostname in groups['rke2_servers'][0]
 
 - name: Basic kubectl tests
-  include_tasks: kubectl_basic.yml
+  ansible.builtin.include_tasks: kubectl_basic.yml
 
 - name: Troubleshooting
-  include_tasks: troubleshooting.yml
+  ansible.builtin.include_tasks: troubleshooting.yml
   tags:
     - troubleshooting

@@ -2,13 +2,13 @@
 
 # Does the Rancher RKE2 Common repo exist already
 - name: Check to see if rke2-common.repo exists
-  stat:
+  ansible.builtin.stat:
     path: '/etc/yum.repos.d/rke2-common.repo'
   register: stat_rke2_common_repo
 
 # Add RKE2 Common repo if it doesn't exist
 - name: Add the rke2-common repo RHEL/CentOS/Rocky
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_common_yum_repo.name }}"
     description: "{{ rke2_common_yum_repo.description }}"
     baseurl: "{{ rke2_common_yum_repo.baseurl }}"
@@ -22,13 +22,13 @@
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
-  stat:
+  ansible.builtin.stat:
     path: '/etc/yum.repos.d/rke2-v{{ rke2_version_majmin }}.repo'
   register: stat_rke2_versioned_repo
 
 # Add RKE2 versioned repo if it doesn't exist
 - name: Add the rke2 versioned repo CentOS/RHEL/Rocky
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: "{{ rke2_versioned_yum_repo.name }}"
     description: "{{ rke2_versioned_yum_repo.description }}"
     baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
@@ -41,7 +41,7 @@
     - ansible_facts['distribution_major_version'] == "7" or ansible_facts['distribution_major_version'] == "8"
 
 - name: YUM-Based | Install rke2-server
-  yum:
+  ansible.builtin.yum:
     name: "rke2-server-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
   when:
@@ -50,7 +50,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: YUM-Based | Install rke2-agent
-  yum:
+  ansible.builtin.yum:
     name: "rke2-agent-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
   when:

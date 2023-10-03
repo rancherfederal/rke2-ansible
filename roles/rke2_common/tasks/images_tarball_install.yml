@@ -1,6 +1,6 @@
 ---
 - name: "Check for images tar.gz in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"  # noqa name[template] yaml[line-length]
-  stat:
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
     get_checksum: false
   register: got_images_gz
@@ -8,7 +8,7 @@
   become: false
 
 - name: "Check for images tar.zst in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"  # noqa name[template] yaml[line-length]
-  stat:
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
     get_checksum: false
   register: got_images_zst
@@ -16,14 +16,14 @@
   become: false
 
 - name: Add images tar.gz to needed directory if provided
-  copy:
+  ansible.builtin.copy:
     src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
     dest: /var/lib/rancher/rke2/agent/images/
     mode: '0644'
   when: got_images_gz.stat.exists
 
 - name: Add images tar.zst to needed directory if provided
-  copy:
+  ansible.builtin.copy:
     src: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.zst"
     dest: /var/lib/rancher/rke2/agent/images/
     mode: '0644'

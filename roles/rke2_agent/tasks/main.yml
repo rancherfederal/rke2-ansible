@@ -3,18 +3,18 @@
 - name: RKE2 agent and server tasks
   vars:
     caller_role_name: agent
-  include_role:
+  ansible.builtin.include_role:
     name: rke2_common
     tasks_from: main
 
 - name: Does config file already have server token?  # noqa command-instead-of-shell
-  command: 'grep -i "^token:" /etc/rancher/rke2/config.yaml'
+  ansible.builtin.command: 'grep -i "^token:" /etc/rancher/rke2/config.yaml'
   register: server_token_check
   failed_when: server_token_check.rc >= 2
   changed_when: false
 
 - name: Add token to config.yaml
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "token: {{ hostvars[groups['rke2_servers'][0]].rke2_config_token }}"
     state: present
@@ -23,13 +23,13 @@
     - '"token:" not in server_token_check.stdout'
 
 - name: Does config file already have server url?  # noqa command-instead-of-shell
-  command: 'grep -i "^server:" /etc/rancher/rke2/config.yaml'
+  ansible.builtin.command: 'grep -i "^server:" /etc/rancher/rke2/config.yaml'
   register: server_url_check
   failed_when: server_url_check.rc >= 2
   changed_when: false
 
 - name: Add server url to config file
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/rancher/rke2/config.yaml
     line: "server: https://{{ kubernetes_api_server_host }}:9345"
     state: present
@@ -38,7 +38,7 @@
     - '"server:" not in server_url_check.stdout'
 
 - name: Start rke2-agent
-  systemd:
+  ansible.builtin.systemd:
     name: rke2-agent.service
     state: started
     enabled: yes
