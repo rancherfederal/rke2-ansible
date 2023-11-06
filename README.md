@@ -129,6 +129,21 @@ ansible -i 18.217.113.10, all -u ec2-user -a "/usr/local/bin/rke2-uninstall.sh"
 ```
 On rare occasions you may have to run the uninstall commands a second time.
 
+Known Issues
+------------------
+- For RHEL8+ Operating Systems that have fapolicyd daemon running, rpm installation of RKE2 will fail due to a permission error while starting containerd. Users have to add the following rules file before installing RKE2. This is not an issue if the install.sh script is used to install RKE2. The RPM issue is expected to be fixed in later versions of RKE2.
+```bash
+cat <<-EOF >>"/etc/fapolicyd/rules.d/80-rke2.rules"
+allow perm=any all : dir=/var/lib/rancher/
+allow perm=any all : dir=/opt/cni/
+allow perm=any all : dir=/run/k3s/
+allow perm=any all : dir=/var/lib/kubelet/
+EOF
+
+systemctl restart fapolicyd
+
+```
+
 
 Author Information
 ------------------
