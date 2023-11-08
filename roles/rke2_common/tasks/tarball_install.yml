@@ -57,7 +57,7 @@
         remote_src: true
 
     - name: Get tarball RKE2 version from temp location
-      ansible.builtin.shell: set -o pipefail && {{ temp_dir.path }}/bin/rke2 -v | head -n 1 | cut -d ' ' -f 3
+      ansible.builtin.shell: set -o pipefail && {{ temp_dir.path }}/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
       register: tarball_rke2_version_tmp
       changed_when: false
       args:
