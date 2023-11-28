@@ -1,5 +1,5 @@
 ---
-name: Rocky 8
+name: Ansible build test for Rocky 8
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
 jobs:
 
   lint-test:
-    name: Lint
+    name: Lint for PR
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +38,7 @@ jobs:
         run: ansible-lint
 
   rocky8-test:
-    name: Initial build test
+    name: Ansible build test for Rocky 8
     runs-on: ubuntu-latest
     needs: ['lint-test']
 
@@ -119,6 +119,10 @@ jobs:
           echo "" >> ansible.cfg
           echo "remote_user=centos" >> ansible.cfg
           echo "private_key_file=.key" >> ansible.cfg
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
 
       - name: Check hosts.ini and ansible.cfg
         run: |
@@ -160,7 +164,11 @@ jobs:
           echo "[all:vars]" >> hosts.ini
           echo "kubernetes_api_server_host=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text | head -1)" >> hosts.ini
           cp hosts.ini inventory/rocky8/hosts.ini
-
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
+          
       - name: Run playbook again with added hosts
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.ini -u centos --verbose --private-key .key site.yml
@@ -185,3 +193,8 @@ jobs:
         run: |
           cd testing/
           terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
+          

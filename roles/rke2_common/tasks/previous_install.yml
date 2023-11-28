@@ -40,6 +40,9 @@
   args:
     executable: /usr/bin/bash
   when: rke2_binary.stat.exists
+  failed_when: >
+    (installed_rke2_version_tmp.rc != 141) and
+    (installed_rke2_version_tmp.rc != 0)
 
 - name: Determine if current version differs what what is being installed
   ansible.builtin.set_fact:
