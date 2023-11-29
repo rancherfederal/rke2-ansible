@@ -34,7 +34,7 @@
   register: rke2_binary
 
 - name: Get current RKE2 version if already installed
-  ansible.builtin.shell: set -o pipefail && /usr/local/bin/rke2 -v | head -n 1 | cut -d ' ' -f 3
+  ansible.builtin.shell: set -o pipefail && /usr/local/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
   register: installed_rke2_version_tmp
   changed_when: false
   args:
