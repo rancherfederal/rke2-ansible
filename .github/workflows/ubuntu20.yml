@@ -1,19 +1,14 @@
 ---
-name: Ubuntu 20.04
+name: Ansible build test for Ubuntu
 
 on:
   pull_request:
   workflow_dispatch:
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: us-gov-west-1
-
 jobs:
 
   lint-test:
-    name: Lint
+    name: Lint for PR
     runs-on: ubuntu-latest
 
     steps:
@@ -41,7 +36,7 @@ jobs:
         run: ansible-lint
 
   ubuntu20-test:
-    name: Initial build test
+    name: Ansible build test for Ubuntu
     runs-on: ubuntu-latest
     needs: ['lint-test']
 
@@ -77,6 +72,10 @@ jobs:
           cd testing/
           terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=ubuntu20" -no-color
         continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
@@ -86,7 +85,11 @@ jobs:
         run: |
           cd testing/
           terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=ubuntu20" -auto-approve
-
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
+          
       - name: Set up Python
         id: setup_python
         uses: actions/setup-python@v2
@@ -114,7 +117,11 @@ jobs:
           echo "" >> ansible.cfg
           echo "remote_user=ubuntu" >> ansible.cfg
           echo "private_key_file=.key" >> ansible.cfg
-
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
+          
       - name: Check hosts.ini and ansible.cfg
         run: |
           cat hosts.ini
@@ -155,7 +162,11 @@ jobs:
           echo "[all:vars]" >> hosts.ini
           echo "kubernetes_api_server_host=$(aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text | head -1)" >> hosts.ini
           cp hosts.ini inventory/ubuntu20/hosts.ini
-
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
+          
       - name: Run playbook again with added hosts
         run: |
           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/ubuntu20/hosts.ini -u ubuntu --verbose --private-key .key site.yml
@@ -175,3 +186,8 @@ jobs:
         run: |
           cd testing/
           terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
+          
