@@ -1,7 +1,7 @@
 ---
 - name: CIS MODE
   become: yes
-  when: rke2_config.profile | default("") | regex_search('cis-\\d+.\\d+')
+  when: rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$')
   block:
 
     - name: Create etcd group
