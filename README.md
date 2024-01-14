@@ -42,6 +42,7 @@ Red Hat:
 Ubuntu:
   - bionic/18.04 (amd64)
   - focal/20.04 (amd64)
+  - jammy/22.04 (amd64)
 ```
 
 
