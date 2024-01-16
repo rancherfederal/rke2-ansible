@@ -1,0 +1,13 @@
+---
+
+- name: Add cluster manifest addons files
+  ansible.builtin.copy:
+    src: "{{ cluster_manifest_config_file_path }}"
+    dest: "/var/lib/rancher/rke2/server/manifests/"
+    mode: '0640'
+    owner: root
+    group: root
+  when:
+    - inventory_hostname in groups['rke2_servers'][0]
+    - cluster_manifest_config_file_path is defined
+    - cluster_manifest_config_file_path | length > 0
