@@ -15,3 +15,10 @@
   roles:
     - role: rke2_agent
   serial: 3
+
+- name: Cluster manifest play
+  hosts: rke2_servers
+  any_errors_fatal: true
+  become: true
+  roles:
+    - role: cluster_manifest
