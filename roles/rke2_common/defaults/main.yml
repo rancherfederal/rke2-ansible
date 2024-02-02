@@ -3,6 +3,7 @@ tarball_dir: "/usr/local"
 rke2_channel: stable
 audit_policy_config_file_path: ""
 registry_config_file_path: ""
+pod_security_admission_config_file_path: ""
 add_iptables_rules: false
 rke2_common_yum_repo:
   name: rke2-common
