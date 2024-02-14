@@ -1,0 +1,77 @@
+- name: Create temporary working directory
+  ansible.builtin.tempfile:
+    state: directory
+  register: working_dir
+
+- name: Git clone chart repo
+  ansible.builtin.git:
+    repo: https://github.com/jsnouffer/homelab.git
+    dest: "{{ working_dir.path }}/repo"
+
+- name: Copy kubeconfig from control-plane node
+  shell: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@{{ kubernetes_api_server_host }} "sudo cat /etc/rancher/rke2/rke2.yaml" > {{ working_dir.path }}/kubeconfig
+
+- name: Update API URL in kubeconfig
+  shell: sed -i 's/127.0.0.1/{{ kubernetes_api_server_host }}/g' {{ working_dir.path }}/kubeconfig
+
+- name: Deploy external-secrets chart initially
+  kubernetes.core.helm:
+    kubeconfig: "{{ working_dir.path }}/kubeconfig"
+    name: external-secrets
+    chart_ref: "{{ working_dir.path }}/repo/kubernetes-deployments/core/external-secrets"
+    release_namespace: external-secrets
+    dependency_update: true
+    create_namespace: true
+    wait: true
+    values:
+      external-secrets:
+        initialInstall: true
+    values_files:
+      - "{{ working_dir.path }}/repo/kubernetes-deployments/core/external-secrets/{{ default_helm_values_file }}"
+
+- name: Deploy external-secrets chart with all manifests
+  kubernetes.core.helm:
+    kubeconfig: "{{ working_dir.path }}/kubeconfig"
+    name: external-secrets
+    chart_ref: "{{ working_dir.path }}/repo/kubernetes-deployments/core/external-secrets"
+    release_namespace: external-secrets
+    wait: true
+    values:
+      external-secrets:
+        initialInstall: false
+    values_files:
+      - "{{ working_dir.path }}/repo/kubernetes-deployments/core/external-secrets/{{ default_helm_values_file }}"
+
+- name: Deploy argocd chart initially
+  kubernetes.core.helm:
+    kubeconfig: "{{ working_dir.path }}/kubeconfig"
+    name: argocd
+    chart_ref: "{{ working_dir.path }}/repo/kubernetes-deployments/core/argocd"
+    release_namespace: argocd
+    dependency_update: true
+    create_namespace: true
+    wait: true
+    values:
+      argocd-apps:
+        enabled: false
+    values_files:
+      - "{{ working_dir.path }}/repo/kubernetes-deployments/core/argocd/{{ default_helm_values_file }}"
+
+- name: Deploy argocd chart with all manifests
+  kubernetes.core.helm:
+    kubeconfig: "{{ working_dir.path }}/kubeconfig"
+    name: argocd
+    chart_ref: "{{ working_dir.path }}/repo/kubernetes-deployments/core/argocd"
+    release_namespace: argocd
+    wait: true
+    values:
+      argocd-apps:
+        enabled: true
+    values_files:
+      - "{{ working_dir.path }}/repo/kubernetes-deployments/core/argocd/{{ default_helm_values_file }}"
+
+- name: Remove temporary working directory
+  ansible.builtin.file:
+    path: "{{ working_dir.path }}"
+    state: absent
+  when: working_dir.path is defined

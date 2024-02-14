@@ -1,5 +1,10 @@
 ---
 
+- hosts: rke2_cluster
+  roles:
+    - role: common/init
+      become: true
+
 - name: Server play
   hosts: rke2_servers
   any_errors_fatal: true
@@ -22,3 +27,17 @@
   become: true
   roles:
     - role: cluster_manifest
+
+- hosts: rke2_servers
+  vars_files:
+    - inventory/skaro/group_vars/vault.yaml
+  roles:
+    - role: k8s/secrets
+      become: true
+
+- hosts: localhost
+  vars_files:
+    - inventory/skaro/group_vars/vault.yaml
+  roles:
+    - role: k8s/charts
+      become: false

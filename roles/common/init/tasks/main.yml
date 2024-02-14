@@ -1,0 +1,5 @@
+- name: Install a list of apt packages
+  ansible.builtin.apt:
+    pkg:
+    - htop
+    - net-tools
