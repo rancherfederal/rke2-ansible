@@ -4,13 +4,11 @@
 rke2_config:
   disable:
     - rke2-ingress-nginx
-    # - rke2-canal
-    # - rke2-cilium
-    # - rke2-calico
   tls-san:
-  - davros.jsnouff.net
-  # cni: {}
-  # disable-kube-proxy: true
+    - davros.jsnouff.net
+  cni:
+    - none
+  disable-kube-proxy: true
 
 # Example of possible rke2_config.
 #rke2_config:

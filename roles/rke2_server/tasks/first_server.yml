@@ -36,6 +36,51 @@
       regex_search('\\s--hostname-override=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))\\s',\
       '\\1') }}"
 
+# BEGIN CONFIGURING GITOPS CILIUM DEPLOYMENT
+- name: Create temporary working directory
+  delegate_to: localhost
+  vars:
+    ansible_become: false
+  ansible.builtin.tempfile:
+    state: directory
+  register: working_dir
+
+- name: Git clone chart repo
+  delegate_to: localhost
+  vars:
+    ansible_become: false
+  ansible.builtin.git:
+    repo: https://github.com/jsnouffer/homelab.git
+    dest: "{{ working_dir.path }}/repo"
+
+- name: Copy kubeconfig from control-plane node
+  delegate_to: localhost
+  vars:
+    ansible_become: false
+  shell: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@{{ kubernetes_api_server_host }} "sudo cat /etc/rancher/rke2/rke2.yaml" > {{ working_dir.path }}/kubeconfig
+
+- name: Update API URL in kubeconfig
+  delegate_to: localhost
+  vars:
+    ansible_become: false
+  shell: sed -i 's/127.0.0.1/{{ kubernetes_api_server_host }}/g' {{ working_dir.path }}/kubeconfig
+
+- name: Deploy cilium chart
+  delegate_to: localhost
+  vars:
+    ansible_become: false
+  kubernetes.core.helm:
+    kubeconfig: "{{ working_dir.path }}/kubeconfig"
+    name: cilium
+    chart_ref: "{{ working_dir.path }}/repo/kubernetes-deployments/core/cilium"
+    release_namespace: cilium
+    dependency_update: true
+    create_namespace: true
+    wait: true
+    values_files:
+      - "{{ working_dir.path }}/repo/kubernetes-deployments/core/cilium/{{ default_helm_values_file }}"
+# END CONFIGURING GITOPS CILIUM DEPLOYMENT
+
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
