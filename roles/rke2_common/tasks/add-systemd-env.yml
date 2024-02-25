@@ -1,0 +1,21 @@
+---
+- name: Systemd env file
+  become: true
+  when: (systemd_extra_env is defined) and (systemd_extra_env|length > 0)
+  block:
+
+    - name: Add the systemd env file
+      ansible.builtin.blockinfile:
+        path: /etc/default/rke2-{{ caller_role_name }}
+        marker: "#{mark} ANSIBLE MANAGED FILE"
+        create: true
+        mode: '640'
+        owner: root
+        group: root
+        block: |
+          {% for item in systemd_extra_env %}
+          {{ item }}
+          {% endfor %}
+    - name: Reload the systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
