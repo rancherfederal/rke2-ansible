@@ -186,6 +186,26 @@
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
 
+# --etcd-s3
+- name: Add etcd-s3 credentials to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["etcd-s3-access-key"]
+        value: "{{ MINIO_S3_ACCESS_KEY }}"
+      - path: rke2_config["etcd-s3-secret-key"]
+        value: "{{ MINIO_S3_SECRET_KEY }}"
+  when:
+    - (MINIO_S3_ACCESS_KEY is defined) and (MINIO_S3_SECRET_KEY is defined)
+    - inventory_hostname in groups['rke2_servers']
+  register: updated_rke2_config
+
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+  ansible.builtin.set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when:
+    - (MINIO_S3_ACCESS_KEY is defined) and (MINIO_S3_SECRET_KEY is defined)
+    - inventory_hostname in groups['rke2_servers']
+
 - name: Remove tmp config file
   ansible.builtin.file:
     path: /tmp/ansible-config.txt

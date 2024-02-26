@@ -3,3 +3,5 @@
     pkg:
     - htop
     - net-tools
+    - cifs-utils
+    - nfs-common

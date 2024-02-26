@@ -15,8 +15,8 @@ run-k8s-role:
 
 get-kube-config: ## download kubeconfig file
 	mkdir -p ~/.kube
-	ssh cloud-user@davros.jsnouff.net "sudo cat /etc/rancher/rke2/rke2.yaml" > ~/.kube/config-skaro
-	sed -i 's/127.0.0.1/davros.jsnouff.net/g' ~/.kube/config-skaro
+	ssh cloud-user@davros.jsnouff.net "sudo cat /etc/rancher/rke2/rke2.yaml" > ~/.kube/config
+	sed -i 's/127.0.0.1/davros.jsnouff.net/g' ~/.kube/config
 
 edit-vault: ## edit ansible-vault vars file
 	ansible-vault edit --vault-password-file ~/.vault-password inventory/skaro/group_vars/vault.yaml

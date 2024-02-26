@@ -12,6 +12,8 @@
   roles:
     - role: rke2_server
   serial: 1
+  vars_files:
+    - inventory/skaro/group_vars/vault.yaml
 
 - name: Agent play
   hosts: rke2_agents

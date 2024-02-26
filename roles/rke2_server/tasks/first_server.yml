@@ -67,6 +67,7 @@
 
 - name: Deploy cilium chart
   delegate_to: localhost
+  ignore_errors: True
   vars:
     ansible_become: false
   kubernetes.core.helm:
@@ -77,6 +78,9 @@
     dependency_update: true
     create_namespace: true
     wait: true
+    values:
+      cilium:
+        initialInstall: true
     values_files:
       - "{{ working_dir.path }}/repo/kubernetes-deployments/core/cilium/{{ default_helm_values_file }}"
 # END CONFIGURING GITOPS CILIUM DEPLOYMENT

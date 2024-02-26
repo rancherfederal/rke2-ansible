@@ -2,7 +2,9 @@
 
 # Primary RKE2 agent configuration parameters. Remove the curly braces ( {} ) and add your configuration.
 # See https://docs.rke2.io/install/install_options/linux_agent_config/ for all configuration options.
-rke2_config: {}
+rke2_config:
+  kubelet-arg:
+    - "allowed-unsafe-sysctls=net.ipv4.conf.all.src_valid_mark"
 
 # See https://docs.rke2.io/install/containerd_registry_configuration/
 # Add a registry configuration file by specifying the file path on the control host

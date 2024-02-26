@@ -1,4 +1,4 @@
 ansible_user: cloud-user
 kubernetes_api_server_host: davros.jsnouff.net
 
-default_helm_values_file: values-skaro.yaml
+default_helm_values_file: values.yaml
