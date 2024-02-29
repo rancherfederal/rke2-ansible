@@ -70,6 +70,10 @@
   ansible.builtin.include_tasks: add-registry-config.yml
   when: registry_config_file_path | length > 0
 
+- name: Include task file add-pod-security-admission-config.yml
+  ansible.builtin.include_tasks: add-pod-security-admission-config.yml
+  when: pod_security_admission_config_file_path | length > 0
+
 - name: Run CIS-Hardening Tasks
   ansible.builtin.include_role:
     name: rke2_common
