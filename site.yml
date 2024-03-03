@@ -30,16 +30,16 @@
   roles:
     - role: cluster_manifest
 
-- hosts: rke2_servers
-  vars_files:
-    - inventory/skaro/group_vars/vault.yaml
-  roles:
-    - role: k8s/secrets
-      become: true
+# - hosts: rke2_servers
+#   vars_files:
+#     - inventory/skaro/group_vars/vault.yaml
+#   roles:
+#     - role: k8s/secrets
+#       become: true
 
-- hosts: localhost
-  vars_files:
-    - inventory/skaro/group_vars/vault.yaml
-  roles:
-    - role: k8s/charts
-      become: false
+# - hosts: localhost
+#   vars_files:
+#     - inventory/skaro/group_vars/vault.yaml
+#   roles:
+#     - role: k8s/charts
+#       become: false

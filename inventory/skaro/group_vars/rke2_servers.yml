@@ -17,6 +17,7 @@ rke2_config:
   etcd-s3-endpoint: barenas.jsnouff.net:9000
   etcd-s3-insecure: true
   etcd-s3-bucket: skaro-etcd-snapshots
+  etcd-snapshot-retention: 25
 
 # Example of possible rke2_config.
 #rke2_config:
