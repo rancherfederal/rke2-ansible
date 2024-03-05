@@ -1,0 +1,173 @@
+---
+name: SUSE Linux Enterprise Server 15
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-gov-west-1
+
+jobs:
+
+  lint-test:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.7.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint ansible-lint ansible
+
+      - name: Version check
+        run: |
+          ansible --version
+          ansible-lint --version
+          yamllint --version
+
+      - name: Run yamllint.
+        run: yamllint .
+
+      - name: Run ansible-lint.
+        run: ansible-lint
+
+  sles15sp2-test:
+    name: Initial build test
+    runs-on: ubuntu-latest
+    needs: ['lint-test']
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Terraform Init
+        id: init
+        run: |
+          cd testing/
+          terraform init
+
+      - run: 'echo "$SSH_KEY" > .key'
+        shell: bash
+        env:
+          SSH_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+
+      - run: chmod 400 .key
+
+      - name: Terraform private key
+        run: cp .key testing/.key
+
+      - name: Terraform Validate
+        id: validate
+        run: |
+          cd testing/
+          terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd testing/
+          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=sles15sp2" -no-color
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        run: |
+          cd testing/
+          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=sles15sp2" -auto-approve
+
+      - name: Set up Python
+        id: setup_python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip3 install ansible pytest-testinfra
+
+      - name: Ansible Version check
+        run: ansible --version
+
+      - name: Create inventory hosts.ini
+        run: |
+          touch hosts.ini
+          echo "[rke2_servers]" > hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[rke2_agents]" >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "" >> ansible.cfg
+          echo "" >> ansible.cfg
+          echo "remote_user=ubuntu" >> ansible.cfg
+          echo "private_key_file=.key" >> ansible.cfg
+
+      - name: Check hosts.ini and ansible.cfg
+        run: |
+          cat hosts.ini
+          cat ansible.cfg
+
+      - name: Prep inventory
+        run: |
+          cp -R inventory/sample inventory/sles15sp2
+          cp hosts.ini inventory/sles15sp2/hosts.ini
+
+      - name: Run playbook
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key site.yml
+
+      - name: Run playbook again for idempotency
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key site.yml
+
+      - name: Run Ansible Tests
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key testing.yml
+
+      - name: Run Python Tests
+        run: |
+          export DEFAULT_PRIVATE_KEY_FILE=.key
+          pytest --hosts=rke2_servers --ansible-inventory=inventory/sles15sp2/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
+          pytest --hosts=rke2_agents --ansible-inventory=inventory/sles15sp2/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
+
+      - name: Create new inventory hosts.ini with added hosts
+        run: |
+          rm hosts.ini
+          touch hosts.ini
+          echo "[rke2_servers]" > hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          echo "[rke2_agents]" >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          aws ec2 describe-instances --filters "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> hosts.ini
+          cp hosts.ini inventory/sles15sp2/hosts.ini
+
+      - name: Run playbook again with added hosts
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key site.yml
+
+      - name: Run Ansible Tests with added hosts
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/sles15sp2/hosts.ini -u ec2-user --verbose --private-key .key testing.yml
+
+      - name: Run Python Tests with added hosts
+        run: |
+          export DEFAULT_PRIVATE_KEY_FILE=.key
+          pytest --hosts=rke2_servers --ansible-inventory=inventory/sles15sp2/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
+          pytest --hosts=rke2_agents --ansible-inventory=inventory/sles15sp2/hosts.ini --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
+
+      - name: Delete Stack
+        if: ${{ always() }}
+        run: |
+          cd testing/
+          terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
