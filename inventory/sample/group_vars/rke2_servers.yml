@@ -44,4 +44,9 @@ rke2_config: {}
 
 # See https://docs.rke2.io/helm/#automatically-deploying-manifests-and-helm-charts
 # Add manifest files by specifying the directory path on the control host
+# These get applied after the first host in your inventory is configured
 # manifest_config_file_path: "{{ playbook_dir }}/sample_files/manifest/"
+
+# Add manifest files by specifying the directory path on the control host
+# These get applied after the last host in your inventory is configured
+# cluster_manifest_config_file_path: "{{ playbook_dir }}/sample_files/cluster_manifest/"
