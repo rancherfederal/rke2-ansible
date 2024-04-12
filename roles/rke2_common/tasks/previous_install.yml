@@ -46,5 +46,5 @@
 
 - name: Determine if current version differs what what is being installed
   ansible.builtin.set_fact:
-    installed_rke2_version: "{{installed_rke2_version_tmp.stdout}}"
+    installed_rke2_version: "{{ installed_rke2_version_tmp.stdout }}"
   when: rke2_binary.stat.exists

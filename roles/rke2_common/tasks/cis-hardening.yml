@@ -52,4 +52,7 @@
     - name: Reboot the machine (Wait for 5 min)
       ansible.builtin.reboot:
         reboot_timeout: 300
-      when: (sysctl_operation_yum.changed or sysctl_operation_tarball.changed) and rke2_running is defined and rke2_running
+      when:
+        - (sysctl_operation_yum.changed or sysctl_operation_tarball.changed)
+        - rke2_running is defined
+        - rke2_running
