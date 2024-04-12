@@ -66,7 +66,7 @@
 
     - name: Set tarball RKE2 version var
       ansible.builtin.set_fact:
-        tarball_rke2_version: "{{tarball_rke2_version_tmp.stdout}}"
+        tarball_rke2_version: "{{ tarball_rke2_version_tmp.stdout }}"
 
     - name: Determine if current version differs what what is being installed
       ansible.builtin.set_fact:
