@@ -46,7 +46,10 @@
         name: systemd-sysctl
       when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
 
+    # Per CIS hardening guide, if Kubernetes is already running, making changes to sysctl can result in unexpected
+    # side-effects. Rebooting node if RKE2 is already running to prevent potential issues whereas before we were
+    # always rebooting, even if the node was brand new and RKE2 not running yet.
     - name: Reboot the machine (Wait for 5 min)
       ansible.builtin.reboot:
         reboot_timeout: 300
-      when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
+      when: (sysctl_operation_yum.changed or sysctl_operation_tarball.changed) and rke2_running is defined and rke2_running
