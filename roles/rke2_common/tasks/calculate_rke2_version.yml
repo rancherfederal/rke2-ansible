@@ -24,7 +24,8 @@
 
 - name: Set rke2_full_version fact
   ansible.builtin.set_fact:
-    rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or (install_rke2_version|length == 0)) else install_rke2_version }}"  # yamllint disable-line rule:line-length
+    rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or
+    (install_rke2_version | length == 0)) else install_rke2_version }}"
 
 - name: Set dot version
   ansible.builtin.shell:

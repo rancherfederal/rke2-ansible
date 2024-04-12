@@ -18,7 +18,9 @@
   when:
     - not stat_rke2_common_repo.stat.exists
     - ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Rocky"
-    - ansible_facts['distribution_major_version'] == "7" or ansible_facts['distribution_major_version'] == "8" or ansible_facts['distribution_major_version'] == "9"
+    - ansible_facts['distribution_major_version'] == "7" or
+      ansible_facts['distribution_major_version'] == "8" or
+      ansible_facts['distribution_major_version'] == "9"
 
 # Does the Rancher RKE2 versioned repo exist already
 - name: Check to see if rke2 versioned repo exists
@@ -38,7 +40,9 @@
   when:
     - not stat_rke2_common_repo.stat.exists
     - ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Rocky"
-    - ansible_facts['distribution_major_version'] == "7" or ansible_facts['distribution_major_version'] == "8" or ansible_facts['distribution_major_version'] == "9"
+    - ansible_facts['distribution_major_version'] == "7" or
+      ansible_facts['distribution_major_version'] == "8" or
+      ansible_facts['distribution_major_version'] == "9"
 
 - name: YUM-Based | Install rke2-server
   ansible.builtin.yum:
