@@ -1,3 +1,4 @@
 # This file contains ignores rule violations for ansible-lint
 
 roles/testing/tasks/troubleshooting.yml ignore-errors
+inventory/sample/hosts.yml yaml[line-length]

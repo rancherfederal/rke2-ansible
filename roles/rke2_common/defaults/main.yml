@@ -1,5 +1,7 @@
 ---
 tarball_dir: "/usr/local"
+rke2_tarball_url: ""
+rke2_images_urls: []
 rke2_channel: stable
 audit_policy_config_file_path: ""
 registry_config_file_path: ""
