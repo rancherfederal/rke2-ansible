@@ -36,6 +36,11 @@
     group: root
   when: not previous_rke2_config.stat.exists
 
+# https://github.com/ansible-collections/ansible.utils/issues/135
+- name: Ensure Ansible renders any templated variables in rke2_config
+  ansible.builtin.set_fact:
+    rke2_config: "{{ rke2_config | default({}) }}"
+
 # --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 
 - name: Get rke2_config node-labels
