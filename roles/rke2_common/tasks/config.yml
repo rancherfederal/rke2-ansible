@@ -1,15 +1,8 @@
 ---
-- name: Does the /etc/rancher/rke2 dir exist?
-  ansible.builtin.stat:
-    path: /etc/rancher/rke2
-  register: rke2_directory
-
 - name: Create the /etc/rancher/rke2 config dir
   ansible.builtin.file:
     path: /etc/rancher/rke2
     state: directory
-    recurse: yes
-  when: not rke2_directory.stat.exists
 
 - name: Does the /etc/rancher/rke2/config.yaml file exist?
   ansible.builtin.stat:
