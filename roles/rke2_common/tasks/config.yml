@@ -1,15 +1,9 @@
 ---
-- name: Does the /etc/rancher/rke2 dir exist?
-  ansible.builtin.stat:
-    path: /etc/rancher/rke2
-  register: rke2_directory
-
 - name: Create the /etc/rancher/rke2 config dir
   ansible.builtin.file:
     path: /etc/rancher/rke2
     state: directory
-    recurse: yes
-  when: not rke2_directory.stat.exists
+    mode: "0750"
 
 - name: Does the /etc/rancher/rke2/config.yaml file exist?
   ansible.builtin.stat:
@@ -36,8 +30,12 @@
     group: root
   when: not previous_rke2_config.stat.exists
 
-# --node-label value                     (agent/node) Registering and starting kubelet with set of labels
+# https://github.com/ansible-collections/ansible.utils/issues/135
+- name: Ensure Ansible renders any templated variables in rke2_config
+  ansible.builtin.set_fact:
+    rke2_config: "{{ rke2_config | default({}) }}"
 
+# --node-label value                     (agent/node) Registering and starting kubelet with set of labels
 - name: Get rke2_config node-labels
   ansible.builtin.set_fact:
     rke2_config_node_labels: "{{ rke2_config['node-label'] | default([]) }}"
