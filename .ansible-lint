@@ -6,5 +6,6 @@ warn_list:
   - no-handler
   - var-spacing
   - var-naming
+  - yaml[comments-indentation]
 skip_list:
   - experimental
