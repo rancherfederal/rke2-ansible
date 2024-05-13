@@ -1,0 +1,12 @@
+- name: Add role label to node
+  kubernetes.core.k8s:
+    state: patched
+    kubeconfig: /etc/rancher/rke2/rke2.yaml
+    kind: Node
+    name: "{{ item.value.inventory_hostname_short }}"
+    definition:
+      metadata:
+        labels: "{{ ({ 'node-role.kubernetes.io/' ~ role: 'true' }) | to_json | from_json }}"
+  loop: "{{ item.value.node_roles | default([]) }}"
+  loop_control:
+    loop_var: role

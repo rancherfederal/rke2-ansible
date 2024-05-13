@@ -1,0 +1,12 @@
+- name: Install a list of apt packages
+  ansible.builtin.apt:
+    pkg:
+    - pip
+
+- name: Install required python libraries
+  pip:
+    name:
+      - kubernetes >= 12.0.0
+
+- include_tasks: node.yml
+  loop: "{{ hostvars | dict2items }}"
