@@ -9,7 +9,7 @@ add_iptables_rules: false
 rke2_common_yum_repo:
   name: rke2-common
   description: "Rancher RKE2 Common Latest"
-  baseurl: "https://rpm.rancher.io/rke2/latest/common/centos/$releasever/noarch"
+  baseurl: "https://rpm.rancher.io/rke2/stable/common/centos/$releasever/noarch"
   gpgcheck: true
   gpgkey: "https://rpm.rancher.io/public.key"
   enabled: yes
@@ -17,7 +17,7 @@ rke2_common_yum_repo:
 rke2_versioned_yum_repo:
   name: "rke2-v{{ rke2_version_majmin }}"  # noqa jinja[spacing]
   description: "Rancher RKE2 Version"
-  baseurl: "https://rpm.rancher.io/rke2/latest/{{ rke2_version_majmin }}/centos/$releasever/$basearch"
+  baseurl: "https://rpm.rancher.io/rke2/stable/{{ rke2_version_majmin }}/centos/$releasever/$basearch"
   gpgcheck: true
   gpgkey: "https://rpm.rancher.io/public.key"
   enabled: yes
