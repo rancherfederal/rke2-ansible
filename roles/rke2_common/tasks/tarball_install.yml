@@ -23,13 +23,26 @@
     src: "{{ playbook_dir }}/tarball_install/rke2.linux-amd64.tar.gz"
     dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
     mode: '0644'
-  when: rke2_binary_tarball_check.stat.exists
+  when:
+    - rke2_binary_tarball_check.stat.exists
+    - rke2_tarball_url == ""
+
+- name: Download Tar from provided URL
+  ansible.builtin.get_url:
+    url: "{{ rke2_tarball_url }}"
+    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+    mode: "0644"
+  when:
+    - not rke2_binary_tarball_check.stat.exists
+    - rke2_tarball_url != ""
+
 
 - name: Determine if current version differs what what is being installed
   ansible.builtin.set_fact:
     rke2_version_changed: true
   when:
     - not rke2_binary_tarball_check.stat.exists
+    - rke2_tarball_url == ""
     - not installed or installed_rke2_version != rke2_full_version
 
 - name: TARBALL | Download the tarball
@@ -39,6 +52,7 @@
     mode: "0644"
   when:
     - not rke2_binary_tarball_check.stat.exists
+    - rke2_tarball_url == ""
     - rke2_version_changed
 
 - name: TARBALL | Install tar package
@@ -49,7 +63,7 @@
 
 - name: Get version of provided tarball
   when:
-    - rke2_binary_tarball_check.stat.exists
+    - (rke2_binary_tarball_check.stat.exists or rke2_tarball_url != "")
   block:
     - name: Unarchive tarball into temp location
       ansible.builtin.unarchive:
@@ -66,7 +80,7 @@
 
     - name: Set tarball RKE2 version var
       ansible.builtin.set_fact:
-        tarball_rke2_version: "{{tarball_rke2_version_tmp.stdout}}"
+        tarball_rke2_version: "{{ tarball_rke2_version_tmp.stdout }}"
 
     - name: Determine if current version differs what what is being installed
       ansible.builtin.set_fact:
