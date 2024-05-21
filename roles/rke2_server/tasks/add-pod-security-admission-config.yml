@@ -7,16 +7,16 @@
 
 - name: Add pod security admission config file
   vars:
-        file_contents: "{{ lookup('file', pod_security_admission_config_file_path) }}"
+    file_contents: "{{ lookup('file', pod_security_admission_config_file_path) }}"
   ansible.builtin.template:
     src: ansible_header.j2
     dest: "/etc/rancher/rke2/pod-security-admission-config.yaml"
     mode: '0640'
     owner: root
     group: root
-  when: 
-  - pod_security_admission_config_file_path is defined
-  - pod_security_admission_config_file_path|length != 0
+  when:
+    - pod_security_admission_config_file_path is defined
+    - pod_security_admission_config_file_path|length != 0
   notify: Restart rke2-server
 
 - name: Remove pod security admission config file
@@ -40,6 +40,6 @@
         path: "/etc/rancher/rke2/pod-security-admission-config.yaml"
         state: absent
       when:
-      - ansible_managed_check.changed == false
+        - ansible_managed_check.changed == false
   when:
     - pod_security_admission_config_file_path is not defined or pod_security_admission_config_file_path|length == 0
