@@ -45,3 +45,8 @@ rke2_config: {}
 # See https://docs.rke2.io/helm/#automatically-deploying-manifests-and-helm-charts
 # Add manifest files by specifying the directory path on the control host
 # manifest_config_file_path: "{{ playbook_dir }}/sample_files/manifest/"
+
+# See https://ranchermanager.docs.rancher.com/how-to-guides/new-user-guides/authentication-permissions-and-global-configuration/psa-config-templates#exempting-required-rancher-namespaces
+# Available in RKE2 1.25+
+# Add a pod security admission config file by specifying the file path on the control host
+# pod_security_admission_config_file_path: "{{ playbook_dir }}/sample_files/pod-security-admission-config.yaml"

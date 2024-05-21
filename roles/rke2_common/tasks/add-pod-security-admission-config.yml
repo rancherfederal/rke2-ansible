@@ -1,0 +1,16 @@
+---
+- name: Create the /etc/rancher/rke2 config dir
+  ansible.builtin.file:
+    path: /etc/rancher/rke2
+    state: directory
+    recurse: yes
+
+- name: Add pod security admission config file
+  ansible.builtin.copy:
+    src: "{{ pod_security_admission_config_file_path }}"
+    dest: "/etc/rancher/rke2/pod-security-admission-config.yaml"
+    mode: '0640'
+    owner: root
+    group: root
+  when: caller_role_name == "server"
+  notify: Restart rke2-server
