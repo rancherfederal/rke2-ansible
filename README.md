@@ -73,6 +73,8 @@ Second, edit `inventory/my-cluster/hosts.yaml` to match the system information g
 
 ```yaml
 rke2_cluster:
+  vars:
+    install_rke2_version: v1.27.10+rke2r1
   children:
     rke2_servers:
       hosts:
@@ -83,9 +85,6 @@ rke2_cluster:
         agent2.example.com:
           node_labels:
           - agent2Label=true"
-all:
-  vars:
-    install_rke2_version: v1.27.10+rke2r1
 ```
 
 If needed, you can also edit `inventory/my-cluster/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
