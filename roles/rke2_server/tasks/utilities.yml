@@ -1,82 +1,24 @@
-# - name: Symlink crictl to /usr/local/bin
-#   ansible.builtin.file:
-#     src: "/var/lib/rancher/rke2/bin/crictl"
-#     dest: "/usr/local/bin/crictl"
-#     state: link
+- name: Add /var/lib/rancher/rke2/bin to PATH
+  lineinfile:
+    dest: "/root/.bashrc"
+    line: 'PATH=$PATH:/var/lib/rancher/rke2/bin'
+    insertafter: EOF
 
-# - name: Symlink crictl config to /etc/crictl.yaml
-#   ansible.builtin.file:
-#     src: "/var/lib/rancher/rke2/agent/etc/crictl.yaml"
-#     dest: "/etc/crictl.yaml"
-#     state: link
-
-# - name: Symlink ctr to /usr/local/bin
-#   ansible.builtin.file:
-#     src: "/var/lib/rancher/rke2/bin/ctr"
-#     dest: "/usr/local/bin/ctr"
-#     state: link
-  
-# - name: Symlink kubectl to /usr/local/bin
-#   ansible.builtin.file:
-#     src: "/var/lib/rancher/rke2/bin/kubectl"
-#     dest: "/usr/local/bin/kubectl"
-#     state: link
-  
-# - name: Create .kube directory in /root
-#   ansible.builtin.file:
-#     path: /root/.kube
-#     state: directory
-#     mode: '0750'
-
-# - name: Symlink kubectl config to /root/.kube/config
-#   ansible.builtin.file:
-#     src: "/etc/rancher/rke2/rke2.yaml"
-#     dest: "/root/.kube/config"
-#     state: link
-
-# - name: Check if Helm is installed
-#   stat:
-#     path: "/usr/local/bin/helm"
-#   register: helm_installed
-#   when: 
-#      - helm_tar_url is defined
-#      - helm_tar_url | length > 0
-
-# - name: Get Helm version
-#   command: "/usr/local/bin/helm version"
-#   changed_when: false
-#   register: helm_installed_version
-#   when: helm_installed.stat.exists
-
-- name: Install Helm Tar from URL
-  ansible.builtin.unarchive:
-    remote_src: yes #allow file to be pulled via https
-    src: "{{ helm_tar_url }}"
-    dest: "/usr/local/bin"
-    extra_opts:
-      - --strip=1
-      - --wildcards
-      - '*/helm'
-  when: 
-    # - not helm_installed.stat.exists
-    - helm_tar_url is defined
-    - helm_tar_url | length > 0
-
-- name: Install Helm Binary from file
-  ansible.builtin.copy:
-    src: "{{ helm_binary_path }}"
-    dest: "/usr/local/bin/helm"
-  when:
-    - helm_binary_path is defined
-    - helm_binary_path | length > 0
-
-- name: Set Helm permissions
+- name: Symlink crictl config to /etc/crictl.yaml
   ansible.builtin.file:
-    path: /usr/local/bin/helm
-    owner: root
-    group: root
-    mode: '0755'
-  when:
-    - (helm_tar_url is defined and helm_tar_url | length > 0) or
-      (helm_binary_path is defined and helm_binary_path | length > 0)
+    src: "/var/lib/rancher/rke2/agent/etc/crictl.yaml"
+    dest: "/etc/crictl.yaml"
+    state: link
+  
+- name: Create .kube directory in /root
+  ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: '0750'
+
+- name: Symlink kubectl config to /root/.kube/config
+  ansible.builtin.file:
+    src: "/var/lib/rancher/rke2/server/cred/admin.kubeconfig"
+    dest: "/root/.kube/config"
+    state: link
   
