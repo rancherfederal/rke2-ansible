@@ -18,4 +18,3 @@
 - name: Configure Utilities
   ansible.builtin.include_tasks: utilities.yml
   when: configure_utilites | bool
-  
