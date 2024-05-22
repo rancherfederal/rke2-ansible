@@ -16,6 +16,17 @@ Build a Kubernetes cluster using RKE2 via Ansible
 |________________________________________________________|
 ```
 
+Unofficial Rancher Government Repository
+---------
+
+Support: Please note that the code provided in this repository is not supported under any official support subscriptions. While we strive to ensure the quality and functionality of our code, we provide it on an "as-is" basis and make no guarantees regarding its performance.
+
+Issues: We understand that issues may arise, and while we do not offer formal support, we will address reported issues on a "best effort" basis. We encourage users to report any problems or bugs they encounter, and we will do our best to address them in a timely manner.
+
+Contributions: Contributions to this repository are welcome! If you have improvements or fixes, please feel free to submit a pull request. We appreciate your efforts to improve the quality and effectiveness of this code.
+
+Thank you for your understanding and cooperation.
+
 Ansible RKE2 (RKE Government) Playbook
 ---------
 [![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml)

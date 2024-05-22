@@ -1,6 +1,7 @@
-#This sample list was generated from:
-#https://ranchermanager.docs.rancher.com/how-to-guides/new-user-guides/authentication-permissions-and-global-configuration/psa-config-templates#exempting-required-rancher-namespaces
-#For security reasons, this list should be as concise as possible - only include active namespaces that need to be except from a restricted profile.
+# This sample list was generated from:
+# https://ranchermanager.docs.rancher.com/how-to-guides/new-user-guides/authentication-permissions-and-global-configuration/psa-config-templates#exempting-required-rancher-namespaces
+# For security reasons, this list should be as concise as possible
+# only include active namespaces that need to be except from a restricted profile.
 
 ---
 apiVersion: apiserver.config.k8s.io/v1
