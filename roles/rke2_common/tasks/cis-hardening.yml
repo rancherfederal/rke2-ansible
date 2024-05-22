@@ -13,7 +13,7 @@
       ansible.builtin.user:
         name: etcd
         comment: etcd user
-        shell: /bin/nologin
+        shell: /usr/sbin/nologin
         group: etcd
         create_home: false
 
