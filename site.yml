@@ -6,7 +6,7 @@
   become: true
   roles:
     - role: rke2_server
-  serial: "4"
+  serial: 1
 
 - name: Agent play
   hosts: rke2_agents
@@ -14,7 +14,7 @@
   become: true
   roles:
     - role: rke2_agent
-  serial: "10"
+  serial: 3
 
 - name: Cluster manifest play
   hosts: rke2_servers
