@@ -16,7 +16,6 @@
     gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
     enabled: "{{ rke2_common_yum_repo.enabled }}"
   when:
-    - not stat_rke2_common_repo.stat.exists
     - ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Rocky"
     - ansible_facts['distribution_major_version'] == "7" or
       ansible_facts['distribution_major_version'] == "8" or
@@ -38,7 +37,6 @@
     gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
     enabled: "{{ rke2_versioned_yum_repo.enabled }}"
   when:
-    - not stat_rke2_versioned_repo.stat.exists
     - ansible_facts['os_family'] == "RedHat" or ansible_facts['os_family'] == "Rocky"
     - ansible_facts['distribution_major_version'] == "7" or
       ansible_facts['distribution_major_version'] == "8" or
