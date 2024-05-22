@@ -17,3 +17,6 @@
 - name: Setup other servers
   ansible.builtin.include_tasks: other_servers.yml
   when: inventory_hostname in groups['rke2_servers'][1:]
+
+- name: Configure Utilities
+  ansible.builtin.include_tasks: utilities.yml
