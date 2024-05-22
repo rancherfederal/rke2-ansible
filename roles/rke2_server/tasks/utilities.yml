@@ -1,5 +1,7 @@
+---
+
 - name: Add /var/lib/rancher/rke2/bin to PATH
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "/root/.bashrc"
     line: 'PATH=$PATH:/var/lib/rancher/rke2/bin'
     insertafter: EOF
