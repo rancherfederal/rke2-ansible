@@ -7,6 +7,9 @@
     name: rke2_common
     tasks_from: main
 
+- name: Include task file add-pod-security-admission-config.yml
+  ansible.builtin.include_tasks: add-pod-security-admission-config.yml
+
 - name: Setup initial server
   ansible.builtin.include_tasks: first_server.yml
   when: inventory_hostname in groups['rke2_servers'][0]
