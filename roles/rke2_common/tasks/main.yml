@@ -24,7 +24,7 @@
   ansible.builtin.include_tasks: calculate_rke2_version.yml
   when:
     - not rke2_binary_tarball_check.stat.exists
-    - rke2_tarball_url == ""
+    - rke2_tarball_url is not defined or rke2_tarball_url == ""
 
 - name: SLES/Ubuntu/Tarball Installation
   ansible.builtin.include_tasks: tarball_install.yml
@@ -33,8 +33,7 @@
       ((ansible_facts['os_family'] != 'RedHat' and
       ansible_facts['os_family'] != 'Rocky') or
       rke2_binary_tarball_check.stat.exists or
-      (rke2_tarball_url is defined and rke2_tarball_url != "") or
-      rke2_tarball_url != "" )
+      (rke2_tarball_url is defined and rke2_tarball_url != ""))
 
 - name: RHEL/CentOS Installation
   when:
