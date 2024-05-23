@@ -33,6 +33,7 @@
       ((ansible_facts['os_family'] != 'RedHat' and
       ansible_facts['os_family'] != 'Rocky') or
       rke2_binary_tarball_check.stat.exists or
+      (rke2_tarball_url is defined and rke2_tarball_url != "") or
       rke2_tarball_url != "" )
 
 - name: RHEL/CentOS Installation
