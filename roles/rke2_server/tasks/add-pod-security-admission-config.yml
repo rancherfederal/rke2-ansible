@@ -9,7 +9,7 @@
   vars:
     file_contents: "{{ lookup('file', pod_security_admission_config_file_path) }}"
   ansible.builtin.template:
-    src: ansible_header.j2
+    src: templates/ansible_header.j2
     dest: "/etc/rancher/rke2/pod-security-admission-config.yaml"
     mode: '0640'
     owner: root

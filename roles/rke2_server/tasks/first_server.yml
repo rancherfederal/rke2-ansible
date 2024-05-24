@@ -1,18 +1,20 @@
 ---
 
-- name: Add manifest files
-  ansible.builtin.include_role:
-    name: rke2_common
-    tasks_from: add-manifest-addons.yml
-  when:
-    - manifest_config_file_path is defined
-    - manifest_config_file_path | length > 0
-
 - name: Start rke2-server
   ansible.builtin.systemd:
     name: rke2-server
     state: started
     enabled: yes
+
+- name: Add manifest files
+  ansible.builtin.include_role:
+    name: rke2_common
+    tasks_from: add-manifest-addons.yml
+  vars:
+    src: "{{ manifest_config_file_path }}"
+  when:
+    - manifest_config_file_path is defined
+    - manifest_config_file_path | length > 0
 
 - name: Wait for k8s apiserver
   ansible.builtin.wait_for:
@@ -46,6 +48,13 @@
   retries: 20
   delay: 10
   changed_when: false
+
+- name: Wait for k8s entrypoint 9345
+  ansible.builtin.wait_for:
+    host: "{{ kubernetes_api_server_host }}"
+    port: "9345"
+    state: present
+    timeout: 300
 
 - name: Add generated Token if none provided
   block:
