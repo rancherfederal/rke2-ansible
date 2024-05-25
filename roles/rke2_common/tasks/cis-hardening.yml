@@ -16,6 +16,11 @@
         shell: /usr/sbin/nologin
         group: etcd
         create_home: false
+        
+    - name: "Check for rke2-cis-sysctl.conf in the /opt directory"
+      ansible.builtin.stat:
+        path: "/opt/rke2/share/rke2/rke2-cis-sysctl.conf"
+      register: rke2_cis_conf_in_opt
 
     - name: Copy systemctl file for kernel hardening for yum installs
       ansible.builtin.copy:
@@ -28,6 +33,7 @@
         - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
         - not rke2_binary_tarball_check.stat.exists
         - rke2_tarball_url is not defined or rke2_tarball_url == ""
+        - not rke2_cis_conf_in_opt.stat.exists
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
       ansible.builtin.copy:
@@ -37,16 +43,27 @@
         mode: 0600
       register: sysctl_operation_tarball
       when: >-
+        not rke2_cis_conf_in_opt.stat.exists and
         (ansible_facts['os_family'] != 'RedHat' and
         ansible_facts['os_family'] != 'Rocky') or
         rke2_binary_tarball_check.stat.exists or
         (rke2_tarball_url is defined and rke2_tarball_url != "")
 
+    - name: Copy systemctl file for kernel hardening for other
+      ansible.builtin.copy:
+        src: /opt/rke2/share/rke2/rke2-cis-sysctl.conf
+        dest: /etc/sysctl.d/60-rke2-cis.conf
+        remote_src: true
+        mode: 0600
+      register: sysctl_operation_other
+      when:
+        - rke2_cis_conf_in_opt.stat.exists
+
     - name: Restart systemd-sysctl
       ansible.builtin.service:
         state: restarted
         name: systemd-sysctl
-      when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
+      when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed or sysctl_operation_other.changed
 
     # Per CIS hardening guide, if Kubernetes is already running, making changes to sysctl can result in unexpected
     # side-effects. Rebooting node if RKE2 is already running to prevent potential issues whereas before we were

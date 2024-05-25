@@ -41,6 +41,15 @@
     - '"server:" not in server_url_check.stdout'
     - fixed_registration_address is defined
 
+- name: Wait for k8s apiserver reachability when use fixed registration address
+  ansible.builtin.wait_for:
+    host: "{{ fixed_registration_address }}"
+    port: "6443"
+    state: present
+    timeout: 300
+  when:
+    - fixed_registration_address is defined
+
 - name: Start rke2-server
   throttle: 1
   ansible.builtin.systemd:

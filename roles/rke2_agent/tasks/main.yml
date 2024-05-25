@@ -37,6 +37,16 @@
   when:
     - '"server:" not in server_url_check.stdout'
 
+- name: Add fixed registration url to config file
+  ansible.builtin.lineinfile:
+    dest: /etc/rancher/rke2/config.yaml
+    line: "server: https://{{ fixed_registration_address }}:9345"
+    state: present
+    insertbefore: BOF
+  when:
+    - '"server:" not in server_url_check.stdout'
+    - fixed_registration_address is defined
+
 - name: Start rke2-agent
   ansible.builtin.systemd:
     name: rke2-agent.service
