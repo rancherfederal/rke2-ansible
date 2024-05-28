@@ -50,7 +50,7 @@
     host: "{{ kubernetes_api_server_host }}"
     port: "6443"
     state: present
-    timeout: 300
+    timeout: 600
 
 - name: Wait for kubelet process to be present on host
   ansible.builtin.command: >-
@@ -58,7 +58,7 @@
   register: kubelet_check
   until: kubelet_check.rc == 0
   retries: 20
-  delay: 10
+  delay: 30
   changed_when: false
 
 - name: Extract the hostname-override parameter from the kubelet process
@@ -75,5 +75,5 @@
   register: status_result
   until: status_result.stdout.find("True") != -1
   retries: 20
-  delay: 10
+  delay: 30
   changed_when: false

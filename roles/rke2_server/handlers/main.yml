@@ -1,13 +1,25 @@
 ---
 - name: Ensure the RKE2 Service is started 
   block:
-    - name: Start RKE2
+    - name: Attempt to start RKE2
       ansible.builtin.systemd:
         name: rke2-server
         enabled: yes 
+        state: started
       register: rke2_service_start
       retries: 20
       delay: 10
       until: rke2_service_start is succeeded
+      listen: Start RKE2
 
-      
+    - name: Wait to ensure the service started correctly
+      ansible.builtin.pause:
+        seconds: 20
+      listen: Start RKE2
+
+    - name: Verify rke2-server started 
+      ansible.builtin.systemd:
+        name: rke2-server 
+        state: started 
+      failed_when: rke2_service_start is failed
+      listen: Start RKE2
