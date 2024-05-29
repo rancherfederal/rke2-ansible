@@ -18,7 +18,7 @@
   ansible.builtin.include_tasks: other_servers.yml
   when: inventory_hostname in groups['rke2_servers'][1:]
 
-- name: Add first server to HA Setup 
+- name: Add first server to fixed registration address (High availability)
   ansible.builtin.include_tasks: fixed-registration.yml
   when:
     - inventory_hostname in groups['rke2_servers'][0]
