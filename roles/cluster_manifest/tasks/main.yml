@@ -1,12 +1,48 @@
 ---
 
+#- name: Add cluster manifest addons files
+#  ansible.builtin.copy:
+#    src: "{{ cluster_manifest_config_file_path }}"
+#    dest: "/var/lib/rancher/rke2/server/manifests/"
+#    mode: '0640'
+#    owner: root
+#    group: root
+#  when:
+#    - inventory_hostname in groups['rke2_servers'][0]
+#    - cluster_manifest_config_file_path is defined
+#    - cluster_manifest_config_file_path | length > 0
+
+- name: Find yaml files
+  ansible.builtin.find:
+    paths: "{{ cluster_manifest_config_file_path }}"
+    file_type: file
+    recurse: No
+    patterns: "*yaml"
+  register: files_matched
+  delegate_to: localhost
+  when:
+    - inventory_hostname in groups['rke2_servers'][0]
+    - cluster_manifest_config_file_path is defined
+    - cluster_manifest_config_file_path | length > 0
+
+
+- name: Set manifest_file_list for other hosts
+  ansible.builtin.set_fact:
+    manifest_file_list: "{{files_matched}}"
+  delegate_to: localhost
+
+- name: Print manifest_file_list
+  ansible.builtin.debug:
+    msg:  "{{ manifest_file_list }}"
+
 - name: Add cluster manifest addons files
   ansible.builtin.copy:
-    src: "{{ cluster_manifest_config_file_path }}"
-    dest: "/var/lib/rancher/rke2/server/manifests/"
+    src: "{{ item.path }}"
+    dest: "/var/lib/rancher/rke2/server/manifests/cluster_manifests/"
     mode: '0640'
     owner: root
     group: root
+  with_items: "{{manifest_file_list.files}}"
   when:
     - inventory_hostname in groups['rke2_servers'][0]
     - cluster_manifest_config_file_path is defined
