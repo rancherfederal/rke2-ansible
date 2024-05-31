@@ -51,3 +51,11 @@ rke2_config: {}
 # Add a pod security admission config file by specifying the file path on the control host
 # Requires config.yaml to include `- admission-control-config-file=/etc/rancher/rke2/pod-security-admission-config.yaml` in order for this to be honored
 # pod_security_admission_config_file_path: "{{ playbook_dir }}/sample_files/pod-security-admission-config.yaml"
+
+# See https://ranchermanager.docs.rancher.com/v2.6/how-to-guides/new-user-guides/kubernetes-clusters-in-rancher-setup/register-existing-clusters#authorized-cluster-endpoint-support-for-rke2-and-k3s-clusters
+# Authorized Cluster Endpoint Support for RKE2
+# Warning: You must also set:
+# # rke2_config:
+# #    kube-apiserver-arg:
+# #      - authentication-token-webhook-config-file=/var/lib/rancher/rke2/kube-api-authn-webhook.yaml
+# kube_api_authn_webhook_file_path: "{{ playbook_dir }}/sample_files/kube-api-authn-webhook.yaml"
