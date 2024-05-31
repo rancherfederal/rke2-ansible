@@ -184,6 +184,22 @@
     rke2_config: "{{ updated_rke2_config.rke2_config }}"
   when: (cloud_provider_name is defined) and (cloud_provider_name|length > 0)
 
+# --tls-san value to add custom Subject Alternative Names (SANs) for RKE2
+- name: Add tls-san to rke2_config
+  ansible.utils.update_fact:
+    updates:
+      - path: rke2_config["tls-san"]
+        value: "{{ tls_san }}"
+  when: (tls_san is defined) and (tls_san|length > 0)
+  register: updated_rke2_config
+  changed_when: false
+     
+- name: Update rke2_config to take value of updated_rke2_config  # noqa no-handler
+  ansible.builtin.set_fact:
+    rke2_config: "{{ updated_rke2_config.rke2_config }}"
+  when: (tls_san is defined) and (tls_san|length > 0)
+  changed_when: false
+
 - name: Remove tmp config file
   ansible.builtin.file:
     path: /tmp/ansible-config.txt
