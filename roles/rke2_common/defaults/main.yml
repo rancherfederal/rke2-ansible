@@ -24,3 +24,5 @@ rke2_versioned_yum_repo:
   enabled: yes
 
 rke2_config: {}
+
+systemd_extra_env: {}

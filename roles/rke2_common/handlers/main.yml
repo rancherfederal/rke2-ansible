@@ -6,11 +6,13 @@
     name: systemd-sysctl
 
 - name: Restart rke2-server
+  throttle: 1
   ansible.builtin.service:
     state: restarted
     name: rke2-server
 
 - name: Restart rke2-agent
+  throttle: 1
   ansible.builtin.service:
     state: restarted
     name: rke2-agent

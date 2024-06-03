@@ -74,6 +74,9 @@
   ansible.builtin.include_tasks: add-registry-config.yml
   when: registry_config_file_path | length > 0
 
+- name: Include task file add-systemd-env.yml
+  ansible.builtin.include_tasks: add-systemd-env.yml
+
 - name: Run CIS-Hardening Tasks
   ansible.builtin.include_role:
     name: rke2_common
