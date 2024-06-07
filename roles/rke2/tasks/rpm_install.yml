@@ -30,20 +30,26 @@
       ansible_facts['distribution_major_version'] == "8" or
       ansible_facts['distribution_major_version'] == "9"
 
-- name: YUM-Based | Install rke2-server
+- name: YUM-Based Install
   ansible.builtin.yum:
-    name: "rke2-server-{{ rke2_version_rpm }}"
+    name: "{{ service_name }}-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
-  when:
-    - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
-    - not rke2_binary_tarball_check.stat.exists
-    - inventory_hostname in groups['rke2_servers']
+  notify: Restart {{ service_name }}
 
-- name: YUM-Based | Install rke2-agent
-  ansible.builtin.yum:
-    name: "rke2-agent-{{ rke2_version_rpm }}"
-    state: latest  # noqa package-latest
-  when:
-    - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
-    - not rke2_binary_tarball_check.stat.exists
-    - inventory_hostname in groups.get('rke2_agents', [])
+# - name: YUM-Based | Install rke2-server
+#   ansible.builtin.yum:
+#     name: "rke2-server-{{ rke2_version_rpm }}"
+#     state: latest  # noqa package-latest
+#   when:
+#     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
+#     - not rke2_binary_tarball_check.stat.exists #<- THIS SHOULD NEVER BE TRUE
+#     - inventory_hostname in groups['rke2_servers']
+
+# - name: YUM-Based | Install rke2-agent
+#   ansible.builtin.yum:
+#     name: "rke2-agent-{{ rke2_version_rpm }}"
+#     state: latest  # noqa package-latest
+#   when:
+#     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
+#     - not rke2_binary_tarball_check.stat.exists #<- THIS SHOULD NEVER BE TRUE
+#     - inventory_hostname in groups.get('rke2_agents', [])

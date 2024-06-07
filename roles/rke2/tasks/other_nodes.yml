@@ -1,11 +1,7 @@
 ---
 
-- name: RKE2 agent and server tasks
-  vars:
-    rke2_common_caller_role_name: agent
-  ansible.builtin.include_role:
-    name: rke2_common
-    tasks_from: main
+- name: Generate config.yml on other nodes
+  ansible.builtin.include_tasks: config.yml
 
 - name: Does config file already have server token?  # noqa command-instead-of-shell
   ansible.builtin.command: 'grep -i "^token:" /etc/rancher/rke2/config.yaml'
@@ -21,6 +17,7 @@
     insertbefore: BOF
   when:
     - '"token:" not in server_token_check.stdout'
+  notify: Restart {{ service_name }}
 
 - name: Does config file already have server url?  # noqa command-instead-of-shell
   ansible.builtin.command: 'grep -i "^server:" /etc/rancher/rke2/config.yaml'
@@ -36,10 +33,7 @@
     insertbefore: BOF
   when:
     - '"server:" not in server_url_check.stdout'
+  notify: Restart {{ service_name }}
 
-- name: Start rke2-agent
-  ansible.builtin.systemd:
-    name: rke2-agent.service
-    state: started
-    enabled: yes
-    daemon_reload: yes
+- name: Wait for rke2
+  ansible.builtin.include_tasks: wait_for_rke2.yml

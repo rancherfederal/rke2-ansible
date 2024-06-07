@@ -25,9 +25,11 @@
         mode: 0600
       register: sysctl_operation_yum
       when:
-        - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
-        - not rke2_binary_tarball_check.stat.exists
-        - rke2_tarball_url is not defined or rke2_tarball_url == ""
+        - install_method == "rpm"
+      notify:
+        - Restart systemd-sysctl
+        - Restart {{ service_name }}
+        - Reboot the machine
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
       ansible.builtin.copy:
@@ -36,25 +38,33 @@
         remote_src: yes
         mode: 0600
       register: sysctl_operation_tarball
-      when: >-
-        (ansible_facts['os_family'] != 'RedHat' and
-        ansible_facts['os_family'] != 'Rocky') or
-        rke2_binary_tarball_check.stat.exists or
-        (rke2_tarball_url is defined and rke2_tarball_url != "")
+      when:
+        - install_method == "tarball"
+      notify:
+        - Restart systemd-sysctl
+        - Restart {{ service_name }}
+        - Reboot the machine
 
-    - name: Restart systemd-sysctl
-      ansible.builtin.service:
-        state: restarted
-        name: systemd-sysctl
-      when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
+    # - name: Restart systemd-sysctl
+    #   ansible.builtin.service:
+    #     state: restarted
+    #     name: systemd-sysctl
+    #   when: sysctl_operation_yum.changed or sysctl_operation_tarball.changed
 
     # Per CIS hardening guide, if Kubernetes is already running, making changes to sysctl can result in unexpected
     # side-effects. Rebooting node if RKE2 is already running to prevent potential issues whereas before we were
     # always rebooting, even if the node was brand new and RKE2 not running yet.
     - name: Reboot the machine (Wait for 5 min)
-      ansible.builtin.reboot:
-        reboot_timeout: 300
+      ansible.builtin.set_fact:
+        reboot: true
       when:
         - (sysctl_operation_yum.changed or sysctl_operation_tarball.changed)
         - rke2_running is defined
         - rke2_running
+      # ansible.builtin.reboot:
+      #   reboot_timeout: 300
+      # throttle: 1
+      # when:
+      #   - (sysctl_operation_yum.changed or sysctl_operation_tarball.changed)
+      #   - rke2_running is defined
+      #   - rke2_running

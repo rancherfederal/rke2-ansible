@@ -1,4 +1,5 @@
 ---
+
 - name: "Check for images tar.gz in {{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"  # noqa name[template] yaml[line-length]
   ansible.builtin.stat:
     path: "{{ playbook_dir }}/tarball_install/rke2-images.linux-amd64.tar.gz"
@@ -20,6 +21,10 @@
     path: /var/lib/rancher/rke2/agent/images
     state: directory
     mode: '0644'
+  when:
+    - got_images_gz
+    - got_images_zst
+    - rke2_images_urls != []
 
 - name: Download images tar files url
   ansible.builtin.get_url:

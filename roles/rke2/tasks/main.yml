@@ -1,0 +1,90 @@
+---
+
+- name: Populate service facts
+  ansible.builtin.service_facts: {}
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Satisfy OS Pre-Reqs
+  ansible.builtin.include_tasks: pre_reqs.yml
+
+- name: Set for install method of tarball
+  ansible.builtin.set_fact:
+    install_method: tarball
+  when: |-
+      ((ansible_facts['os_family'] != 'RedHat' and
+      ansible_facts['os_family'] != 'Rocky') or
+      (rke2_tarball_url is defined and rke2_tarball_url != "") or
+      (rke2_local_tarball_path is defined and rke2_local_tarball_path != ""))
+
+- name: Set for install method of rpm
+  ansible.builtin.set_fact:
+    install_method: rpm
+  when:
+    - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
+    - rke2_local_tarball_path == ""
+    - rke2_tarball_url == ""
+
+- name: Set as server
+  ansible.builtin.set_fact:
+    service_name: rke2-server
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Set as agent
+  ansible.builtin.set_fact:
+    service_name: rke2-agent
+  when:
+    - inventory_hostname in groups.get('rke2_agents', [])
+
+- name: Has rke2 been installed already
+  ansible.builtin.include_tasks: previous_install.yml
+
+- name: Check for images bundle
+  ansible.builtin.include_tasks: images_tarball_install.yml
+
+- name: Determine rke2_version to install
+  ansible.builtin.include_tasks: calculate_rke2_version.yml
+
+- name: Tarball Install
+  ansible.builtin.include_tasks: tarball_install.yml
+  when:
+    - install_method == "tarball"
+
+- name: RPM Install
+  when:
+    - install_method == "rpm"
+  ansible.builtin.include_tasks: rpm_install.yml
+
+- name: Set rke2 configuration files
+  ansible.builtin.include_tasks: configure_rke2.yml
+
+- name: RKE2 on first node
+  ansible.builtin.include_tasks: first_server.yml
+  when:
+    - inventory_hostname in groups['rke2_servers'][0]
+
+- name: RKE2 on all other nodes
+  ansible.builtin.include_tasks: other_nodes.yml
+  when:
+    - inventory_hostname in groups['rke2_servers'][1:] or
+      inventory_hostname in groups.get('rke2_agents', [])
+
+- name: Configure kubectl,crictl,ctr
+  ansible.builtin.include_tasks: utilities.yml
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Add cluster manifest addons files
+  ansible.builtin.copy:
+    src: "{{ cluster_manifest_config_file_path }}"
+    dest: "/var/lib/rancher/rke2/server/manifests/"
+    mode: '0640'
+    owner: root
+    group: root
+  when:
+    - inventory_hostname in groups['rke2_servers'][0]
+    - cluster_manifest_config_file_path is defined
+    - cluster_manifest_config_file_path | length > 0

@@ -4,13 +4,28 @@
   ansible.builtin.service:
     state: restarted
     name: systemd-sysctl
+  when:
+    - reboot is not defined
 
 - name: Restart rke2-server
   ansible.builtin.service:
     state: restarted
     name: rke2-server
+  throttle: 1
+  when:
+    - reboot is not defined
 
 - name: Restart rke2-agent
   ansible.builtin.service:
     state: restarted
     name: rke2-agent
+  throttle: 1
+  when:
+    - reboot is not defined
+
+- name: Reboot the machine
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+  throttle: 1
+  when:
+    - reboot

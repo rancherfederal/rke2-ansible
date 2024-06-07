@@ -1,22 +1,17 @@
 ---
 
-- name: Add manifest files
-  ansible.builtin.include_role:
-    name: rke2_common
-    tasks_from: add-manifest-addons.yml
-  when:
-    - manifest_config_file_path is defined
-    - manifest_config_file_path | length > 0
+- name: Start {{ service_name }}
+  ansible.builtin.meta: flush_handlers
 
-- name: Start rke2-server
+- name: Enable {{ service_name }}
   ansible.builtin.systemd:
-    name: rke2-server
+    name: "{{ service_name }}"
     state: started
     enabled: yes
 
 - name: Wait for k8s apiserver
   ansible.builtin.wait_for:
-    host: localhost
+    host: "{{ kubernetes_api_server_host }}"
     port: "6443"
     state: present
     timeout: 300
@@ -35,6 +30,8 @@
     kubelet_hostname_override_parameter: "{{ kubelet_check.stdout | \
       regex_search('\\s--hostname-override=((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]))\\s',\
       '\\1') }}"
+  when:
+    - inventory_hostname in groups['rke2_servers']
 
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
@@ -46,18 +43,5 @@
   retries: 20
   delay: 10
   changed_when: false
-
-- name: Add generated Token if none provided
-  block:
-    - name: Wait for node-token
-      ansible.builtin.wait_for:
-        path: /var/lib/rancher/rke2/server/node-token
-
-    - name: Read node-token from master
-      ansible.builtin.slurp:
-        src: /var/lib/rancher/rke2/server/node-token
-      register: node_token
-
-    - name: Store Master node-token
-      ansible.builtin.set_fact:
-        rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+  when:
+    - inventory_hostname in groups['rke2_servers']

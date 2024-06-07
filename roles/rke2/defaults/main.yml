@@ -1,5 +1,7 @@
 ---
+kubernetes_api_server_host: "{{ hostvars[groups['rke2_servers'][0]].inventory_hostname }}"
 tarball_dir: "/usr/local"
+rke2_local_tarball_path: ""
 rke2_tarball_url: ""
 rke2_images_urls: []
 rke2_channel: stable

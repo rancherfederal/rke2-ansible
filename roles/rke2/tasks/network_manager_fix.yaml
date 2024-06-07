@@ -3,6 +3,7 @@
 # This fixes known issue with NetworkManager
 # https://docs.rke2.io/known_issues/#networkmanager
 
+# blockinfile or own entire file?
 - name: Add NetworkManager fix to rke2-canal.conf
   ansible.builtin.blockinfile:
     path: /etc/NetworkManager/conf.d/rke2-canal.conf
