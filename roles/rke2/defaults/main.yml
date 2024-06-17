@@ -4,11 +4,13 @@ tarball_dir: "/usr/local"
 rke2_local_tarball_path: ""
 rke2_tarball_url: ""
 rke2_images_urls: []
+rke2_images_local_tarball_path: []
 rke2_channel: stable
 audit_policy_config_file_path: ""
 registry_config_file_path: ""
 pod_security_admission_config_file_path: ""
 add_iptables_rules: false
+cluster_manifest_config_file_path: ""
 rke2_common_yum_repo:
   name: rancher-rke2-common
   description: "Rancher RKE2 Common Latest"

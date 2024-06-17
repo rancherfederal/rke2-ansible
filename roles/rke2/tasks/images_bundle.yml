@@ -1,0 +1,28 @@
+---
+
+- name: Create images directory
+  ansible.builtin.file:
+    path: /var/lib/rancher/rke2/agent/images
+    state: directory
+    mode: '0644'
+
+- name: Download images tar files url
+  ansible.builtin.get_url:
+    url: "{{ item }}"
+    dest: "/var/lib/rancher/rke2/agent/images"
+    mode: "0644"
+  when:
+    - rke2_images_urls != []
+  with_items: "{{ rke2_images_urls }}"
+  notify: "Restart {{ service_name }}"
+
+- name: Copy local tarball images
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /var/lib/rancher/rke2/agent/images/
+    mode: '0644'
+  with_items:
+    - "{{ rke2_images_local_tarball_path }}"
+  when:
+    - rke2_images_local_tarball_path != []
+  notify: "Restart {{ service_name }}"

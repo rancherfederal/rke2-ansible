@@ -6,7 +6,7 @@
 - name: Wait for rke2
   ansible.builtin.include_tasks: wait_for_rke2.yml
 
-- name: Add generated Token if none provided  ### <- what's the intent here?
+- name: Add generated Token if none provided
   block:
     - name: Wait for node-token
       ansible.builtin.wait_for:

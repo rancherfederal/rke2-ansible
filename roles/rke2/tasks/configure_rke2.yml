@@ -1,23 +1,26 @@
 ---
 
+- name: Create the /etc/rancher/rke2 config dir
+  ansible.builtin.file:
+    path: /etc/rancher/rke2
+    state: directory
+    recurse: yes
+
 - name: Run CIS-Hardening Tasks
   ansible.builtin.include_tasks: cis-hardening.yml
 
 - name: Configure registries.yaml
   ansible.builtin.include_tasks: add-registry-config.yml
-  when: registry_config_file_path | length > 0
 
 - name: Configure audit policy
   ansible.builtin.include_tasks: add-audit-policy-config.yml
   when:
     - inventory_hostname in groups['rke2_servers']
-    - audit_policy_config_file_path | length > 0
 
 - name: Configure psa policy
   ansible.builtin.include_tasks: add-pod-security-admission-config.yml
   when:
     - inventory_hostname in groups['rke2_servers']
-    - pod_security_admission_config_file_path | length > 0
 
 - name: Configure first server manifests
   ansible.builtin.include_tasks: add-manifest-addons.yml

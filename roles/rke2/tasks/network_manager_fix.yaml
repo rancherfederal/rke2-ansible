@@ -26,6 +26,7 @@
     owner: root
     group: root
   when: rke2_canal_file.stat.exists
+  notify: "Restart {{ service_name }}"
 
 - name: Disable service nm-cloud-setup
   ansible.builtin.systemd:
@@ -33,6 +34,9 @@
     enabled: no
     state: stopped
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
+  notify: 
+    - Reload NetworkManager
+    - "Restart {{ service_name }}"
 
 - name: Disable nm-cloud-setup.timer unit
   ansible.builtin.systemd:
@@ -40,10 +44,8 @@
     state: stopped
     enabled: no
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
+  notify: 
+    - Reload NetworkManager
+    - "Restart {{ service_name }}"
 
-- name: Reload NetworkManager
-  ansible.builtin.systemd:
-    name: NetworkManager
-    state: reloaded
-  when: (ansible_facts.services["NetworkManager.service"] is defined) and
-        (ansible_facts.services["NetworkManager.service"].status == "running")
+

@@ -3,10 +3,10 @@
 - name: "Calculate rke2 full version"
   when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )
   block:
-    - name: Stop if the provided is not valid
-      ansible.builtin.fail:
-        msg: "Provided channel is not valid"
-      when: rke2_channel not in channels
+    # - name: Stop if the provided is not valid
+    #   ansible.builtin.fail:
+    #     msg: "Provided channel is not valid"
+    #   when: rke2_channel not in channels
 
     - name: Get full version name url
       ansible.builtin.uri:

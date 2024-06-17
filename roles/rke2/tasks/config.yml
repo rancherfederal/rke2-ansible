@@ -256,21 +256,3 @@
     path: /tmp/ansible-config.txt
     state: absent
   changed_when: false
-
-- name: Restart rke2-server if package installed and config changed or RKE2 version changed
-  ansible.builtin.service:
-    state: restarted
-    name: rke2-server
-  when:
-    - ansible_facts.services["rke2-server.service"] is defined
-    - "ansible_facts.services['rke2-server.service'].state == 'running'"
-    - (tmp_sha1 != previous_rke2_config.stat.checksum or (rke2_version_changed | default(false)))
-
-- name: Restart rke2-agent if package installed and config changed or RKE2 version changed
-  ansible.builtin.service:
-    state: restarted
-    name: rke2-agent
-  when:
-    - ansible_facts.services["rke2-agent.service"] is defined
-    - "ansible_facts.services['rke2-agent.service'].state == 'running'"
-    - (tmp_sha1 != previous_rke2_config.stat.checksum or (rke2_version_changed | default(false)))
