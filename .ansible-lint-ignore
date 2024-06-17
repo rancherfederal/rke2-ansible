@@ -2,3 +2,7 @@
 
 roles/testing/tasks/troubleshooting.yml ignore-errors
 inventory/sample/hosts.yml yaml[line-length]
+inventory/sample/hosts.yml yaml[comments-indentation]
+roles/rke2/tasks/add-audit-policy-config.yml no-handler
+roles/rke2/tasks/add-pod-security-admission-config.yml no-handler
+roles/rke2/tasks/add-registry-config.yml no-handler

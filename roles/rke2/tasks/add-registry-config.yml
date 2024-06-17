@@ -1,7 +1,7 @@
 ---
 - name: Add registry configuration file
   vars:
-    file_contents: "{{ lookup('file', registry_config_file_path) }}"
+    file_contents: "{{ lookup('file', rke2_registry_config_file_path) }}"
   ansible.builtin.template:
     src: ansible_header.j2
     dest: "/etc/rancher/rke2/registries.yaml"
@@ -9,12 +9,12 @@
     owner: root
     group: root
   when:
-    - registry_config_file_path|length != 0
+    - rke2_registry_config_file_path|length != 0
   notify: "Restart {{ service_name }}"
 
 - name: Remove registry configuration file
   when:
-    - registry_config_file_path|length == 0
+    - rke2_registry_config_file_path|length == 0
   block:
     - name: Check that the registry config file exists
       ansible.builtin.stat:

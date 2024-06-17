@@ -36,7 +36,6 @@
     - not rke2_binary_tarball_check.stat.exists
     - rke2_tarball_url != ""
 
-
 - name: Determine if current version differs what what is being installed
   ansible.builtin.set_fact:
     rke2_version_changed: true

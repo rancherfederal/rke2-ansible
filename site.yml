@@ -6,4 +6,3 @@
   become: true
   roles:
     - role: rke2
-  # serial: 5

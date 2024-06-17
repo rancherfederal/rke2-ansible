@@ -2,7 +2,7 @@
 
 - name: Set fact if rke2-server was previously installed
   ansible.builtin.set_fact:
-    installed: true
+    rke2_installed: true
   when:
     - ansible_facts.services["rke2-server.service"] is defined
     - not ansible_facts.services["rke2-server.service"].status == 'disabled'
@@ -18,7 +18,7 @@
 
 - name: Set fact if rke2-agent was previously installed
   ansible.builtin.set_fact:
-    installed: true
+    rke2_installed: true
   when:
     - ansible_facts.services["rke2-agent.service"] is defined
     - not ansible_facts.services["rke2-agent.service"].status == 'disabled'

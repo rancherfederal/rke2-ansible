@@ -34,7 +34,7 @@
     enabled: no
     state: stopped
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
-  notify: 
+  notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
 
@@ -44,8 +44,6 @@
     state: stopped
     enabled: no
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
-  notify: 
+  notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
-
-

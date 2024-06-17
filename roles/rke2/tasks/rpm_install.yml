@@ -34,7 +34,7 @@
       ansible_facts['distribution_major_version'] == "9"
 
 - name: YUM-Based Install
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: "{{ service_name }}-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
   notify: "Restart {{ service_name }}"

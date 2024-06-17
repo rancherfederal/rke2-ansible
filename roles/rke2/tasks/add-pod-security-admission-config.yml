@@ -1,7 +1,7 @@
 ---
 - name: Add pod security admission config file
   vars:
-    file_contents: "{{ lookup('file', pod_security_admission_config_file_path) }}"
+    file_contents: "{{ lookup('file', rke2_pod_security_admission_config_file_path) }}"
   ansible.builtin.template:
     src: ansible_header.j2
     dest: "/etc/rancher/rke2/pod-security-admission-config.yaml"
@@ -9,12 +9,12 @@
     owner: root
     group: root
   when:
-    - pod_security_admission_config_file_path|length != 0
+    - rke2_pod_security_admission_config_file_path|length != 0
   notify: "Restart {{ service_name }}"
 
 - name: Remove pod security admission config file
   when:
-    - pod_security_admission_config_file_path is not defined or pod_security_admission_config_file_path|length == 0
+    - rke2_pod_security_admission_config_file_path|length == 0
   block:
     - name: Check that the PSA config file exists
       ansible.builtin.stat:

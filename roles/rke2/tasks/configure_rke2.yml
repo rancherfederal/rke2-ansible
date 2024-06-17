@@ -24,7 +24,8 @@
 
 - name: Configure first server manifests
   ansible.builtin.include_tasks: add-manifest-addons.yml
+  vars:
+    src: "{{ rke2_initial_manifest_config_file_path }}"
   when:
     - inventory_hostname in groups['rke2_servers'][0]
-    - manifest_config_file_path is defined
-    - manifest_config_file_path | length > 0
+    - rke2_initial_manifest_config_file_path | length > 0

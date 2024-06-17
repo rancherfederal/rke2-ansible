@@ -2,7 +2,7 @@
 
 - name: Add manifest addons files
   ansible.builtin.copy:
-    src: "{{ manifest_config_file_path }}"
+    src: "{{ src }}"
     dest: "/var/lib/rancher/rke2/server/manifests/"
     mode: '0640'
     owner: root

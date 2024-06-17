@@ -19,4 +19,4 @@
   ansible.builtin.include_tasks: iptables_rules.yml
   when:
     - ansible_facts.services["iptables.service"] is defined
-    - add_iptables_rules | bool
+    - rek2_add_iptables_rules | bool

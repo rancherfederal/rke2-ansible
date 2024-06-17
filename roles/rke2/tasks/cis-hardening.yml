@@ -50,7 +50,7 @@
     # always rebooting, even if the node was brand new and RKE2 not running yet.
     - name: Reboot the machine (Wait for 5 min)
       ansible.builtin.set_fact:
-        reboot: true
+        rke2_reboot: true
       when:
         - (sysctl_operation_yum.changed or sysctl_operation_tarball.changed)
         - rke2_running is defined

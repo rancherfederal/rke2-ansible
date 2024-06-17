@@ -28,7 +28,7 @@
 - name: Add server url to config file
   ansible.builtin.lineinfile:
     dest: /etc/rancher/rke2/config.yaml
-    line: "server: https://{{ kubernetes_api_server_host }}:9345"
+    line: "server: https://{{ rke2_kubernetes_api_server_host }}:9345"
     state: present
     insertbefore: BOF
   when:

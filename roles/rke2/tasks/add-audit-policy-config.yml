@@ -1,7 +1,7 @@
 ---
 - name: Add audit policy configuration file
   vars:
-    file_contents: "{{ lookup('file', audit_policy_config_file_path) }}"
+    file_contents: "{{ lookup('file', rke2_audit_policy_config_file_path) }}"
   ansible.builtin.template:
     src: ansible_header.j2
     dest: "/etc/rancher/rke2/audit-policy.yaml"
@@ -9,12 +9,12 @@
     owner: root
     group: root
   when:
-    - audit_policy_config_file_path|length != 0
+    - rke2_audit_policy_config_file_path|length != 0
   notify: "Restart {{ service_name }}"
 
 - name: Remove audit policy configuration file
   when:
-    - audit_policy_config_file_path|length == 0
+    - rke2_audit_policy_config_file_path|length == 0
   block:
     - name: Check that the audit policy config file exists
       ansible.builtin.stat:
