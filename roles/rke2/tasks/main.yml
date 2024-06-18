@@ -12,16 +12,18 @@
     install_method: tarball
   when: |-
       ((ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Rocky') or
-      rke2_tarball_url != "" or
-      rke2_local_tarball_path != "")
+      rke2_install_tarball_url != "" or
+      rke2_local_install_tarball_path != "" or
+      rke2_force_tarball_install|bool)
 
 - name: Set for install method of rpm
   ansible.builtin.set_fact:
     install_method: rpm
   when:
     - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
-    - rke2_local_tarball_path == ""
-    - rke2_tarball_url == ""
+    - rke2_local_install_tarball_path == ""
+    - rke2_install_tarball_url == ""
+    - not rke2_force_tarball_install|bool
 
 - name: Set as server
   ansible.builtin.set_fact:
@@ -46,6 +48,9 @@
   when:
     - rke2_images_urls != [] or
       rke2_images_local_tarball_path != []
+
+- name: Determine rke2_version to install
+  ansible.builtin.include_tasks: calculate_rke2_version.yml
 
 - name: Tarball Install
   ansible.builtin.include_tasks: tarball_install.yml

@@ -1,8 +1,5 @@
 ---
 
-- name: Determine rke2_version to install
-  ansible.builtin.include_tasks: calculate_rke2_version.yml
-
 # Add RKE2 Common repo
 - name: Add the rke2-common repo RHEL/CentOS/Rocky
   ansible.builtin.yum_repository:

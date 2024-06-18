@@ -40,7 +40,7 @@
 
 - name: Get current RKE2 version if already installed
   ansible.builtin.shell: set -o pipefail && /usr/local/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
-  register: installed_rke2_version_tmp
+  register: rke2_installed_version_tmp
   changed_when: false
   args:
     executable: /usr/bin/bash
@@ -48,12 +48,12 @@
     - install_method == "tarball"
     - rke2_binary.stat.exists
   failed_when: >
-    (installed_rke2_version_tmp.rc != 141) and
-    (installed_rke2_version_tmp.rc != 0)
+    (rke2_installed_version_tmp.rc != 141) and
+    (rke2_installed_version_tmp.rc != 0)
 
 - name: Determine if current version differs what what is being installed
   ansible.builtin.set_fact:
-    installed_rke2_version: "{{ installed_rke2_version_tmp.stdout }}"
+    rke2_installed_version: "{{ rke2_installed_version_tmp.stdout }}"
   when:
     - install_method == "tarball"
     - rke2_binary.stat.exists

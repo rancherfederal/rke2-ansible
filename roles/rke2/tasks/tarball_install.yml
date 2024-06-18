@@ -14,47 +14,49 @@
 - name: TARBALL | Make temp dir
   ansible.builtin.tempfile:
     state: directory
-    suffix: rke2-install.XXXXXXXXXX
+    suffix: .rke2-install.XXXXXXXXXX
     path: "{{ tarball_tmp_dir | default(omit) }}"
   register: temp_dir
 
 - name: Send provided tarball if available
   ansible.builtin.copy:
-    src: "{{ rke2_local_tarball_path }}"
-    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+    src: "{{ inventory_dir}}/{{ rke2_local_install_tarball_path }}"
+    dest: "{{ temp_dir.path }}/"
     mode: '0644'
   when:
-    - rke2_binary_tarball_check.stat.exists
-    - rke2_tarball_url == ""
+    - rke2_local_install_tarball_path != ""
 
 - name: Download Tar from provided URL
   ansible.builtin.get_url:
-    url: "{{ rke2_tarball_url }}"
-    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+    url: "{{ rke2_install_tarball_url }}"
+    dest: "{{ temp_dir.path }}/"
     mode: "0644"
   when:
-    - not rke2_binary_tarball_check.stat.exists
-    - rke2_tarball_url != ""
+    - rke2_install_tarball_url != ""
 
-- name: Determine if current version differs what what is being installed
+- name: Determine if current version differs from what is being installed
   ansible.builtin.set_fact:
     rke2_version_changed: true
   when:
-    - not rke2_binary_tarball_check.stat.exists
-    - rke2_tarball_url == ""
-    - not installed or installed_rke2_version != rke2_full_version
+    # - rke2_local_install_tarball_path == ""
+    # - rke2_install_tarball_url == ""
+    - not rke2_installed or rke2_installed_version != rke2_full_version
+
+- name: Set architecture specific variables
+  set_fact:
+    arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
 
 - name: TARBALL | Download the tarball
   ansible.builtin.get_url:
-    url: https://github.com/rancher/rke2/releases/download/{{ rke2_full_version }}/rke2.linux-amd64.tar.gz
-    dest: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+    url: "https://github.com/rancher/rke2/releases/download/{{ rke2_full_version }}/rke2.linux-{{ arch }}.tar.gz"
+    dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
     mode: "0644"
   when:
-    - not rke2_binary_tarball_check.stat.exists
-    - rke2_tarball_url == ""
+    - rke2_local_install_tarball_path == ""
+    - rke2_install_tarball_url == ""
     - rke2_version_changed
 
-- name: TARBALL | Install tar package
+- name: TARBALL | Install tar binary
   ansible.builtin.package:
     name: tar
     state: present
@@ -62,53 +64,54 @@
 
 - name: Get version of provided tarball
   when:
-    - (rke2_binary_tarball_check.stat.exists or rke2_tarball_url != "")
+    - (rke2_local_install_tarball_path != "" or rke2_install_tarball_url != "")
   block:
     - name: Unarchive tarball into temp location
       ansible.builtin.unarchive:
-        src: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
+        src: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
         dest: "{{ temp_dir.path }}"
         remote_src: true
+      changed_when: false
 
     - name: Get tarball RKE2 version from temp location
       ansible.builtin.shell: set -o pipefail && {{ temp_dir.path }}/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
-      register: tarball_rke2_version_tmp
+      register: rke2_tarball_version_tmp
       changed_when: false
       args:
         executable: /usr/bin/bash
 
     - name: Set tarball RKE2 version var
       ansible.builtin.set_fact:
-        tarball_rke2_version: "{{ tarball_rke2_version_tmp.stdout }}"
+        rke2_tarball_version: "{{ rke2_tarball_version_tmp.stdout }}"
 
-    - name: Determine if current version differs what what is being installed
+    - name: Determine if current version differs from what is being installed
       ansible.builtin.set_fact:
         rke2_version_changed: true
       when:
-        - not installed or installed_rke2_version != tarball_rke2_version
+        - not rke2_installed or rke2_installed_version != rke2_tarball_version
 
 - name: TARBALL | Check Target Mountpoint
-  ansible.builtin.command: mountpoint -q {{ tarball_dir }}
-  register: tarball_dir_stat
+  ansible.builtin.command: mountpoint -q {{ rke2_tarball_install_dir }}
+  register: rke2_tarball_install_dir_stat
   failed_when: false
   changed_when: false
 
-- name: TARBALL | tarball_dir is a mountpoint setting dir to /opt/rke2
+- name: TARBALL | rke2_tarball_install_dir is a mountpoint setting dir to /opt/rke2
   ansible.builtin.set_fact:
-    tarball_dir: "/opt/rke2"
-  when: tarball_dir_stat.rc == 0
+    rke2_tarball_install_dir: "/opt/rke2"
+  when: rke2_tarball_install_dir_stat.rc == 0
 
 - name: TARBALL | Using /opt/rke2
   ansible.builtin.debug:
     msg: "Using /opt/rke2 for install directory"
-  when: tarball_dir_stat.rc == 0
+  when: rke2_tarball_install_dir_stat.rc == 0
 
-- name: TARBALL | Create {{ tarball_dir }}
+- name: TARBALL | Create {{ rke2_tarball_install_dir }}
   ansible.builtin.file:
-    path: "{{ tarball_dir }}"
+    path: "{{ rke2_tarball_install_dir }}"
     state: directory
     recurse: true
-  when: tarball_dir is defined
+  when: rke2_tarball_install_dir is defined
 
 - name: Final extraction/installation of RKE2 Tar
   when:
@@ -117,31 +120,33 @@
 
     - name: Unarchive rke2 tar
       ansible.builtin.unarchive:
-        src: "{{ temp_dir.path }}/rke2.linux-amd64.tar.gz"
-        dest: "{{ tarball_dir }}"
+        src: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
+        dest: "{{ rke2_tarball_install_dir }}"
         remote_src: true
 
     - name: TARBALL | Updating rke2-server.service
       ansible.builtin.replace:
-        path: "{{ tarball_dir }}/lib/systemd/system/rke2-server.service"
+        path: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-server.service"
         regexp: '/usr/local'
-        replace: '{{ tarball_dir }}'
+        replace: '{{ rke2_tarball_install_dir }}'
+      notify: Restart rke2-server
 
     - name: TARBALL | Updating rke2-agent.service
       ansible.builtin.replace:
-        path: "{{ tarball_dir }}/lib/systemd/system/rke2-agent.service"
+        path: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-agent.service"
         regexp: '/usr/local'
-        replace: '{{ tarball_dir }}'
+        replace: '{{ rke2_tarball_install_dir }}'
+      notify: Restart rke2-agent
 
     - name: TARBALL | Updating rke2-uninstall.sh
       ansible.builtin.replace:
-        path: "{{ tarball_dir }}/bin/rke2-uninstall.sh"
+        path: "{{ rke2_tarball_install_dir }}/bin/rke2-uninstall.sh"
         regexp: '/usr/local'
-        replace: '{{ tarball_dir }}'
+        replace: '{{ rke2_tarball_install_dir }}'
 
     - name: TARBALL | Moving Systemd units to /etc/systemd/system
       ansible.builtin.copy:
-        src: "{{ tarball_dir }}/lib/systemd/system/rke2-server.service"
+        src: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-server.service"
         dest: /etc/systemd/system/rke2-server.service
         mode: '0644'
         owner: root
@@ -152,7 +157,7 @@
 
     - name: TARBALL | Moving Systemd units to /etc/systemd/system
       ansible.builtin.copy:
-        src: "{{ tarball_dir }}/lib/systemd/system/rke2-server.env"
+        src: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-server.env"
         dest: /etc/systemd/system/rke2-server.env
         mode: '0644'
         owner: root
@@ -163,7 +168,7 @@
 
     - name: TARBALL | Moving Systemd units to /etc/systemd/system
       ansible.builtin.copy:
-        src: "{{ tarball_dir }}/lib/systemd/system/rke2-agent.service"
+        src: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-agent.service"
         dest: /etc/systemd/system/rke2-agent.service
         mode: '0644'
         owner: root
@@ -174,7 +179,7 @@
 
     - name: TARBALL | Moving Systemd units to /etc/systemd/system
       ansible.builtin.copy:
-        src: "{{ tarball_dir }}/lib/systemd/system/rke2-agent.env"
+        src: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-agent.env"
         dest: /etc/systemd/system/rke2-agent.env
         mode: '0644'
         owner: root
