@@ -51,6 +51,9 @@
 
 - name: Determine rke2_version to install
   ansible.builtin.include_tasks: calculate_rke2_version.yml
+  when:
+    - rke2_local_install_tarball_path == ""
+    - rke2_install_tarball_url == ""
 
 - name: Tarball Install
   ansible.builtin.include_tasks: tarball_install.yml

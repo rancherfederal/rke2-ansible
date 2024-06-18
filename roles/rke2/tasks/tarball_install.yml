@@ -20,7 +20,7 @@
 
 - name: Send provided tarball if available
   ansible.builtin.copy:
-    src: "{{ inventory_dir}}/{{ rke2_local_install_tarball_path }}"
+    src: "{{ inventory_dir }}/{{ rke2_local_install_tarball_path }}"
     dest: "{{ temp_dir.path }}/"
     mode: '0644'
   when:
@@ -38,12 +38,12 @@
   ansible.builtin.set_fact:
     rke2_version_changed: true
   when:
-    # - rke2_local_install_tarball_path == ""
-    # - rke2_install_tarball_url == ""
+    - rke2_local_install_tarball_path == ""
+    - rke2_install_tarball_url == ""
     - not rke2_installed or rke2_installed_version != rke2_full_version
 
 - name: Set architecture specific variables
-  set_fact:
+  ansible.builtin.set_fact:
     arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
 
 - name: TARBALL | Download the tarball

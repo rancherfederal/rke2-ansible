@@ -1,9 +1,9 @@
 ---
 
-- name: Start {{ service_name }}
+- name: Start rke2
   ansible.builtin.meta: flush_handlers
 
-- name: Enable {{ service_name }}
+- name: Enable service
   ansible.builtin.systemd:
     name: "{{ service_name }}"
     state: started

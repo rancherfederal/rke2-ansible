@@ -1,21 +1,20 @@
 ---
 
-- name: "Calculate rke2 full version"
-  when: ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )
+- name: "Determine latest version from internet"
+  when:
+    - ( install_rke2_version is not defined ) or ( install_rke2_version | length == 0 )
+    - rke2_local_install_tarball_path == ""
+    - rke2_install_tarball_url == ""
   block:
-    # - name: Stop if the provided is not valid
-    #   ansible.builtin.fail:
-    #     msg: "Provided channel is not valid"
-    #   when: rke2_channel not in channels
 
-    - name: Get full version name url
+    - name: Get versions from update.rke2.io
       ansible.builtin.uri:
         url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
         follow_redirects: safe
         remote_src: true
       register: rke2_version_url
 
-    - name: Set full version name
+    - name: Save version
       ansible.builtin.shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
       register: rke2_full_version
       changed_when: false
