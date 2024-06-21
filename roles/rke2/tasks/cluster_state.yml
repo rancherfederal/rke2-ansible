@@ -1,6 +1,9 @@
 ---
 
 - name: Check for existing cluster
+  when:
+    - rke2_running is defined
+    - rke2_running
   block:
     - name: Check for node-token (existing cluster)
       ansible.builtin.stat:
@@ -18,7 +21,8 @@
       ansible.builtin.set_fact:
         rke2_config_token: "{{ rke2_config_token_tmp.content | b64decode | regex_replace('\n', '') }}"
       when:
-        - rke2_config_token_tmp.stat.exists
+        - "rke2_config_token_tmp.content is defined"
+        - rke2_config_token_tmp.content | length != 0
 
     - name: Set node-token fact on all hosts (existing cluster)
       ansible.builtin.set_fact:
@@ -27,8 +31,6 @@
       run_once: true
       loop: "{{ groups['all'] }}"
       when: "hostvars[item]['rke2_config_token'] is defined"
-      vars:
-        rke2_config_token: "{{ rke2_config_token | default('') }}"
 
     - name: Debug found token
       ansible.builtin.debug:
@@ -52,9 +54,6 @@
         - hostvars[item]['rke2_kubernetes_api_server_host'] == ""
       vars:
         rke2_kubernetes_api_server_host: "{{ existing_join_host | default('') }}"
-  when:
-    - rke2_running is defined
-    - rke2_running
 
 - name: No existing cluster found and api server not set
   ansible.builtin.set_fact:

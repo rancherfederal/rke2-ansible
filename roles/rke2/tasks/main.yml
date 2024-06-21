@@ -82,8 +82,6 @@
   when:
     - inventory_hostname in groups['rke2_servers'][1:] or
       inventory_hostname in groups.get('rke2_agents', [])
-  when:
-    - "rke2_config_token is not defined"
 
 - name: Confirm configuration on cluster
   when:
