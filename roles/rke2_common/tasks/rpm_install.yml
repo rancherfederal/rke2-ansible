@@ -38,6 +38,10 @@
     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
     - inventory_hostname in groups['rke2_servers']
+  register: result
+  retries: 10
+  until: result is succeeded
+  delay: 30
 
 - name: YUM-Based | Install rke2-agent
   ansible.builtin.yum:
@@ -47,3 +51,7 @@
     - ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Rocky'
     - not rke2_binary_tarball_check.stat.exists
     - inventory_hostname in groups.get('rke2_agents', [])
+  register: result
+  retries: 10
+  until: result is succeeded
+  delay: 30
