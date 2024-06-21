@@ -1,11 +1,11 @@
 ---
-rke2_kubernetes_api_server_host: "{{ hostvars[groups['rke2_servers'][0]].inventory_hostname }}"
+rke2_kubernetes_api_server_host: ""
 rke2_tarball_install_dir: "/usr/local"
 rke2_local_install_tarball_path: ""
 rke2_install_tarball_url: ""
 rke2_images_urls: []
 rke2_images_local_tarball_path: []
-rke2_channel: stable
+rke2_channel: "stable"
 rke2_audit_policy_config_file_path: ""
 rke2_registry_config_file_path: ""
 rke2_pod_security_admission_config_file_path: ""

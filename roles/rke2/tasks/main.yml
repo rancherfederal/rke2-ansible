@@ -43,6 +43,9 @@
 - name: Has rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
 
+- name: Determine cluster state
+  ansible.builtin.include_tasks: cluster_state.yml
+
 - name: Check for images bundle
   ansible.builtin.include_tasks: images_bundle.yml
   when:
@@ -71,6 +74,7 @@
 - name: RKE2 on first node
   ansible.builtin.include_tasks: first_server.yml
   when:
+    - "rke2_config_token is not defined"
     - inventory_hostname in groups['rke2_servers'][0]
 
 - name: RKE2 on all other nodes
@@ -78,6 +82,13 @@
   when:
     - inventory_hostname in groups['rke2_servers'][1:] or
       inventory_hostname in groups.get('rke2_agents', [])
+  when:
+    - "rke2_config_token is not defined"
+
+- name: Confirm configuration on cluster
+  when:
+    - "existing_join_host is defined"
+  ansible.builtin.include_tasks: other_nodes.yml
 
 - name: Configure kubectl,crictl,ctr
   ansible.builtin.include_tasks: utilities.yml
@@ -85,7 +96,7 @@
     - inventory_hostname in groups['rke2_servers']
 
 - name: Configure cluster manifests
-  ansible.builtin.include_tasks: add-manifest-addons.yml
+  ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
     src: "{{ rke2_cluster_manifest_config_file_path }}"
   when:

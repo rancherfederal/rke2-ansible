@@ -19,4 +19,23 @@
   ansible.builtin.include_tasks: iptables_rules.yml
   when:
     - ansible_facts.services["iptables.service"] is defined
-    - rek2_add_iptables_rules | bool
+    - rke2_add_iptables_rules | bool
+
+- name: Add fapolicyd rules
+  ansible.builtin.copy:
+    content: "{{ fapolicyd_rules }}"
+    dest: /etc/fapolicyd/rules.d/80-rke2.rules
+    mode: '0644'
+    owner: root
+    group: fapolicyd
+  when:
+    - ansible_facts.services["fapolicyd.service"] is defined
+    - ansible_facts.services["fapolicyd.service"].state == "running"
+  vars:
+    fapolicyd_rules: |
+      allow perm=any all : dir=/var/lib/rancher/
+      allow perm=any all : dir=/opt/cni/
+      allow perm=any all : dir=/run/k3s/
+      allow perm=any all : dir=/var/lib/kubelet/
+  notify: Restart fapolicyd
+

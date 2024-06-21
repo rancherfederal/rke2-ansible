@@ -34,4 +34,8 @@
   ansible.builtin.dnf:
     name: "{{ service_name }}-{{ rke2_version_rpm }}"
     state: latest  # noqa package-latest
+  register: result
+  retries: 10
+  until: result is succeeded
+  delay: 30
   notify: "Restart {{ service_name }}"

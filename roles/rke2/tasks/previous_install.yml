@@ -7,6 +7,7 @@
     - ansible_facts.services["rke2-server.service"] is defined
     - not ansible_facts.services["rke2-server.service"].status == 'disabled'
     - inventory_hostname in groups['rke2_servers']
+    - install_method == "tarball"
 
 - name: Set fact if rke2-server is running
   ansible.builtin.set_fact:
@@ -23,6 +24,7 @@
     - ansible_facts.services["rke2-agent.service"] is defined
     - not ansible_facts.services["rke2-agent.service"].status == 'disabled'
     - inventory_hostname in groups.get('rke2_agents', [])
+    - install_method == "tarball"
 
 - name: Set fact if rke2-agent is running
   ansible.builtin.set_fact:
