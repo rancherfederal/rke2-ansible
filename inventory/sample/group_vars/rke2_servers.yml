@@ -51,3 +51,10 @@ rke2_config: {}
 # Add a pod security admission config file by specifying the file path on the control host
 # Requires config.yaml to include `- admission-control-config-file=/etc/rancher/rke2/pod-security-admission-config.yaml` in order for this to be honored
 # pod_security_admission_config_file_path: "{{ playbook_dir }}/sample_files/pod-security-admission-config.yaml"
+
+# See https://docs.rke2.io/advanced#configuring-an-http-proxy
+# Add proxy information for the systemd environment
+# systemd_extra_env:
+# #- HTTP_PROXY=http://your-proxy.example.com:8888
+# #- HTTPS_PROXY=http://your-proxy.example.com:8888
+# #- NO_PROXY=127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16

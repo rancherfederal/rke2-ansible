@@ -1,0 +1,59 @@
+---
+- name: Add the systemd env file for rke2-{{ rke2_common_caller_role_name }}
+  when: (systemd_extra_env is defined) and (systemd_extra_env|length > 0)
+  ansible.builtin.blockinfile:
+    path: /etc/default/rke2-{{ rke2_common_caller_role_name }}
+    marker: "#{mark} This is an Ansible managed file, contents will be overwritten"
+    create: true
+    mode: '640'
+    owner: root
+    group: root
+    block: |
+      {% for item in systemd_extra_env %}
+      {{ item }}
+      {% endfor %}
+  register: systemd_added
+
+- name: Remove the systemd env file
+  when:
+    - (systemd_extra_env is not defined) or (systemd_extra_env|length == 0)
+  block:
+    - name: Check that the systemd env file exists
+      ansible.builtin.stat:
+        path: /etc/default/rke2-{{ rke2_common_caller_role_name }}
+      register: stat_result
+
+    - name: "Check that the systemd env file has ansible managed comments"
+      ansible.builtin.lineinfile:
+        name: "/etc/default/rke2-{{ rke2_common_caller_role_name }}"
+        line: '#BEGIN This is an Ansible managed file, contents will be overwritten'
+        state: present
+      check_mode: yes
+      register: ansible_managed_check
+      when: stat_result.stat.exists | bool is true
+
+    - name: Remove the systemd env file if exists and has ansible managed comments
+      ansible.builtin.file:
+        path: "/etc/default/rke2-{{ rke2_common_caller_role_name }}"
+        state: absent
+      when:
+        - ansible_managed_check.changed | bool is false
+      register: systemd_removed
+
+# Reload systemd if adding env file on initial build
+- name: Reload the systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when:
+    - systemd_added is changed
+    - installed is false
+
+# Reload and restart service if adding/removing env file post install
+- name: Reload the systemd daemon and notify restart of rke2-{{ rke2_common_caller_role_name }}
+  ansible.builtin.systemd:
+    daemon_reload: true
+  changed_when: true
+  notify: Restart rke2-{{ rke2_common_caller_role_name }}
+  when:
+    - (systemd_added is changed) or (systemd_removed is changed)
+    - installed is true
