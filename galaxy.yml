@@ -1,14 +1,11 @@
 ---
 namespace: rancherfederal
 name: rke2_ansible
-version: 0.0.1
+version: 0.0.2
 readme: README.md
 authors:
   - Rancher Government <carbide@ranchergovernment.com>
 description: Collection for rancherfederal/rke2-ansible
-
-license:
-  - Apache-2.0
 
 license_file: 'LICENSE'
 
