@@ -1,0 +1,25 @@
+---
+namespace: rancherfederal
+name: rke2_ansible
+version: 0.0.2
+readme: README.md
+authors:
+  - Rancher Government <carbide@ranchergovernment.com>
+description: Collection for rancherfederal/rke2-ansible
+
+license_file: 'LICENSE'
+
+tags: [infrastructure, linux, kubernetes, rancher, rke2]
+
+dependencies:
+  ansible.utils: 4.1.0
+
+repository: https://github.com/rancherfederal/rke2-ansible
+documentation: https://github.com/rancherfederal/rke2-ansible
+homepage: https://github.com/rancherfederal/rke2-ansible
+issues: https://github.com/rancherfederal/rke2-ansible/issues
+
+build_ignore:
+  - tarball_install/*
+  - testing
+  - .github

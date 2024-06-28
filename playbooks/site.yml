@@ -1,0 +1,23 @@
+---
+- name: Server play
+  hosts: rke2_servers
+  any_errors_fatal: true
+  become: true
+  roles:
+    - role: rke2_server
+  serial: 5
+
+- name: Agent play
+  hosts: rke2_agents
+  any_errors_fatal: true
+  become: true
+  roles:
+    - role: rke2_agent
+  serial: 10
+
+- name: Cluster manifest play
+  hosts: rke2_servers
+  any_errors_fatal: true
+  become: true
+  roles:
+    - role: cluster_manifest
