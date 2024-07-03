@@ -23,4 +23,7 @@ rke2_versioned_yum_repo:
   gpgkey: "https://rpm.rancher.io/public.key"
   enabled: yes
 
-rke2_config: {}
+rke2_config:
+  tls-san:
+    - "192.168.0.202"
+    - "rke2vip.superasian.net"
