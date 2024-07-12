@@ -33,7 +33,8 @@
 - name: YUM-Based Install
   ansible.builtin.dnf:
     name: "{{ service_name }}-{{ rke2_version_rpm }}"
-    state: latest  # noqa package-latest
+    state: installed
+    allow_downgrade: true
   register: result
   retries: 10
   until: result is succeeded
