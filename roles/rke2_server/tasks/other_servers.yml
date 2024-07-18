@@ -29,20 +29,17 @@
     insertbefore: BOF
   when:
     - '"server:" not in server_url_check.stdout'
+  notify: Start RKE2
 
-- name: Start rke2-server
-  throttle: 1
-  ansible.builtin.systemd:
-    name: rke2-server
-    state: started
-    enabled: yes
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Wait for k8s apiserver reachability
   ansible.builtin.wait_for:
     host: "{{ kubernetes_api_server_host }}"
     port: "6443"
     state: present
-    timeout: 300
+    timeout: 600
 
 - name: Wait for kubelet process to be present on host
   ansible.builtin.command: >-
@@ -50,7 +47,7 @@
   register: kubelet_check
   until: kubelet_check.rc == 0
   retries: 20
-  delay: 10
+  delay: 30
   changed_when: false
 
 - name: Extract the hostname-override parameter from the kubelet process
@@ -66,6 +63,6 @@
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
   register: status_result
   until: status_result.stdout.find("True") != -1
-  retries: 20
-  delay: 10
+  retries: 60
+  delay: 30
   changed_when: false

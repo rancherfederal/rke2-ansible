@@ -1,8 +1,9 @@
 *.retry
 .cache/
-
+.vscode/
+files/
 venv/
-
+inventory/homelab/*
 test_inventory*
 
 rke2-images.linux-amd64.tar.gz

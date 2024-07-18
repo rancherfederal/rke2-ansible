@@ -4,6 +4,7 @@
   ansible.builtin.lineinfile:
     dest: "/root/.bashrc"
     line: 'PATH=$PATH:/var/lib/rancher/rke2/bin'
+    create: true
     insertafter: EOF
 
 - name: Symlink crictl config to /etc/crictl.yaml
