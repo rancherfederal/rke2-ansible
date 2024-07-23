@@ -37,10 +37,4 @@
   when:
     - inventory_hostname in groups['rke2_servers']
 
-- name: Configure first server manifests
-  ansible.builtin.include_tasks: add_manifest_addons.yml
-  vars:
-    src: "{{ rke2_initial_manifest_config_file_path }}"
-  when:
-    - inventory_hostname in groups['rke2_servers'][0]
-    - rke2_initial_manifest_config_file_path | length > 0
+

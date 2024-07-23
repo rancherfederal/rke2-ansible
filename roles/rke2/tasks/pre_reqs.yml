@@ -18,7 +18,7 @@
 - name: Add server iptables rules
   ansible.builtin.include_tasks: iptables_rules.yml
   when:
-    - ansible_facts.services["iptables.service"] is defined
+   # - ansible_facts.services["iptables.service"] is defined
     - rke2_add_iptables_rules | bool
 
 - name: Add fapolicyd rules

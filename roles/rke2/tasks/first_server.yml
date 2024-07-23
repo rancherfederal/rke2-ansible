@@ -1,22 +1,18 @@
 ---
 
-- name: Generate config.yml on first server
+
+- name: Include task file config.yml
   ansible.builtin.include_tasks: config.yml
 
-- name: Wait for rke2
-  ansible.builtin.include_tasks: wait_for_rke2.yml
+- name: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
-- name: Determine generated token
-  block:
-    - name: Wait for node-token
-      ansible.builtin.wait_for:
-        path: /var/lib/rancher/rke2/server/node-token
-
-    - name: Read node-token from first server
-      ansible.builtin.slurp:
-        src: /var/lib/rancher/rke2/server/node-token
-      register: node_token
-
-    - name: Store join node-token
-      ansible.builtin.set_fact:
-        rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+- block:
+  - name: Start check_node_ready.yml
+    ansible.builtin.include_tasks: check_node_ready.yml
+    vars:
+      check_node_ready_timeout: 300
+      check_node_ready_retries: 30
+      check_node_ready_delay: 10
+      check_node_ready_ignore_errors: false
+  any_errors_fatal: true
