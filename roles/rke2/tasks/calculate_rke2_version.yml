@@ -4,7 +4,7 @@
   when:
     - rke2_install_version | length == 0
     - rke2_versioned_yum_repo.baseurl | search ("rpm.rancher.io")
-    - rke2_local_install_tarball_path == ""
+    - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
   block:
 
