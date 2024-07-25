@@ -19,6 +19,7 @@
     state: restarted
     enabled: true
     name: rke2-server
+  throttle: 1
   when:
     - not rke2_reboot
 
@@ -27,6 +28,7 @@
     state: restarted
     enabled: true
     name: rke2-agent
+  throttle: 1
   when:
     - not rke2_reboot
 
