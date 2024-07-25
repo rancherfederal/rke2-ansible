@@ -2,6 +2,7 @@
 .cache/
 
 venv/
+.venv/
 
 test_inventory*
 
