@@ -20,8 +20,12 @@ It is worth noting that the EC2 driver does not provide a way to login to EC2 in
 The `vpc_subnet_id` key has been removed as a defined variable and is pulled from the environment variable `VPC_SUBNET_ID`. Other than the AWS keys needed this is the only environment variable required. 
 
 # Available Scenarios  
-## default  
-The default scenario is the simplest possible scenario, with a single Ubuntu 20.04 master node and a single Ubuntu 20.04 worker node. 
+## template  
+As the name would imply this is a template scenario, no one is supposed to run this and it will not ever work. The purpose is to prevent other scenarios from having to rewrite or copy from one another, this also allows changes to be shared across all scenarios that are descendants of the template.
+
+## ubuntu-2404
+The ubuntu-2404 scenario is the simplest possible scenario, with a single Ubuntu 24.04 master node and a single Ubuntu 20.04 worker node. 
+
 
 # To Do
   - Add tests

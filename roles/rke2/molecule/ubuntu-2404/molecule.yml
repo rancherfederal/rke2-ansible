@@ -27,7 +27,10 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    converge: converge.yml
+    converge: ../template/converge.yml
+    create: ../template/create.yml
+    destroy: ../template/destroy.yml
+    requirements: ../template/requirements.yml
   inventory:
     hosts:
       rke2_cluster:
