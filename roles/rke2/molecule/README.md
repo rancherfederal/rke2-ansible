@@ -17,6 +17,8 @@ aws_secret_access_key=
 It is worth noting that the EC2 driver does not provide a way to login to EC2 instances, this needs to be done manually, your ssh key can be found in `~/.cache/molecule/rke2/default/id_rsa` and the default user is `ansible`, you will be able to login like so:  
 `ssh ansible@000.000.000.000 -i ~/.cache/molecule/rke2/default/id_rsa` note that the keys location is dependant on the scenario name. 
 
+The `vpc_subnet_id` key has been removed as a defined variable and is pulled from the environment variable `VPC_SUBNET_ID`. Other than the AWS keys needed this is the only environment variable required. 
+
 # Available Scenarios  
 ## default  
 The default scenario is the simplest possible scenario, with a single Ubuntu 20.04 master node and a single Ubuntu 20.04 worker node. 

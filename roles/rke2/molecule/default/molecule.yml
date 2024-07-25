@@ -8,7 +8,6 @@ platforms:
     instance_type: t2.medium
     region: us-east-2
     assign_public_ip: true
-    vpc_subnet_id: subnet-095d88c4efe5abf6a
     tags:
       deployed-with: "molecule"
       molecule-scenario: "default"
@@ -19,7 +18,6 @@ platforms:
     instance_type: t2.medium
     region: us-east-2
     assign_public_ip: true
-    vpc_subnet_id: subnet-095d88c4efe5abf6a
     tags:
       deployed-with: "molecule"
       molecule-scenario: "default"

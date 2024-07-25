@@ -28,7 +28,7 @@
       security_group_name: "{{ default_security_group_name }}"
       security_groups: []
       vpc_id: ""
-      vpc_subnet_id: ""
+      vpc_subnet_id: "{{ lookup('env', 'VPC_SUBNET_ID') }}"
 
     # Merging defaults into a list of dicts is, it turns out, not straightforward
     platforms: >-
