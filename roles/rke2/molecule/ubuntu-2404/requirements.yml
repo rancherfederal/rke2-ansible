@@ -1,5 +1,0 @@
----
-collections:
-  - name: ansible.utils
-  - name: amazon.aws
-  - name: community.crypto
