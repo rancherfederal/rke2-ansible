@@ -30,7 +30,8 @@
   ansible.builtin.set_fact:
     rke2_full_version: ""
   when:
-    rke2_full_version is skipped
+    - rke2_full_version.skipped is defined
+    - rke2_full_version is skipped
 
 # - name: Set rke2_full_version fact
 #   ansible.builtin.set_fact:
