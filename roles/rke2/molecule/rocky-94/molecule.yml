@@ -4,7 +4,7 @@ driver:
 
 platforms:
   - name: master-01
-    image: ami-0862be96e41dcbf74
+    image: ami-051a0f669bb174783
     instance_type: t2.medium
     region: us-east-2
     assign_public_ip: true
@@ -14,7 +14,7 @@ platforms:
     groups:
       - rke2_servers
   - name: worker-01
-    image: ami-0862be96e41dcbf74
+    image: ami-051a0f669bb174783
     instance_type: t2.medium
     region: us-east-2
     assign_public_ip: true
