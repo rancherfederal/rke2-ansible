@@ -67,11 +67,7 @@
 
 - name: Create a list of ready servers
   ansible.builtin.set_fact:
-    ready_servers: "{{ groups.rke2_servers|
-                        map('extract', hostvars)|
-                        selectattr('node_ready', 'equalto', true)|
-                        map(attribute='inventory_hostname')|
-                        list }}"
+    ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
   delegate_to: localhost
   run_once: true
 
@@ -108,7 +104,7 @@
 - name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
   vars:
-    token_source_node: "{{groups['rke2_servers'][0]}}"
+    token_source_node: "{{ groups['rke2_servers'][0] }}"
   when:
     - ready_servers | length == 0
 
@@ -116,7 +112,7 @@
 - name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
   vars:
-    token_source_node: "{{ready_servers[0]}}"
+    token_source_node: "{{ ready_servers[0] }}"
   when:
     - ready_servers | length > 0
 
@@ -131,7 +127,7 @@
 - name: Include task file add_manifest_addons.yml
   ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
-    source_directory: "{{rke2_manifest_config_post_run_directory}}"
+    source_directory: "{{ rke2_manifest_config_post_run_directory }}"
     destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_1
   when:
     - rke2_manifest_config_post_run_directory is defined

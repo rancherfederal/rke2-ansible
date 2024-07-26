@@ -33,5 +33,5 @@
         path: "{{ file_destination }}"
         state: absent
       when:
-        - ansible_managed_check.changed | bool is false
+        - ansible_managed_check.changed | bool is false  # noqa no-handler
       notify: "Restart {{ service_name }}"

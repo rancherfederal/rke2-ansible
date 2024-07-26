@@ -8,11 +8,11 @@
     timeout: "300"
   changed_when: false
 
-- name: Include task file add-manifest-addons.yml
-  ansible.builtin.include_tasks: add-manifest-addons.yml
-  when:
-    - manifest_config_file_path is defined
-    - manifest_config_file_path | length > 0
+# - name: Include task file add-manifest-addons.yml
+#   ansible.builtin.include_tasks: add-manifest-addons.yml
+#   when:
+#     - manifest_config_file_path is defined
+#     - manifest_config_file_path | length > 0
 
 - name: Generate config.yml on other nodes
   ansible.builtin.include_tasks: config.yml
