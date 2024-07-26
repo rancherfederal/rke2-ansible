@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: true
   pre_tasks:
-    - name: Set api_server_host 
+    - name: Set api_server_host
       ansible.builtin.set_fact:
         rke2_kubernetes_api_server_host: "{{ hostvars[groups['rke2_servers'][0]].ansible_host }}"
   roles:

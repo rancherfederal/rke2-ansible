@@ -16,7 +16,7 @@
 
     # Platform settings handling
     default_aws_profile: "{{ lookup('env', 'AWS_PROFILE') }}"
-    default_key_inject_method: cloud-init # valid values: [cloud-init, ec2]
+    default_key_inject_method: cloud-init  # valid values: [cloud-init, ec2]
     default_key_name: "molecule-{{ run_config.run_id }}"
     default_security_group_name: "molecule-{{ run_config.run_id }}"
 

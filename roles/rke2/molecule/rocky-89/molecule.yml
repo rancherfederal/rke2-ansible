@@ -34,7 +34,7 @@ provisioner:
   inventory:
     hosts:
       rke2_cluster:
-        children: 
+        children:
           rke2_servers:
             vars:
               group_rke2_config:
