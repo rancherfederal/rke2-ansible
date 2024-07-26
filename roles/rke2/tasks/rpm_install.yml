@@ -20,10 +20,14 @@
     gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
     enabled: "{{ rke2_versioned_yum_repo.enabled }}"
 
+- name: debug install
+  debug:
+    msg: installing {{ service_name }}{{ rke2_version_rpm }}
+
 - name: YUM-Based Install
   ansible.builtin.dnf:
     name: "{{ service_name }}{{ rke2_version_rpm }}"
-    state: installed
+    state: "{{ rke2_package_state}}"
     allow_downgrade: true
   register: result
   retries: 10
