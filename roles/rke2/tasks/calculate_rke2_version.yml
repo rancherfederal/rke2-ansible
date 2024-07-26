@@ -22,9 +22,9 @@
       args:
         executable: /usr/bin/bash
 
-    # - name: Set rke2_full_version fact from internet source
-    #   ansible.builtin.set_fact:
-    #     rke2_full_version: "{{ rke2_full_version.stdout }}"
+    - name: Set rke2_full_version fact from internet source
+      ansible.builtin.set_fact:
+        rke2_full_version: "{{ rke2_full_version.stdout }}"
 
 - name: Unset rke2_full_version if skipped
   ansible.builtin.set_fact:
@@ -32,16 +32,15 @@
   when:
     rke2_full_version is skipped
 
-- name: Set rke2_full_version fact
-  ansible.builtin.set_fact:
-    rke2_full_version: "{{ rke2_full_version.stdout if ((install_rke2_version is not defined) or
-    (install_rke2_version | length == 0)) else install_rke2_version }}"
-
-# - name: Set rke2_full_version fact from variable source
+# - name: Set rke2_full_version fact
 #   ansible.builtin.set_fact:
-#     rke2_full_version: "{{ rke2_install_version }}"
-#   when:
-#     - rke2_install_version | length > 0
+    # rke2_full_version: "{{ rke2_full_version.stdout if (install_rke2_version | length == 0) else install_rke2_version }}"
+
+- name: Set rke2_full_version fact from variable source
+  ansible.builtin.set_fact:
+    rke2_full_version: "{{ rke2_install_version }}"
+  when:
+    - rke2_install_version | length > 0
 
 - name: Set rke2_package_state to latest
   ansible.builtin.set_fact:
@@ -83,7 +82,7 @@
     ansible.builtin.set_fact:
       rke2_version_rpm: "{{ '-' + rke2_version_rpm }}"
     when:
-      - rke2_version_rpm | length > 0 
+      - rke2_version_rpm | length > 0
 
   # - name: Describe versions
   #   ansible.builtin.debug:

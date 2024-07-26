@@ -43,8 +43,6 @@
 - name: Has rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
 
-
-
 - name: Check for images bundle
   ansible.builtin.include_tasks: images_bundle.yml
   when:
@@ -65,10 +63,10 @@
     check_node_ready_delay: 2
     check_node_ready_ignore_errors: true
   when:
-  - inventory_hostname in groups['rke2_servers']
+    - inventory_hostname in groups['rke2_servers']
 
 - name: Create a list of ready servers
-  set_fact:
+  ansible.builtin.set_fact:
     ready_servers: "{{ groups.rke2_servers|
                         map('extract', hostvars)|
                         selectattr('node_ready', 'equalto', true)|
@@ -90,8 +88,6 @@
 - name: Set rke2 configuration files
   ansible.builtin.include_tasks: configure_rke2.yml
 
-
-
 - name: Include task file add_manifest_addons.yml
   ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
@@ -106,23 +102,23 @@
 - name: Start the first rke2 node
   ansible.builtin.include_tasks: first_server.yml
   when:
-  - inventory_hostname in groups['rke2_servers'][0]
-  - ready_servers | length == 0
+    - inventory_hostname in groups['rke2_servers'][0]
+    - ready_servers | length == 0
 
-- name: save_generated_token.yml
+- name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
   vars:
     token_source_node: "{{groups['rke2_servers'][0]}}"
   when:
-  - ready_servers | length == 0
+    - ready_servers | length == 0
 
 # is the ready_servers array is > 0, we assume it's an established cluster and treat all nodes equally (no need for initial server procedure)
-- name: save_generated_token.yml
+- name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
   vars:
     token_source_node: "{{ready_servers[0]}}"
   when:
-  - ready_servers | length > 0
+    - ready_servers | length > 0
 
 - name: Start all other rke2 nodes
   ansible.builtin.include_tasks: other_nodes.yml

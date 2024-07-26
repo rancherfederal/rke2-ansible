@@ -1,4 +1,4 @@
-
+---
 
 - name: Wait for node-token
   ansible.builtin.wait_for:
@@ -30,14 +30,14 @@
     temp_host_rke2_config:
       server: "https://{{ rke2_kubernetes_api_server_host }}:9345"
   when:
-  - rke2_kubernetes_api_server_host != ""
+    - rke2_kubernetes_api_server_host != ""
 
 - name: Set temp fact to store server config line with server URL
   ansible.builtin.set_fact:
     temp_host_rke2_config:
       server: "https://{{ token_source_node }}:9345"
   when:
-  - rke2_kubernetes_api_server_host == ""
+    - rke2_kubernetes_api_server_host == ""
 
 - name: Update host_rke2_config fact to contain server line
   ansible.builtin.set_fact:

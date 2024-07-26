@@ -1,3 +1,5 @@
+---
+
 - name: Wait for k8s apiserver
   ansible.builtin.wait_for:
     host: localhost
@@ -8,14 +10,14 @@
   register: api_serve_status
   ignore_errors: "{{check_node_ready_ignore_errors}}"
 
-- name: set fact
+- name: Set fact
   ansible.builtin.set_fact:
     api_server_running: true
-  when: 
-  - api_serve_status.state is not undefined
-  - api_serve_status.state == "present"
+  when:
+    - api_serve_status.state is not undefined
+    - api_serve_status.state == "present"
 
-- name: set fact
+- name: Set fact
   ansible.builtin.set_fact:
     api_server_running: "{{api_server_running}}"
 
@@ -35,9 +37,9 @@
   ansible.builtin.set_fact:
     metrics_running: true
   when:
-  - 200 | string in node_metrics.status | string
+    - 200 | string in node_metrics.status | string
 
-- name: set fact for metrics_running
+- name: Set fact for metrics_running
   ansible.builtin.set_fact:
     metrics_running: "{{metrics_running}}"
 
@@ -46,8 +48,8 @@
     kubelet_node_name: "{{ node_metrics.content | \
       regex_search('kubelet_node_name{node=\"(.*)\"}',\
       '\\1') }}"
-  when: 
-  - 200 | string in node_metrics.status | string
+  when:
+    - 200 | string in node_metrics.status | string
 
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
@@ -61,19 +63,19 @@
   changed_when: false
   ignore_errors: "{{check_node_ready_ignore_errors}}"
 
-- name: set fact
+- name: Set fact
   ansible.builtin.set_fact:
     node_ready: "true"
   when:
-  - status_result.rc is not undefined
-  - status_result.rc | string == "0"
+    - status_result.rc is not undefined
+    - status_result.rc | string == "0"
 
-- name: set fact
+- name: Set fact
   ansible.builtin.set_fact:
     node_ready: "{{node_ready}}"
 
-- name: node status
-  debug:
+- name: Node status
+  ansible.builtin.debug:
     msg: |
       "node_ready: {{node_ready}}"
       "metrics_running: {{metrics_running}}"

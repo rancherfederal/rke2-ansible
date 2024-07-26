@@ -4,7 +4,7 @@
 - name: Include task file config.yml
   ansible.builtin.include_tasks: config.yml
 
-- name: flush_handlers
+- name: Flush_handlers
   ansible.builtin.meta: flush_handlers
 
 - block:
@@ -16,3 +16,4 @@
       check_node_ready_delay: 10
       check_node_ready_ignore_errors: false
   any_errors_fatal: true
+  

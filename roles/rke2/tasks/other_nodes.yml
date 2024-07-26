@@ -9,5 +9,5 @@
 - name: Generate config.yml on other nodes
   ansible.builtin.include_tasks: config.yml
 
-- name: flush_handlers
+- name: Flush_handlers
   ansible.builtin.meta: flush_handlers

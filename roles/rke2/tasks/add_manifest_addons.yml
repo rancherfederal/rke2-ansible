@@ -1,12 +1,12 @@
 ---
 
-- name: look up manifest files on localhost
-  find:
+- name: Look up manifest files on localhost
+  ansible.builtin.find:
     paths: "{{ source_directory }}"
   register: local_files_find_return
   delegate_to: localhost
 
-- name: create array of managed files
+- name: Create array of managed files
   ansible.builtin.set_fact:
     managed_files: "{{local_files_find_return.files | map(attribute='path') | map('basename') }}"
 
@@ -18,16 +18,16 @@
     owner: root
     group: root
 
-- name: look up manifest files on remote
+- name: Look up manifest files on remote
   find:
     paths: "{{ destination_directory }}"
   register: remote_files_find_return
 
-- name: create array of remote files
+- name: Create array of remote files
   ansible.builtin.set_fact:
     current_files: "{{remote_files_find_return.files | map(attribute='path') | map('basename') }}"
 
-- name: remove remote files not in managed files list
+- name: Remove remote files not in managed files list
   ansible.builtin.file:
     path: "{{ destination_directory }}/{{ item }}"
     state: absent
