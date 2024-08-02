@@ -10,7 +10,7 @@
     block: |
       [keyfile]
       unmanaged-devices=interface-name:cali*;interface-name:flannel*
-    create: yes
+    create: true
     mode: 0600
   when: ansible_facts.services["NetworkManager.service"] is defined
 
@@ -31,7 +31,7 @@
 - name: Disable service nm-cloud-setup
   ansible.builtin.systemd:
     name: nm-cloud-setup.service
-    enabled: no
+    enabled: false
     state: stopped
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
   notify:
@@ -42,7 +42,7 @@
   ansible.builtin.systemd:
     name: nm-cloud-setup.timer
     state: stopped
-    enabled: no
+    enabled: false
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
   notify:
     - Reload NetworkManager

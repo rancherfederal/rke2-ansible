@@ -139,7 +139,7 @@
         mode: '0644'
         owner: root
         group: root
-        remote_src: yes
+        remote_src: true
       when:
         - inventory_hostname in groups['rke2_servers']
 
@@ -150,7 +150,7 @@
         mode: '0644'
         owner: root
         group: root
-        remote_src: yes
+        remote_src: true
       when:
         - inventory_hostname in groups['rke2_servers']
 
@@ -161,7 +161,7 @@
         mode: '0644'
         owner: root
         group: root
-        remote_src: yes
+        remote_src: true
       when:
         - inventory_hostname in groups.get('rke2_agents', [])
 
@@ -172,13 +172,13 @@
         mode: '0644'
         owner: root
         group: root
-        remote_src: yes
+        remote_src: true
       when:
         - inventory_hostname in groups.get('rke2_agents', [])
 
     - name: TARBALL | Refreshing systemd unit files
       ansible.builtin.systemd:
-        daemon-reload: yes
+        daemon-reload: true
 
 - name: Remove the temp_dir
   ansible.builtin.file:

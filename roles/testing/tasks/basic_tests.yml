@@ -9,7 +9,7 @@
   ansible.builtin.lineinfile:
     path: /etc/rancher/rke2/config.yaml
     line: "selinux: true"
-  check_mode: yes
+  check_mode: true
   register: test_is_selinux_true
 
 - name: Assertions

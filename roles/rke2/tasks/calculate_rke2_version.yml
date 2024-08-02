@@ -85,10 +85,9 @@
       when:
         - rke2_version_rpm | length > 0
 
-    # - name: Describe versions
-    #   ansible.builtin.debug:
-    #     msg:
-    #       - "Full version, with revision indication: {{ rke2_full_version }}"
-    #       # - "Version without revision indication: {{ rke2_version_dot }}"
-    #       - "Major and Minor Only: {{ rke2_version_majmin }}"
-    #       - "RPM Version (tilde): {{ rke2_version_rpm }}"
+#   - name: Describe versions
+#   ansible.builtin.debug:
+#     msg:
+#       - "Full version, with revision indication: {{ rke2_full_version }}"
+#       - "Major and Minor Only: {{ rke2_version_majmin }}"
+#       - "RPM Version (tilde): {{ rke2_version_rpm }}"

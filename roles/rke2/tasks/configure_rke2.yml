@@ -4,7 +4,7 @@
   ansible.builtin.file:
     path: /etc/rancher/rke2
     state: directory
-    recurse: yes
+    recurse: true
 
 - name: Run CIS-Hardening Tasks
   ansible.builtin.include_tasks: cis_hardening.yml

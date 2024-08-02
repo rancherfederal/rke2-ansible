@@ -24,7 +24,7 @@
         name: "{{ file_destination }}"
         line: '## This is an Ansible managed file, contents will be overwritten ##'
         state: present
-      check_mode: yes
+      check_mode: true
       register: ansible_managed_check
       when: stat_result.stat.exists | bool is true
 

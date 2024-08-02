@@ -20,7 +20,7 @@ rke2_common_yum_repo:
   baseurl: "https://rpm.rancher.io/rke2/{{ rke2_channel }}/common/centos/$releasever/noarch"
   gpgcheck: true
   gpgkey: "https://rpm.rancher.io/public.key"
-  enabled: yes
+  enabled: true
 
 rke2_versioned_yum_repo:
   name: "rancher-rke2-v{{ rke2_version_majmin }}"  # noqa jinja[spacing]
@@ -28,7 +28,7 @@ rke2_versioned_yum_repo:
   baseurl: "https://rpm.rancher.io/rke2/{{ rke2_channel }}/{{ rke2_version_majmin }}/centos/$releasever/$basearch"
   gpgcheck: true
   gpgkey: "https://rpm.rancher.io/public.key"
-  enabled: yes
+  enabled: true
 rke2_kubelet_node_name:
   - "nodeNameNotFound"
 rke2_config: {}
