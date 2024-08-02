@@ -7,6 +7,20 @@
   ansible.builtin.package_facts:
     manager: auto
 
+- name: Set data-dir from rke2_config var
+  ansible.builtin.set_fact:
+    rke2_data_dir: "{{ rke2_config['data-dir'] }}"
+  when: rke2_config['data-dir'] is defined
+
+- name: Set data-dir var
+  ansible.builtin.set_fact:
+    rke2_data_dir: '/var/lib/rancher/rke2'
+  when: rke2_data_dir is not defined
+
+- name: debug
+  debug:
+    msg: "data-dir is {{ rke2_data_dir }}"
+
 - name: Has rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
 
