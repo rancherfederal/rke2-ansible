@@ -35,7 +35,7 @@
         state: present
       check_mode: yes
       register: ansible_managed_check
-      when: stat_result.stat.exists | bool is true
+      when: stat_result.stat.exists | bool
 
     - name: Remove the PSA config file if exists and has ansible managed comments
       ansible.builtin.file:
