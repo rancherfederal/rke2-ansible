@@ -42,4 +42,4 @@
         path: "/etc/rancher/rke2/pod-security-admission-config.yaml"
         state: absent
       when:
-        - ansible_managed_check.changed | bool is false
+        - ansible_managed_check.changed | bool
