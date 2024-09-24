@@ -33,18 +33,39 @@
     path: /usr/local/bin/rke2
   register: rke2_binary
 
+- name: Check for the rke2 binary
+  ansible.builtin.stat:
+    path: /opt/rke2/bin/rke2
+  register: rke2_binary
+  when: not rke2_binary.stat.exists
+
 - name: Get current RKE2 version if already installed
   ansible.builtin.shell: set -o pipefail && /usr/local/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
   register: installed_rke2_version_tmp
   changed_when: false
   args:
     executable: /usr/bin/bash
-  when: rke2_binary.stat.exists
+  when: 
+   - rke2_binary.stat.exists
+   - rke2_binary.stat.path == '/usr/local/bin/rke2'
   failed_when: >
     (installed_rke2_version_tmp.rc != 141) and
     (installed_rke2_version_tmp.rc != 0)
 
-- name: Determine if current version differs what what is being installed
+- name: Get current RKE2 version if already installed
+  ansible.builtin.shell: set -o pipefail && /opt/rke2/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
+  register: installed_rke2_version_tmp
+  changed_when: false
+  args:
+    executable: /usr/bin/bash
+  when: 
+   - rke2_binary.stat.exists
+   - rke2_binary.stat.path == '/opt/rke2/bin/rke2'
+  failed_when: >
+    (installed_rke2_version_tmp.rc != 141) and
+    (installed_rke2_version_tmp.rc != 0)
+
+- name: Determine if current version differs from what is being installed
   ansible.builtin.set_fact:
     installed_rke2_version: "{{ installed_rke2_version_tmp.stdout }}"
   when: rke2_binary.stat.exists
