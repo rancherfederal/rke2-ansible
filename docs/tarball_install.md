@@ -12,7 +12,7 @@
 # Air-Gap Install  
 RKE2 can be installed in an air-gapped environment with two different methods. You can either deploy via the rke2-airgap-images tarball release artifact, or by using a private registry.
 
-> [!WARNING]SELinux Installs  
+> [!WARNING]  
 > If running on an SELinux enforcing air-gapped node, you must first install the necessary SELinux policy RPM before performing these steps. See our [RPM Documentation](https://docs.rke2.io/install/methods/#rpm) to determine what you need.
 
 # Collecting Your Resources  

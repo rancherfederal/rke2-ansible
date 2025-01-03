@@ -23,7 +23,7 @@
 # Basic Usage  
 There are two methods for consuming this repository, one is to simply clone the repository and edit it as neccessary, the other is to import it as a collection, both options are detailed below. 
 
-> [!NOTE]Airgap/Tarball Instructions  
+> [!NOTE]  
 > If you are looking for airgap or tarball installation instructions, please go [here](./tarball_install.md)
 
 ## Cloning  
