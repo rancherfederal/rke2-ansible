@@ -14,4 +14,3 @@ spec:
       preallocateMaps: true
       tproxy: true
     bpfClockProbe: true
-
