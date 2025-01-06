@@ -86,7 +86,7 @@ Start provisioning of the cluster using the following command:
 ansible-playbook site.yml -i inventory/my-cluster/hosts.yml
 ```  
 
-More detailed information can be found [here](./docs/usage.md)
+More detailed information can be found [here](./docs/README.md)
 
 
 Tarball Install/Air-Gap Install  
