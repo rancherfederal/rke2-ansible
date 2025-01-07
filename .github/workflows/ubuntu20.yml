@@ -6,34 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-
   lint-test:
-    name: Lint for PR
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v3
-
-      - name: Set up Python.
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install test dependencies.
-        run: pip3 install yamllint ansible-lint ansible
-
-      - name: Version check
-        run: |
-          ansible --version
-          ansible-lint --version
-          yamllint --version
-
-      - name: Run yamllint.
-        run: yamllint .
-
-      - name: Run ansible-lint.
-        run: ansible-lint
+      - uses: rancherfederal/rke2-ansible/.github/workflows/lint.yaml
 
   ubuntu20-test:
     name: Ansible build test for Ubuntu

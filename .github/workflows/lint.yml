@@ -11,8 +11,8 @@ env:
 
 jobs:
 
-  lint-test:
-    name: Lint for push
+  ansible-lint:
+    name: Ansible Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -25,16 +25,35 @@ jobs:
           python-version: '3.x'
 
       - name: Install test dependencies.
-        run: pip3 install yamllint ansible-lint ansible
+        run: pip3 install ansible-lint ansible
 
       - name: Version check
         run: |
           ansible --version
           ansible-lint --version
+
+      - name: Run ansible-lint.
+        run: ansible-lint
+
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+
+      - name: Set up Python.
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint
+
+      - name: Version check
+        run: |
           yamllint --version
 
       - name: Run yamllint.
         run: yamllint .
-
-      - name: Run ansible-lint.
-        run: ansible-lint
