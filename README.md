@@ -29,7 +29,11 @@ Thank you for your understanding and cooperation.
 
 Ansible RKE2 (RKE Government) Playbook
 ---------
-[![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml)
+[![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml?query=branch%3Amain)
+
+[![Rocky 8](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky8.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky8.yml?query=branch%3Amain)
+
+[![Ubuntu 20](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu20.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu20.yml?query=branch%3Amain)
 
 RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible playbook installs RKE2 for both the control plane and workers.
 
@@ -91,7 +95,7 @@ Air-Gap/Tarball install information can be found [here](./docs/tarball_install.m
 
 Kubeconfig
 ----------
-The root user will have the `kubeconfig` and `kubectl` made available, to access your cluster login into any server node and `kubectl` will be available for use immideatly. 
+The root user will have the `kubeconfig` and `kubectl` made available, to access your cluster login into any server node and `kubectl` will be available for use immediately. 
 
 
 Available configurations  
@@ -105,7 +109,7 @@ Variables should be set in `inventory/group_vars/rke2_agents.yml` and `inventory
 Uninstall RKE2  
 ---------------  
     Note: Uninstalling RKE2 deletes the cluster data and all of the scripts.
-The offical documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
+The official documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
 
 If you used this module to created the cluster and RKE2 was installed via yum, then you can attempt to run this command to remove all cluster data and all RKE2 scripts.
 
