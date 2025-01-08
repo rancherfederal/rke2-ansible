@@ -53,40 +53,35 @@ Deployment environment must have Ansible 2.9.0+
 
 Usage
 -----
-Create a new directory based on the `sample` directory within the `inventory` directory:
+Create a new directory based on the one of the sample inventory directories within the `docs` directory:
 
 ```bash
-cp -R inventory/sample inventory/my-cluster
+cp -R ./docs/basic_sample_inventory ./inventory
 ```
 
-Second, edit `inventory/my-cluster/hosts.yaml` to match the system information gathered above. For example:
+Second, edit `inventory/hosts.yaml` to match the system information gathered above. For example:
 
 ```yaml
+---
 rke2_cluster:
   children:
     rke2_servers:
       hosts:
-        server1.example.com:
+        server0.example.com:
     rke2_agents:
       hosts:
-        agent1.example.com:
-        agent2.example.com:
-          node_labels:
-          - agent2Label=true"
-all:
-  vars:
-    install_rke2_version: v1.27.10+rke2r1
+        agent0.example.com:
 ```
 
-If needed, you can also edit `inventory/my-cluster/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
+If needed, you can also create `inventory/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
 
 Start provisioning of the cluster using the following command:
 
 ```bash
-ansible-playbook site.yml -i inventory/my-cluster/hosts.yml
+ansible-playbook site.yml -i inventory/hosts.yml
 ```  
-
-More detailed information can be found [here](./docs/README.md)
+> [!NOTE]  
+> More detailed information can be found [here](./docs/README.md)
 
 
 Tarball Install/Air-Gap Install  
@@ -101,7 +96,10 @@ The root user will have the `kubeconfig` and `kubectl` made available, to access
 
 Available configurations  
 ------------------------  
-Variables should be set in `inventory/cluster/group_vars/rke2_agents.yml` and `inventory/cluster/group_vars/rke2_servers.yml`. See sample variables in `inventory/sample/group_vars` for reference.
+Variables should be set in `inventory/group_vars/rke2_agents.yml` and `inventory/group_vars/rke2_servers.yml`. 
+
+> [!NOTE]  
+> More detailed information can be found [here](./docs/README.md)
 
 
 Uninstall RKE2  
