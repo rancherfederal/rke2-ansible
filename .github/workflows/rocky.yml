@@ -10,7 +10,6 @@ jobs:
   rocky8-test:
     name: "8"
     runs-on: ubuntu-latest
-    needs: ['lint-test']
 
     steps:
       - name: Check out the codebase.
