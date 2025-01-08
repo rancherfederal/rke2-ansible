@@ -29,7 +29,11 @@ Thank you for your understanding and cooperation.
 
 Ansible RKE2 (RKE Government) Playbook
 ---------
-[![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml)
+[![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml?query=branch%3Amain)
+
+[![Rocky 8](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky8.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky8.yml?query=branch%3Amain)
+
+[![Ubuntu 20](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu20.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu20.yml?query=branch%3Amain)
 
 RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible playbook installs RKE2 for both the control plane and workers.
 
@@ -53,40 +57,35 @@ Deployment environment must have Ansible 2.9.0+
 
 Usage
 -----
-Create a new directory based on the `sample` directory within the `inventory` directory:
+Create a new directory based on the one of the sample inventory directories within the `docs` directory:
 
 ```bash
-cp -R inventory/sample inventory/my-cluster
+cp -R ./docs/basic_sample_inventory ./inventory
 ```
 
-Second, edit `inventory/my-cluster/hosts.yaml` to match the system information gathered above. For example:
+Second, edit `inventory/hosts.yaml` to match the system information gathered above. For example:
 
 ```yaml
+---
 rke2_cluster:
   children:
     rke2_servers:
       hosts:
-        server1.example.com:
+        server0.example.com:
     rke2_agents:
       hosts:
-        agent1.example.com:
-        agent2.example.com:
-          node_labels:
-          - agent2Label=true"
-all:
-  vars:
-    install_rke2_version: v1.27.10+rke2r1
+        agent0.example.com:
 ```
 
-If needed, you can also edit `inventory/my-cluster/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
+If needed, you can also create `inventory/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
 
 Start provisioning of the cluster using the following command:
 
 ```bash
-ansible-playbook site.yml -i inventory/my-cluster/hosts.yml
+ansible-playbook site.yml -i inventory/hosts.yml
 ```  
-
-More detailed information can be found [here](./docs/README.md)
+> [!NOTE]  
+> More detailed information can be found [here](./docs/README.md)
 
 
 Tarball Install/Air-Gap Install  
@@ -96,18 +95,21 @@ Air-Gap/Tarball install information can be found [here](./docs/tarball_install.m
 
 Kubeconfig
 ----------
-The root user will have the `kubeconfig` and `kubectl` made available, to access your cluster login into any server node and `kubectl` will be available for use immideatly. 
+The root user will have the `kubeconfig` and `kubectl` made available, to access your cluster login into any server node and `kubectl` will be available for use immediately. 
 
 
 Available configurations  
 ------------------------  
-Variables should be set in `inventory/cluster/group_vars/rke2_agents.yml` and `inventory/cluster/group_vars/rke2_servers.yml`. See sample variables in `inventory/sample/group_vars` for reference.
+Variables should be set in `inventory/group_vars/rke2_agents.yml` and `inventory/group_vars/rke2_servers.yml`. 
+
+> [!NOTE]  
+> More detailed information can be found [here](./docs/README.md)
 
 
 Uninstall RKE2  
 ---------------  
     Note: Uninstalling RKE2 deletes the cluster data and all of the scripts.
-The offical documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
+The official documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
 
 If you used this module to created the cluster and RKE2 was installed via yum, then you can attempt to run this command to remove all cluster data and all RKE2 scripts.
 

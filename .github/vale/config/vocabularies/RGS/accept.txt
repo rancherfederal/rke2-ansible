@@ -1,0 +1,18 @@
+# Common/valid Slang
+[C|c]onfig
+airgap
+
+# Acronyms
+STIG
+
+# Tools
+[A|a]nsible
+
+# Kubernetes
+Kubernetes
+[K|k]ubeconfig
+
+# Linux
+[F|f]apolicyd
+containerd
+SELinux
