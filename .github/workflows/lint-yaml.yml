@@ -1,0 +1,30 @@
+---
+name: YAML Lint
+
+on:
+  push:
+
+jobs:
+
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+
+      - name: Set up Python.
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install yamllint
+        run: pip3 install yamllint
+
+      - name: Version check
+        run: |
+          yamllint --version
+
+      - name: Run yamllint
+        run: yamllint .
