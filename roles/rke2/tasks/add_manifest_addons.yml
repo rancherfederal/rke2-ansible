@@ -5,6 +5,7 @@
     paths: "{{ source_directory }}"
   register: local_files_find_return
   delegate_to: localhost
+  become: false
 
 - name: Create array of managed files
   ansible.builtin.set_fact:
