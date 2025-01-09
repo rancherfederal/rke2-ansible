@@ -96,9 +96,9 @@ jobs:
           mkdir ./${{ inputs.os }}
           export RKE2_SERVER=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
           export RKE2_AGENT=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
-          yq --null-input '(.rke2_cluster.children.rke2_servers.hosts.master-01.ansible_host = strenv(RKE2_SERVER)' > ./${{ inputs.os }}/hosts.yml
-          yq -i '(.all.vars.rke2_kubernetes_api_server_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
-          yq -i '(.rke2_cluster.children.rke2_agents.hosts.worker-01.ansible_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
+          yq --null-input '.rke2_cluster.children.rke2_servers.hosts.master-01.ansible_host = strenv(RKE2_SERVER)' > ./${{ inputs.os }}/hosts.yml
+          yq -i '.all.vars.rke2_kubernetes_api_server_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
+          yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-01.ansible_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
           echo "remote_user=centos" >> ansible.cfg
           echo "private_key_file=.key" >> ansible.cfg
         env:
