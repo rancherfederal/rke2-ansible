@@ -131,8 +131,8 @@ There are three levels an RKE2 config variables can be placed in, that is `clust
   - `all.vars.cluster_rke2_config`: Defines common RKE2 config options for the whole cluster
   - `rke2_cluster.children.rke2_servers.vars.group_rke2_config`: Defines common RKE2 config options for the `rke2_servers` group  
   - `rke2_cluster.children.rke2_agents.vars.group_rke2_config`: Defines common RKE2 config options for the `rke2_agents` group   
-  - `rke2_cluster.children.rke2_servers.vars.hosts.<host>.host_rke2_config`: Defines a list of node labels for a specific agent node    
-  - `rke2_cluster.children.rke2_agents.vars.hosts.<host>.host_rke2_config`: Defines a list of node labels for a specific agent node   
+  - `rke2_cluster.children.rke2_servers.vars.hosts.<host>.host_rke2_config`: Defines RKE2 config options for a specific server node 
+  - `rke2_cluster.children.rke2_agents.vars.hosts.<host>.host_rke2_config`: Defines RKE2 config options for a specific agent node
 
 > [!NOTE]
 > Through the rest of these docs you may see references to `rke2_servers.yml`, this is the group vars file for rke2_servers. This is functionally equivalent to `rke2_cluster.children.rke2_servers.vars`. References to `rke2_agents.yml` is functionally equivalent to `rke2_cluster.children.rke2_agents.vars`
