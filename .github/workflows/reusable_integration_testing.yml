@@ -17,7 +17,7 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
       
-      - name: Add Terraform Repository
+      - name: Add terraform repository
         run: |
           wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
@@ -28,14 +28,21 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
-          sudo apt update -y && sudo apt install terraform -y
+          sudo apt update -y
+          sudo apt install terraform yq -y
           python -m pip install --upgrade pip
           pip3 install ansible pytest-testinfra
 
-      - name: Ansible Version check
+      - name: Ansible version check
         run: ansible --version
+      
+      - name: Terraform version check
+        run: terraform --version
+      
+      - name: yq version check
+        run: yq --version
 
       - name: Terraform Init
         id: init
@@ -74,18 +81,18 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: Terraform Apply
-        run: |
-          cd testing/
-          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=${{ inputs.os }}" -auto-approve
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-gov-west-1
+      # - name: Terraform Apply
+      #   run: |
+      #     cd testing/
+      #     terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=${{ inputs.os }}" -auto-approve
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: us-gov-west-1
 
       # - name: Create inventory
       #   run: |
-      #     cp -R inventory/rocky8
+      #     cp -R inventory/${{ inputs.os }}
 
       # - name: Create inventory hosts.yml
       #   run: |
