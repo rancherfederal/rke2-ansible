@@ -1,0 +1,18 @@
+---
+rke2_pod_security_admission_config_file_path: "{{ playbook_dir }}/docs/advanced_sample_inventory/files/pod-security-admission-config.yaml"
+rke2_audit_policy_config_file_path: "{{ playbook_dir }}/docs/advanced_sample_inventory/files/audit-policy.yaml"
+rke2_manifest_config_directory: "{{ playbook_dir }}/docs/advanced_sample_inventory/pre-deploy-manifests/"
+rke2_manifest_config_post_run_directory: "{{ playbook_dir }}/docs/advanced_sample_inventory/post-deploy-manifests/"
+
+group_rke2_config:
+  # Use Cilium as the CNI
+  cni:
+    - cilium
+  # Cilium will replace this
+  disable-kube-proxy: true
+  profile: cis
+  pod-security-admission-config-file: /etc/rancher/rke2/pod-security-admission-config.yaml
+  audit-policy-file: /etc/rancher/rke2/audit-policy.yaml
+  kube-apiserver-arg:
+    - audit-policy-file=/etc/rancher/rke2/audit-policy.yaml
+    - audit-log-path=/var/lib/rancher/rke2/server/logs/audit.log

@@ -29,9 +29,13 @@ Thank you for your understanding and cooperation.
 
 Ansible RKE2 (RKE Government) Playbook
 ---------
-[![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ci.yml)
+[![LINT](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml?query=branch%3Amain)
 
-RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible  playbook installs RKE2 for both the control plane and workers.
+[![Rocky 8](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky8.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky8.yml?query=branch%3Amain)
+
+[![Ubuntu 20](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu20.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu20.yml?query=branch%3Amain)
+
+RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible playbook installs RKE2 for both the control plane and workers.
 
 See the [docs](https://docs.rke2.io/) more information about [RKE Government](https://docs.rke2.io/).
 
@@ -49,79 +53,35 @@ Supported Operating Systems:
 
 System requirements
 -------------------
-
 Deployment environment must have Ansible 2.9.0+
-
-Server and agent nodes must have passwordless SSH access
 
 Usage
 -----
+Create an Ansible inventory file (or folder), you can check the docs folder for examples (`basic_sample_inventory` or `advanced_sample_inventory`).
 
-This playbook requires ansible.utils to run properly. Please see https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-a-collection-from-galaxy for more information about how to install this.
+> [!NOTE]  
+> More detailed information can be found [here](./docs/README.md)
 
-```
-ansible-galaxy collection install -r requirements.yml
-```
-
-Create a new directory based on the `sample` directory within the `inventory` directory:
-
+Start provisioning the cluster using the following command:
 ```bash
-cp -R inventory/sample inventory/my-cluster
-```
+ansible-playbook site.yml -i inventory/hosts.yml -b
+```  
 
-Second, edit `inventory/my-cluster/hosts.yaml` to match the system information gathered above. For example:
 
-```yaml
-rke2_cluster:
-  children:
-    rke2_servers:
-      hosts:
-        server1.example.com:
-    rke2_agents:
-      hosts:
-        agent1.example.com:
-        agent2.example.com:
-          node_labels:
-          - agent2Label=true"
-all:
-  vars:
-    install_rke2_version: v1.27.10+rke2r1
-```
-
-If needed, you can also edit `inventory/my-cluster/group_vars/rke2_agents.yml` and `inventory/my-cluster/group_vars/rke2_servers.yml` to match your environment.
-
-Start provisioning of the cluster using the following command:
-
-```bash
-ansible-playbook site.yml -i inventory/my-cluster/hosts.yml
-```
-
-Tarball Install/Air-Gap Install
--------------------------------
-Added the neeed files to the [tarball_install](tarball_install/) directory.
-
-Further info can be found [here](tarball_install/README.md)
+Tarball Install/Air-Gap Install  
+-------------------------------  
+Air-Gap/Tarball install information can be found [here](./docs/tarball_install.md)
 
 
 Kubeconfig
 ----------
-
-To get access to your **Kubernetes** cluster just
-
-```bash
-ssh ec2-user@rke2_kubernetes_api_server_host "sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes"
-```
-
-Available configurations
-------------------------
-
-Variables should be set in `inventory/cluster/group_vars/rke2_agents.yml` and `inventory/cluster/group_vars/rke2_servers.yml`. See sample variables in `inventory/sample/group_vars` for reference.
+The root user will have the `kubeconfig` and `kubectl` made available, to access your cluster login into any server node and `kubectl` will be available for use immediately. 
 
 
-Uninstall RKE2
----------------
+Uninstall RKE2  
+---------------  
     Note: Uninstalling RKE2 deletes the cluster data and all of the scripts.
-The offical documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
+The official documentation for fully uninstalling the RKE2 cluster can be found in the [RKE2 Documentation](https://docs.rke2.io/install/uninstall/).
 
 If you used this module to created the cluster and RKE2 was installed via yum, then you can attempt to run this command to remove all cluster data and all RKE2 scripts.
 
