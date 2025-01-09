@@ -32,7 +32,7 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install terraform -y
-          sudo snap install yq -y
+          sudo snap install yq
           python -m pip install --upgrade pip
           pip3 install ansible pytest-testinfra
 
