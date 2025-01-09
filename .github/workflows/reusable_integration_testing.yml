@@ -108,7 +108,7 @@ jobs:
 
       - name: Check hosts.yml and ansible.cfg
         run: |
-          cat hosts.yml
+          ./${{ inputs.os }}/hosts.yml
           cat ansible.cfg
 
       # - name: Run playbook
