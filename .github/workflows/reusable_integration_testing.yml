@@ -31,7 +31,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update -y
-          sudo apt install terraform yq -y
+          sudo apt install terraform -y
+          sudo snap innstall yq -y
           python -m pip install --upgrade pip
           pip3 install ansible pytest-testinfra
 
