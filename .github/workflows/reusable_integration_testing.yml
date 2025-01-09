@@ -111,64 +111,51 @@ jobs:
           cat ./${{ inputs.os }}/hosts.yml
           cat ansible.cfg
 
-      # - name: Run playbook
-      #   run: |
-      #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.yml -u centos -vv --private-key .key site.yml
+      - name: Run playbook
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/${{ inputs.os }}/hosts.yml -u centos -vv --private-key .key site.yml
 
-      # - name: Run playbook again for idempotency
-      #   run: |
-      #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.yml -u centos -vv --private-key .key site.yml
+      - name: Run playbook again for idempotency
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/${{ inputs.os }}/hosts.yml -u centos -vv --private-key .key site.yml
 
-      # - name: Run Ansible Tests
-      #   run: |
-      #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.yml -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
+      - name: Run Ansible Tests
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/${{ inputs.os }}/hosts.yml -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
 
-      # - name: Run Python Tests
-      #   run: |
-      #     export DEFAULT_PRIVATE_KEY_FILE=.key
-      #     pytest --hosts=rke2_servers --ansible-inventory=inventory/rocky8/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
-      #     pytest --hosts=rke2_agents --ansible-inventory=inventory/rocky8/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
+      - name: Run Python Tests
+        run: |
+          export DEFAULT_PRIVATE_KEY_FILE=.key
+          pytest --hosts=rke2_servers --ansible-inventory=inventory/${{ inputs.os }}/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
+          pytest --hosts=rke2_agents --ansible-inventory=inventory/${{ inputs.os }}/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
 
-      # - name: Create new inventory hosts.yml with added hosts
-      #   run: |
-      #     rm hosts.yml
-      #     touch hosts.yml
-      #     echo "rke2_cluster:" > hosts.yml
-      #     echo "  children:" >> hosts.yml
-      #     echo "    rke2_servers:" >> hosts.yml
-      #     echo "      hosts:" >> hosts.yml
-      #     echo "        $(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1):" >> hosts.yml
-      #     echo "    rke2_agents:" >> hosts.yml
-      #     echo "      hosts:" >> hosts.yml
-      #     echo "        $(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1):" >> hosts.yml
-      #     echo "        $(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1):" >> hosts.yml
-      #     echo "all:" >> hosts.yml
-      #     echo "  vars:" >> hosts.yml
-      #     echo "    rke2_kubernetes_api_server_host: $(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text | head -1)" >> hosts.yml
-      #     cp hosts.yml inventory/rocky8/hosts.yml
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_DEFAULT_REGION: us-gov-west-1
+      - name: Update inventory hosts.yml with added host
+        run: |
+          export RKE2_AGENT2=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
+          yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-02.ansible_host = strenv(RKE2_SERVER2)' ./${{ inputs.os }}/hosts.yml
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
           
-      # - name: Run playbook again with added hosts
-      #   run: |
-      #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.yml -u centos --verbose --private-key .key site.yml
+      - name: Run playbook again with added host
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/${{ inputs.os }}/hosts.yml -u centos --verbose --private-key .key site.yml
 
-      # - name: Run Ansible Tests with added hosts
-      #   run: |
-      #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.yml -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
+      - name: Run Ansible Tests with added host
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/${{ inputs.os }}/hosts.yml -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
 
-      # - name: Run Python Tests with added hosts
-      #   run: |
-      #     export DEFAULT_PRIVATE_KEY_FILE=.key
-      #     pytest --hosts=rke2_servers --ansible-inventory=inventory/rocky8/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
-      #     pytest --hosts=rke2_agents --ansible-inventory=inventory/rocky8/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
+      - name: Run Python Tests with added host
+        run: |
+          export DEFAULT_PRIVATE_KEY_FILE=.key
+          pytest --hosts=rke2_servers --ansible-inventory=inventory/${{ inputs.os }}/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_server_tests.py
+          pytest --hosts=rke2_agents --ansible-inventory=inventory/${{ inputs.os }}/hosts.yml --force-ansible --connection=ansible --sudo testing/basic_agent_tests.py
 
-      # - name: Run troubleshoot tasks
-      #   if: ${{ failure() }}
-      #   run: |
-      #     ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/rocky8/hosts.yml -u centos -vvv --tags "troubleshooting" --private-key .key testing.yml
+      - name: Run troubleshoot tasks
+        if: ${{ failure() }}
+        run: |
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/${{ inputs.os }}/hosts.yml -u centos -vvv --tags "troubleshooting" --private-key .key testing.yml
 
       - name: Delete Stack
         if: ${{ always() }}
