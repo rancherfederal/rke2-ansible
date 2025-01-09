@@ -11,3 +11,4 @@ jobs:
     uses: ./.github/workflows/reusable_integration_testing.yml
     with: 
       os: rocky8
+    secrets: inherit

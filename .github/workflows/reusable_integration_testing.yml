@@ -1,5 +1,5 @@
 ---
-name: Reusable Cluster Deploymet
+name: Reusable Cluster Testing
 
 on:
   workflow_call:
@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  cluster-deploy:
+  cluster-test:
     runs-on: ubuntu-latest
 
     steps:
