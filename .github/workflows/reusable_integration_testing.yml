@@ -59,29 +59,29 @@ jobs:
           cd testing/
           terraform validate -no-color
 
-      # - name: Terraform Plan
-      #   id: plan
-      #   run: |
-      #     cd testing/
-      #     terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=rocky8" -no-color
-      #   continue-on-error: true
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_DEFAULT_REGION: us-gov-west-1
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd testing/
+          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=${{ inputs.config-path }}" -no-color
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
 
-      # - name: Terraform Plan Status
-      #   if: steps.plan.outcome == 'failure'
-      #   run: exit 1
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
 
-      # - name: Terraform Apply
-      #   run: |
-      #     cd testing/
-      #     terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=rocky8" -auto-approve
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_DEFAULT_REGION: us-gov-west-1
+      - name: Terraform Apply
+        run: |
+          cd testing/
+          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=${{ inputs.config-path }}" -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-gov-west-1
 
       # - name: Create inventory
       #   run: |

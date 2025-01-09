@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  rocky8-test:
+  "_8_":
     uses: ./.github/workflows/reusable_integration_testing.yml
     with: 
       os: rocky8
