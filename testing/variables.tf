@@ -28,7 +28,7 @@ variable "instance_type" {
 variable "os" {
   type        = string
   description = "AWS AMI OS"
-  default     = "ubuntu20"
+  default     = "rocky8"
 }
 
 variable "amis" {

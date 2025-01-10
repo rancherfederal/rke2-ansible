@@ -164,7 +164,7 @@ jobs:
         if: ${{ always() }}
         run: |
           cd testing/
-          terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "GITHUB_JOB_ID=$GITHUB_JOB" -auto-approve
+          terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "GITHUB_JOB_ID=$GITHUB_JOB" -var "os=${{ inputs.os }}" -auto-approve
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
