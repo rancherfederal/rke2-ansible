@@ -8,7 +8,7 @@ provider "aws" {
 ### SECURITY GROUPS
 ###
 resource "aws_security_group" "allow-all" {
-  name   = "${var.tf_user}-allow-all-${var.GITHUB_RUN_ID}-${var.GITHUB_JOB_ID}"
+  name   = "${var.tf_user}-allow-all-${var.GITHUB_RUN_ID}"
   vpc_id = "vpc-01c7511c87c5291ad"
 
   ingress {
@@ -30,7 +30,7 @@ resource "aws_security_group" "allow-all" {
     Name       = "allow-all"
     Owner      = var.tf_user
     github_run = "${var.GITHUB_RUN_ID}"
-    os_test = "${var.OS_TEST}"
+    os_test = "${var.os}"
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_instance" "control_node" {
     Owner      = var.tf_user
     NodeType   = "Server"
     github_run = "${var.GITHUB_RUN_ID}"
-    os_test    = "${var.OS_TEST}"
+    os_test    = "${var.os}"
   }
 
   provisioner "remote-exec" {
@@ -95,7 +95,7 @@ resource "aws_instance" "worker_node" {
     Owner      = var.tf_user
     NodeType   = "Agent"
     github_run = "${var.GITHUB_RUN_ID}"
-    os_test    = "${var.OS_TEST}"
+    os_test    = "${var.os}"
   }
 
   provisioner "remote-exec" {
@@ -133,7 +133,7 @@ resource "aws_instance" "extra_worker_node" {
     Owner      = var.tf_user
     NodeType   = "ExtraNode"
     github_run = "${var.GITHUB_RUN_ID}"
-    os_test    = "${var.OS_TEST}"
+    os_test    = "${var.os}"
   }
 
   provisioner "remote-exec" {

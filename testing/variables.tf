@@ -76,4 +76,3 @@ variable "ansible_user" {
 }
 
 variable "GITHUB_RUN_ID" {}
-variable "OS_TEST" {}
