@@ -134,7 +134,7 @@ jobs:
 
       - name: Update inventory hosts.yml with added host
         run: |
-          export RKE2_AGENT2=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" "Name=tag:os_test,Values=${{ inputs.os }} --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
+          export RKE2_AGENT2=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" "Name=tag:os_test,Values=${{ inputs.os }}" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
           yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-02.ansible_host = strenv(RKE2_AGENT2)' ./${{ inputs.os }}/hosts.yml
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
