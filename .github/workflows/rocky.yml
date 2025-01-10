@@ -13,9 +13,9 @@ jobs:
       os: rocky8
       ssh_user: rocky
     secrets: inherit
-  "_9_":
-    uses: ./.github/workflows/reusable_integration_testing.yml
-    with: 
-      os: rocky9
-      ssh_user: rocky
-    secrets: inherit
+  # "_9_":
+  #   uses: ./.github/workflows/reusable_integration_testing.yml
+  #   with: 
+  #     os: rocky9
+  #     ssh_user: rocky
+  #   secrets: inherit

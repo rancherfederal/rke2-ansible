@@ -30,7 +30,7 @@ resource "aws_security_group" "allow-all" {
     Name       = "allow-all"
     Owner      = var.tf_user
     github_run = "${var.GITHUB_RUN_ID}"
-    github_job = "${var.GITHUB_JOB_ID}"
+    os_test = "${var.OS_TEST}"
   }
 }
 
@@ -53,11 +53,11 @@ resource "aws_instance" "control_node" {
   vpc_security_group_ids = [aws_security_group.allow-all.id]
 
   tags = {
-    Name       = "rke2_ansible-testing-server-${var.os}-${var.GITHUB_RUN_ID}-${var.GITHUB_JOB_ID}-${count.index}"
+    Name       = "rke2_ansible-testing-server-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
     Owner      = var.tf_user
     NodeType   = "Server"
     github_run = "${var.GITHUB_RUN_ID}"
-    github_job = "${var.GITHUB_JOB_ID}"
+    os_test    = "${var.OS_TEST}"
   }
 
   provisioner "remote-exec" {
@@ -91,11 +91,11 @@ resource "aws_instance" "worker_node" {
   }
 
   tags = {
-    Name       = "rke2_ansible-testing-agent-${var.os}-${var.GITHUB_RUN_ID}-${var.GITHUB_JOB_ID}-${count.index}"
+    Name       = "rke2_ansible-testing-agent-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
     Owner      = var.tf_user
     NodeType   = "Agent"
     github_run = "${var.GITHUB_RUN_ID}"
-    github_job = "${var.GITHUB_JOB_ID}"
+    os_test    = "${var.OS_TEST}"
   }
 
   provisioner "remote-exec" {
@@ -129,11 +129,11 @@ resource "aws_instance" "extra_worker_node" {
   }
 
   tags = {
-    Name       = "rke2_ansible-testing-agent-idempotency-${var.os}-${var.GITHUB_RUN_ID}-${var.GITHUB_JOB_ID}-${count.index}"
+    Name       = "rke2_ansible-testing-agent-idempotency-${var.os}-${var.GITHUB_RUN_ID}-${count.index}"
     Owner      = var.tf_user
     NodeType   = "ExtraNode"
     github_run = "${var.GITHUB_RUN_ID}"
-    github_job = "${var.GITHUB_JOB_ID}"
+    os_test    = "${var.OS_TEST}"
   }
 
   provisioner "remote-exec" {
