@@ -7,6 +7,9 @@ on:
       os:
         required: true
         type: string
+      ssh_user:
+        required: true
+        type: string
 
 jobs:
 
@@ -98,8 +101,8 @@ jobs:
           export RKE2_AGENT=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
           yq --null-input '.rke2_cluster.children.rke2_servers.hosts.master-01.ansible_host = strenv(RKE2_SERVER)' > ./${{ inputs.os }}/hosts.yml
           yq -i '.all.vars.rke2_kubernetes_api_server_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
-          yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-01.ansible_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
-          echo "remote_user=centos" >> ansible.cfg
+          yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-01.ansible_host = strenv(RKE2_AGENT)' ./${{ inputs.os }}/hosts.yml
+          echo "remote_user=${{ inputs.ssh_user }}" >> ansible.cfg
           echo "private_key_file=.key" >> ansible.cfg
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -113,15 +116,15 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u centos -vv --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vv --private-key .key site.yml
 
       - name: Run playbook again for idempotency
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u centos -vv --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vv --private-key .key site.yml
 
       - name: Run Ansible Tests
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
 
       - name: Run Python Tests
         run: |
@@ -140,11 +143,11 @@ jobs:
           
       - name: Run playbook again with added host
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u centos --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} --verbose --private-key .key site.yml
 
       - name: Run Ansible Tests with added host
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u centos --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} --verbose --skip-tags "troubleshooting" --private-key .key testing.yml
 
       - name: Run Python Tests with added host
         run: |
@@ -155,7 +158,7 @@ jobs:
       - name: Run troubleshoot tasks
         if: ${{ failure() }}
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u centos -vvv --tags "troubleshooting" --private-key .key testing.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vvv --tags "troubleshooting" --private-key .key testing.yml
 
       - name: Delete Stack
         if: ${{ always() }}
