@@ -9,7 +9,7 @@ provider "aws" {
 ###
 resource "aws_security_group" "allow-all" {
   name   = "${var.tf_user}-allow-all-${var.GITHUB_RUN_ID}-${var.GITHUB_JOB_ID}"
-  vpc_id = "vpc-07402b459d3b18976"
+  vpc_id = "vpc-01c7511c87c5291ad"
 
   ingress {
     from_port   = 0
