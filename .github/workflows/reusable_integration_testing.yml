@@ -74,7 +74,7 @@ jobs:
         id: plan
         run: |
           cd testing/
-          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=${{ inputs.os }}" -no-color
+          terraform plan -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "GITHUB_JOB_ID=$GITHUB_JOB" -var "os=${{ inputs.os }}" -no-color
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -88,7 +88,7 @@ jobs:
       - name: Terraform Apply
         run: |
           cd testing/
-          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "os=${{ inputs.os }}" -auto-approve
+          terraform apply -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "GITHUB_JOB_ID=$GITHUB_JOB" -var "os=${{ inputs.os }}" -auto-approve
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -97,8 +97,8 @@ jobs:
       - name: Create inventory
         run: |
           mkdir ./${{ inputs.os }}
-          export RKE2_SERVER=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
-          export RKE2_AGENT=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
+          export RKE2_SERVER=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Server" "Name=tag:github_run,Values=$GITHUB_RUN_ID" "Name=tag:github_job,Values=$GITHUB_JOB_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
+          export RKE2_AGENT=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=Agent" "Name=tag:github_run,Values=$GITHUB_RUN_ID" "Name=tag:github_job,Values=$GITHUB_JOB_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
           yq --null-input '.rke2_cluster.children.rke2_servers.hosts.master-01.ansible_host = strenv(RKE2_SERVER)' > ./${{ inputs.os }}/hosts.yml
           yq -i '.all.vars.rke2_kubernetes_api_server_host = strenv(RKE2_SERVER)' ./${{ inputs.os }}/hosts.yml
           yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-01.ansible_host = strenv(RKE2_AGENT)' ./${{ inputs.os }}/hosts.yml
@@ -134,7 +134,7 @@ jobs:
 
       - name: Update inventory hosts.yml with added host
         run: |
-          export RKE2_AGENT2=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
+          export RKE2_AGENT2=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=tag:Owner,Values=rke2-ansible-github-actions" "Name=tag:NodeType,Values=ExtraNode" "Name=tag:github_run,Values=$GITHUB_RUN_ID" "Name=tag:github_job,Values=$GITHUB_JOB_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text | head -1)
           yq -i '.rke2_cluster.children.rke2_agents.hosts.worker-02.ansible_host = strenv(RKE2_AGENT2)' ./${{ inputs.os }}/hosts.yml
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -164,7 +164,7 @@ jobs:
         if: ${{ always() }}
         run: |
           cd testing/
-          terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -auto-approve
+          terraform destroy -var "GITHUB_RUN_ID=$GITHUB_RUN_ID" -var "GITHUB_JOB_ID=$GITHUB_JOB" -auto-approve
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

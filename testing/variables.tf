@@ -106,3 +106,4 @@ variable "ansible_user" {
 }
 
 variable "GITHUB_RUN_ID" {}
+variable "GITHUB_JOB_ID" {}
