@@ -44,7 +44,7 @@ resource "aws_instance" "control_node" {
   ami           = var.amis[var.aws_region][var.os].ami
   instance_type = var.instance_type
   subnet_id     = var.aws_subnet
-  key_name      = "rke2-ansible-ci"
+  key_name      = "rke2-ansible-github"
   root_block_device {
     volume_type = "standard"
     volume_size = 30
@@ -80,7 +80,7 @@ resource "aws_instance" "worker_node" {
   ami                         = var.amis[var.aws_region][var.os].ami
   instance_type               = var.instance_type
   subnet_id                   = var.aws_subnet
-  key_name                    = "rke2-ansible-ci"
+  key_name                    = "rke2-ansible-github"
   associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.allow-all.id]
@@ -118,7 +118,7 @@ resource "aws_instance" "extra_worker_node" {
   ami                         = var.amis[var.aws_region][var.os].ami
   instance_type               = var.instance_type
   subnet_id                   = var.aws_subnet
-  key_name                    = "rke2-ansible-ci"
+  key_name                    = "rke2-ansible-github"
   associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.allow-all.id]
