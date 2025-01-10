@@ -13,3 +13,9 @@ jobs:
       os: rocky8
       ssh_user: centos
     secrets: inherit
+  "_9_":
+    uses: ./.github/workflows/reusable_integration_testing.yml
+    with: 
+      os: rocky8
+      ssh_user: centos
+    secrets: inherit
