@@ -54,19 +54,19 @@ variable "amis" {
 variable "control_nodes" {
   type        = number
   description = "Number of RKE2 manager nodes"
-  default     = 3
+  default     = 1
 }
 
 variable "worker_nodes" {
   type        = number
   description = "Number of RKE2 worker nodes"
-  default     = 2
+  default     = 1
 }
 
 variable "extra_worker_nodes" {
   type        = number
   description = "Number of RKE2 worker nodes to add for idempotency tests"
-  default     = 2
+  default     = 1
 }
 
 variable "ansible_user" {
