@@ -47,6 +47,14 @@ variable "amis" {
         ami  = "ami-05150ea4d8a533099"
         user = "rocky"
       }
+      "ubuntu22" = {
+        ami  = "ami-00eb69d236edcfaf8"
+        user = "ubuntu"
+      }
+      "ubuntu24" = {
+        ami  = "ami-036841078a4b68e14"
+        user = "ubuntu"
+      }
     }
   }
 }

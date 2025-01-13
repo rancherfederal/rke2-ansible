@@ -1,0 +1,21 @@
+---
+name: Ubuntu
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  "_22_":
+    uses: ./.github/workflows/reusable_integration_testing.yml
+    with: 
+      os: rocky8
+      ssh_user: ubuntu
+    secrets: inherit
+  "_24_":
+    uses: ./.github/workflows/reusable_integration_testing.yml
+    with: 
+      os: rocky9
+      ssh_user: ubuntu
+    secrets: inherit
