@@ -13,6 +13,7 @@ jobs:
       os: ubuntu22
       ssh_user: ubuntu
     secrets: inherit
+
   "_24_":
     uses: ./.github/workflows/reusable_integration_testing.yml
     with: 
