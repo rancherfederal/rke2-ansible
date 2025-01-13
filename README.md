@@ -29,7 +29,6 @@ Thank you for your understanding and cooperation.
 
 Ansible RKE2 (RKE Government) Playbook
 ---------
-[![Lint](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml) [![Rocky](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml) [![Ubuntu](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml)
 
 RKE2, also known as RKE Government, is Rancher's next-generation Kubernetes distribution. This Ansible playbook installs RKE2 for both the control plane and workers.
 
@@ -37,13 +36,14 @@ See the [docs](https://docs.rke2.io/) more information about [RKE Government](ht
 
 
 Platforms
----------
-The RKE2 Ansible playbook supports all [RKE2 Supported Operating Systems](https://docs.rke2.io/install/requirements/#operating-systems)
+---------  
 
-Supported Operating Systems:
-- Rocky 8 and 9
-- RedHat: 8 and 9
-- Ubuntu: 18, 20, and 22
+[![Lint](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml) [![Rocky](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml) [![Ubuntu](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml)
+
+The RKE2 Ansible playbook supports:
+- Rocky 8, and 9
+- RedHat: 8, and 9
+- Ubuntu: 22, and 24
 
 
 System requirements
