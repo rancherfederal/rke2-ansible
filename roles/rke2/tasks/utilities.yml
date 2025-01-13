@@ -5,6 +5,7 @@
     dest: "/root/.bashrc"
     line: 'PATH=$PATH:/var/lib/rancher/rke2/bin'
     insertafter: EOF
+    create: true
 
 - name: Symlink crictl config to /etc/crictl.yaml
   ansible.builtin.file:
