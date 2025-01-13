@@ -55,6 +55,10 @@ variable "amis" {
         ami  = "ami-036841078a4b68e14"
         user = "ubuntu"
       }
+      "sles15" = {
+        ami  = "ami-0371c70ae504994fd"
+        user = "ec2-user"
+      }
     }
   }
 }
