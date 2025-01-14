@@ -1,8 +1,1 @@
 ---
-
-rke2_installed: false
-rke2_version_changed: false
-rke2_reboot: false
-rke2_version_majmin: ""
-rke2_version_rpm: ""
-rke2_package_state: "installed"

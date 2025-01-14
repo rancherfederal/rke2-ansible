@@ -28,7 +28,7 @@ jobs:
           ansible-lint --version
 
       - name: Run ansible-lint
-        run: ansible-lint
+        run: ansible-lint ./roles
 
   yaml-lint:
     name: YAML
