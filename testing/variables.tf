@@ -1,13 +1,13 @@
 variable "aws_region" {
   type        = string
   description = "AWS Region the instance is launched in"
-  default     = "us-gov-west-1"
+  default     = "us-east-2"
 }
 
 variable "aws_subnet" {
   description = "List of vectors of subnets and Availability Zones"
   type        = string
-  default     = "subnet-0523d8467cf8e5cec"
+  default     = "subnet-0e478ddd6ae2ed0b4"
 }
 
 variable "tf_user" {
@@ -23,59 +23,41 @@ variable "instance_type" {
 }
 
 # OS Options
-#  rhel8
-#  rhel7
-#  sles15sp2
-#  ubuntu20
-#  ubuntu18
-#  centos8
-#  centos7
 #  rocky8
+#  rocky9
 variable "os" {
   type        = string
   description = "AWS AMI OS"
-  default     = "ubuntu20"
+  default     = "rocky8"
 }
 
 variable "amis" {
-  description = "List of RHEL OS images based on regions"
+  description = "List of AMIs based on regions"
   type = map(map(object({
     ami  = string
     user = string
   })))
   default = {
-    "us-gov-west-1" = {
-      "rhel8" = {
-        ami  = "ami-0ac4e06a69870e5be"
-        user = "ec2-user"
-      }
-      "rhel7" = {
-        ami  = "ami-e9d5ec88"
-        user = "ec2-user"
-      }
-      "sles15sp2" = {
-        ami  = "ami-04e3d865"
-        user = "ec2-user"
-      }
-      "ubuntu20" = {
-        ami  = "ami-84556de5"
-        user = "ubuntu"
-      }
-      "ubuntu18" = {
-        ami  = "ami-bce9d3dd"
-        user = "ubuntu"
-      }
-      "centos8" = {
-        ami  = "ami-967158f7"
-        user = "centos"
-      }
-      "centos7" = {
-        ami  = "ami-bbba86da"
-        user = "centos"
-      }
+    "us-east-2" = {
       "rocky8" = {
-        ami  = "ami-01c3e8e014e8b0c7a"
-        user = "centos"
+        ami  = "ami-02391db2758465a87"
+        user = "rocky"
+      }
+      "rocky9" = {
+        ami  = "ami-05150ea4d8a533099"
+        user = "rocky"
+      }
+      "ubuntu22" = {
+        ami  = "ami-00eb69d236edcfaf8"
+        user = "ubuntu"
+      }
+      "ubuntu24" = {
+        ami  = "ami-036841078a4b68e14"
+        user = "ubuntu"
+      }
+      "sles15" = {
+        ami  = "ami-0371c70ae504994fd"
+        user = "ec2-user"
       }
     }
   }
@@ -84,19 +66,19 @@ variable "amis" {
 variable "control_nodes" {
   type        = number
   description = "Number of RKE2 manager nodes"
-  default     = 3
+  default     = 1
 }
 
 variable "worker_nodes" {
   type        = number
   description = "Number of RKE2 worker nodes"
-  default     = 2
+  default     = 1
 }
 
 variable "extra_worker_nodes" {
   type        = number
   description = "Number of RKE2 worker nodes to add for idempotency tests"
-  default     = 2
+  default     = 1
 }
 
 variable "ansible_user" {

@@ -1,22 +1,17 @@
 ---
-name: Lint Test
+name: Lint
 
 on:
   push:
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: us-gov-west-1
-
 jobs:
 
-  lint-test:
-    name: Lint for push
+  ansible-lint:
+    name: Ansible
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the codebase.
+      - name: Check out the codebase
         uses: actions/checkout@v3
 
       - name: Set up Python.
@@ -24,17 +19,54 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install test dependencies.
-        run: pip3 install yamllint ansible-lint ansible
+      - name: Install ansible-lint
+        run: pip3 install ansible-lint ansible
 
       - name: Version check
         run: |
           ansible --version
           ansible-lint --version
+
+      - name: Run ansible-lint
+        run: ansible-lint
+
+  yaml-lint:
+    name: YAML
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+
+      - name: Set up Python.
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install yamllint
+        run: pip3 install yamllint
+
+      - name: Version check
+        run: |
           yamllint --version
 
-      - name: Run yamllint.
+      - name: Run yamllint
         run: yamllint .
 
-      - name: Run ansible-lint.
-        run: ansible-lint
+  vale-lint:
+    name: Vale
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+
+      - name: Install vale
+        run: sudo snap install vale
+
+      - name: Version check
+        run: |
+          vale --version
+
+      - name: Run yamllint
+        run: vale --glob='*.md' ./docs ./README.md

@@ -8,8 +8,8 @@ provider "aws" {
 ### SECURITY GROUPS
 ###
 resource "aws_security_group" "allow-all" {
-  name   = "${var.tf_user}-allow-all-${var.GITHUB_RUN_ID}"
-  vpc_id = "vpc-07402b459d3b18976"
+  name   = "${var.tf_user}-allow-all-${var.os}-${var.GITHUB_RUN_ID}"
+  vpc_id = "vpc-01c7511c87c5291ad"
 
   ingress {
     from_port   = 0
@@ -30,6 +30,7 @@ resource "aws_security_group" "allow-all" {
     Name       = "allow-all"
     Owner      = var.tf_user
     github_run = "${var.GITHUB_RUN_ID}"
+    os_test = "${var.os}"
   }
 }
 
@@ -43,7 +44,7 @@ resource "aws_instance" "control_node" {
   ami           = var.amis[var.aws_region][var.os].ami
   instance_type = var.instance_type
   subnet_id     = var.aws_subnet
-  key_name      = "rke2-ansible-ci"
+  key_name      = "rke2-ansible-github"
   root_block_device {
     volume_type = "standard"
     volume_size = 30
@@ -56,6 +57,7 @@ resource "aws_instance" "control_node" {
     Owner      = var.tf_user
     NodeType   = "Server"
     github_run = "${var.GITHUB_RUN_ID}"
+    os_test    = "${var.os}"
   }
 
   provisioner "remote-exec" {
@@ -78,7 +80,7 @@ resource "aws_instance" "worker_node" {
   ami                         = var.amis[var.aws_region][var.os].ami
   instance_type               = var.instance_type
   subnet_id                   = var.aws_subnet
-  key_name                    = "rke2-ansible-ci"
+  key_name                    = "rke2-ansible-github"
   associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.allow-all.id]
@@ -93,6 +95,7 @@ resource "aws_instance" "worker_node" {
     Owner      = var.tf_user
     NodeType   = "Agent"
     github_run = "${var.GITHUB_RUN_ID}"
+    os_test    = "${var.os}"
   }
 
   provisioner "remote-exec" {
@@ -115,7 +118,7 @@ resource "aws_instance" "extra_worker_node" {
   ami                         = var.amis[var.aws_region][var.os].ami
   instance_type               = var.instance_type
   subnet_id                   = var.aws_subnet
-  key_name                    = "rke2-ansible-ci"
+  key_name                    = "rke2-ansible-github"
   associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.allow-all.id]
@@ -130,6 +133,7 @@ resource "aws_instance" "extra_worker_node" {
     Owner      = var.tf_user
     NodeType   = "ExtraNode"
     github_run = "${var.GITHUB_RUN_ID}"
+    os_test    = "${var.os}"
   }
 
   provisioner "remote-exec" {
