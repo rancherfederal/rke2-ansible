@@ -9,6 +9,14 @@
 - name: Run CIS-Hardening Tasks
   ansible.builtin.include_tasks: cis_hardening.yml
 
+- name: Include task file add-systemd-env.yml
+  ansible.builtin.include_tasks: add_ansible_managed_config.yml
+  vars:
+    file_contents: "{{ lookup('file', rke2_systemd_env_config_file_path) }}"
+    file_destination: "/etc/default/{{ service_name }}"
+    file_description: "systemd env options"
+    file_path: "{{ rke2_systemd_env_config_file_path }}"
+
 - name: "Include task file add_ansible_managed_config.yml for {{ file_description }}"
   ansible.builtin.include_tasks: add_ansible_managed_config.yml
   vars:
