@@ -1,20 +1,9 @@
 Build a Kubernetes cluster using RKE2 via Ansible
-=========
-```
-               ,        ,  _______________________________
-   ,-----------|'------'|  |                             |
-  /.           '-'    |-'  |_____________________________|
- |/|             |    |
-   |   .________.'----'    _______________________________
-   |  ||        |  ||      |                             |
-   \__|'        \__|'      |_____________________________|
+=========  
+<p align="center">
+  <img src="./docs/assets/RGS_Logo.png" />
+</p>
 
-|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
-|________________________________________________________|
-
-|‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
-|________________________________________________________|
-```  
 
 > [!CAUTION]  
 > The RKE2-Ansible repository has been significantly refactored. Note that configurations/inventories written for the v1.0.0 release and earlier are not compatible with v2.0.0 and on. Please see the documentation and make any adjustments necessary. 
