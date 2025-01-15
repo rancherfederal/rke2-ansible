@@ -1,0 +1,36 @@
+---
+
+- name: Look up manifest files on localhost
+  ansible.builtin.find:
+    paths: "{{ source_directory }}"
+  register: local_files_find_return
+  delegate_to: localhost
+  become: false
+
+- name: Create array of managed files
+  ansible.builtin.set_fact:
+    managed_files: "{{ local_files_find_return.files | map(attribute='path') | map('basename') }}"
+
+- name: Add manifest addons files from localhost
+  ansible.builtin.copy:
+    src: "{{ source_directory | regex_replace('\\/$', '') }}/"
+    dest: "{{ destination_directory }}"
+    mode: '0640'
+    owner: root
+    group: root
+
+- name: Look up manifest files on remote
+  ansible.builtin.find:
+    paths: "{{ destination_directory }}"
+  register: remote_files_find_return
+
+- name: Create array of remote files
+  ansible.builtin.set_fact:
+    current_files: "{{ remote_files_find_return.files | map(attribute='path') | map('basename') }}"
+
+- name: Remove remote files not in managed files list
+  ansible.builtin.file:
+    path: "{{ destination_directory }}/{{ item }}"
+    state: absent
+  with_items: "{{ current_files }}"
+  when: item not in managed_files

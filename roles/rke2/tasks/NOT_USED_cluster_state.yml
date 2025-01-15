@@ -1,0 +1,66 @@
+---
+
+- name: Check for existing cluster
+  when:
+    - rke2_running is defined
+    - rke2_running
+  block:
+    - name: Check for node-token (existing cluster)
+      ansible.builtin.stat:
+        path: /var/lib/rancher/rke2/server/node-token
+      register: node_token_tmp
+
+    - name: Read node-token (existing cluster)
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/rke2/server/node-token
+      register: rke2_config_token_tmp
+      when:
+        - node_token_tmp.stat.exists
+
+    - name: Set node-token fact (existing cluster)
+      ansible.builtin.set_fact:
+        rke2_config_token: "{{ rke2_config_token_tmp.content | b64decode | regex_replace('\n', '') }}"
+      when:
+        - "rke2_config_token_tmp.content is defined"
+        - rke2_config_token_tmp.content | length != 0
+
+    - name: Set node-token fact on all hosts (existing cluster)
+      ansible.builtin.set_fact:
+        rke2_config_token: "{{ hostvars[item]['rke2_config_token'] }}"
+      delegate_to: localhost
+      run_once: true
+      loop: "{{ groups['all'] }}"
+      when: "hostvars[item]['rke2_config_token'] is defined"
+
+    - name: Debug found token
+      ansible.builtin.debug:
+        msg: "rke2_config_token: {{ rke2_config_token }}"
+      when: rke2_config_token != ""
+
+    - name: Read host with token (existing cluster)
+      ansible.builtin.set_fact:
+        existing_join_host: "{{ ansible_hostname }}"
+      when:
+        - node_token_tmp.stat.exists
+
+    - name: Set join server fact on all hosts (existing cluster)
+      ansible.builtin.set_fact:
+        rke2_kubernetes_api_server_host: "{{ hostvars[item]['existing_join_host'] }}"
+      delegate_to: localhost
+      run_once: true
+      loop: "{{ groups['all'] }}"
+      when:
+        - "hostvars[item]['existing_join_host'] is defined"
+        - hostvars[item]['rke2_kubernetes_api_server_host'] == ""
+      vars:
+        rke2_kubernetes_api_server_host: "{{ existing_join_host | default('') }}"
+
+- name: No existing cluster found and api server not set
+  ansible.builtin.set_fact:
+    rke2_kubernetes_api_server_host: "{{ hostvars[groups['rke2_servers'][0]].inventory_hostname }}"
+  when:
+    - rke2_kubernetes_api_server_host == ""
+
+- name: Debug found join_server
+  ansible.builtin.debug:
+    msg: "Join Server: {{ rke2_kubernetes_api_server_host }}"

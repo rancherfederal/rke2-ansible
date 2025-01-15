@@ -1,0 +1,333 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  vars:
+    # Run config handling
+    default_run_id: "{{ lookup('password', '/dev/null chars=ascii_lowercase length=5') }}"
+    default_run_config:
+      run_id: "{{ default_run_id }}"
+
+    run_config_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/run-config.yml"
+    run_config_from_file: "{{ (lookup('file', run_config_path, errors='ignore') or '{}') | from_yaml }}"
+    run_config: '{{ default_run_config | combine(run_config_from_file) }}'
+
+    # Platform settings handling
+    default_assign_public_ip: true
+    default_aws_profile: "{{ lookup('env', 'AWS_PROFILE') }}"
+    default_boot_wait_seconds: 120
+    default_instance_type: t2.medium
+    default_key_inject_method: cloud-init  # valid values: [cloud-init, ec2]
+    default_key_name: "molecule-{{ run_config.run_id }}"
+    default_private_key_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/id_rsa"
+    default_public_key_path: "{{ default_private_key_path }}.pub"
+    default_ssh_user: ansible
+    default_ssh_port: 22
+    default_user_data: ''
+
+    default_security_group_name: "molecule-{{ run_config.run_id }}"
+    default_security_group_description: Ephemeral security group for Molecule instances
+    default_security_group_rules:
+      - proto: tcp
+        from_port: "{{ default_ssh_port }}"
+        to_port: "{{ default_ssh_port }}"
+        cidr_ip: "0.0.0.0/0"
+      - proto: icmp
+        from_port: 8
+        to_port: -1
+        cidr_ip: "0.0.0.0/0"
+      - proto: tcp
+        from_port: 9345
+        to_port: 9345
+        cidr_ip: "0.0.0.0/0"
+      - proto: tcp
+        from_port: 6443
+        to_port: 6443
+        cidr_ip: "0.0.0.0/0"
+    default_security_group_rules_egress:
+      - proto: -1
+        from_port: 0
+        to_port: 0
+        cidr_ip: "0.0.0.0/0"
+
+    platform_defaults:
+      assign_public_ip: "{{ default_assign_public_ip }}"
+      aws_profile: "{{ default_aws_profile }}"
+      boot_wait_seconds: "{{ default_boot_wait_seconds }}"
+      instance_type: "{{ default_instance_type }}"
+      key_inject_method: "{{ default_key_inject_method }}"
+      key_name: "{{ default_key_name }}"
+      private_key_path: "{{ default_private_key_path }}"
+      public_key_path: "{{ default_public_key_path }}"
+      security_group_name: "{{ default_security_group_name }}"
+      security_group_description: "{{ default_security_group_description }}"
+      security_group_rules: "{{ default_security_group_rules }}"
+      security_group_rules_egress: "{{ default_security_group_rules_egress }}"
+      ssh_user: "{{ default_ssh_user }}"
+      ssh_port: "{{ default_ssh_port }}"
+      cloud_config: {}
+      image: ""
+      image_name: ""
+      image_owner: [self]
+      name: ""
+      region: ""
+      security_groups: []
+      tags: {}
+      volumes: []
+      vpc_id: ""
+      vpc_subnet_id: "{{ lookup('env', 'VPC_SUBNET_ID') }}"
+
+    # Merging defaults into a list of dicts is, it turns out, not straightforward
+    platforms: >-
+      {{ [platform_defaults | dict2items]
+           | product(molecule_yml.platforms | map('dict2items') | list)
+           | map('flatten', levels=1)
+           | list
+           | map('items2dict')
+           | list }}
+  pre_tasks:
+    - name: Validate platform configurations
+      ansible.builtin.assert:
+        that:
+          - platforms | length > 0
+          - platform.name is string and platform.name | length > 0
+          - platform.assign_public_ip is boolean
+          - platform.aws_profile is string
+          - platform.boot_wait_seconds is integer and platform.boot_wait_seconds >= 0
+          - platform.cloud_config is mapping
+          - platform.image is string
+          - platform.image_name is string
+          - platform.image_owner is sequence or (platform.image_owner is string and platform.image_owner | length > 0)
+          - platform.instance_type is string and platform.instance_type | length > 0
+          - platform.key_inject_method is in ["cloud-init", "ec2"]
+          - platform.key_name is string and platform.key_name | length > 0
+          - platform.private_key_path is string and platform.private_key_path | length > 0
+          - platform.public_key_path is string and platform.public_key_path | length > 0
+          - platform.region is string
+          - platform.security_group_name is string and platform.security_group_name | length > 0
+          - platform.security_group_description is string and platform.security_group_description | length > 0
+          - platform.security_group_rules is sequence
+          - platform.security_group_rules_egress is sequence
+          - platform.security_groups is sequence
+          - platform.ssh_user is string and platform.ssh_user | length > 0
+          - platform.ssh_port is integer and platform.ssh_port in range(1, 65536)
+          - platform.tags is mapping
+          - platform.volumes is sequence
+          - platform.vpc_id is string
+          - platform.vpc_subnet_id is string and platform.vpc_subnet_id | length > 0
+        quiet: true
+      loop: '{{ platforms }}'
+      loop_control:
+        loop_var: platform
+        label: "{{ platform.name }}"
+  tasks:
+    - name: Write run config to file
+      ansible.builtin.copy:
+        dest: "{{ run_config_path }}"
+        content: "{{ run_config | to_yaml }}"
+        mode: "0600"
+
+    - name: Generate local key pairs
+      community.crypto.openssh_keypair:
+        path: "{{ item.private_key_path }}"
+        type: rsa
+        size: 2048
+        regenerate: never
+        backend: cryptography
+        private_key_format: pkcs1
+      loop: "{{ platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: local_keypairs
+
+    - name: Look up EC2 AMI(s) by owner and name (if image not set)
+      amazon.aws.ec2_ami_info:
+        owners: "{{ item.image_owner }}"
+        filters: "{{ item.image_filters | default({}) | combine(image_name_map) }}"
+      vars:
+        image_name_map: "{% if item.image_name is defined and item.image_name | length > 0 %}{{ {'name': item.image_name} }}{% else %}{}{% endif %}"
+      loop: "{{ platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: not item.image
+      register: ami_info
+
+    - name: Look up subnets to determine VPCs (if needed)
+      amazon.aws.ec2_vpc_subnet_info:
+        subnet_ids: "{{ item.vpc_subnet_id }}"
+      loop: "{{ platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: not item.vpc_id
+      register: subnet_info
+
+    - name: Validate discovered information
+      ansible.builtin.assert:
+        that:
+          - platform.image or (ami_info.results[index].images | length > 0)
+          - platform.vpc_id or (subnet_info.results[index].subnets | length > 0)
+        quiet: true
+      loop: "{{ platforms }}"
+      loop_control:
+        loop_var: platform
+        index_var: index
+        label: "{{ platform.name }}"
+
+    - name: Create ephemeral EC2 keys (if needed)
+      amazon.aws.ec2_key:
+        profile: "{{ item.aws_profile | default(omit) }}"
+        region: "{{ item.region | default(omit) }}"
+        name: "{{ item.key_name }}"
+        key_material: "{{ local_keypair.public_key }}"
+      vars:
+        local_keypair: "{{ local_keypairs.results[index] }}"
+      loop: "{{ platforms }}"
+      loop_control:
+        index_var: index
+        label: "{{ item.name }}"
+      when: item.key_inject_method == "ec2"
+      register: ec2_keys
+
+    - name: Create ephemeral security groups (if needed)
+      amazon.aws.ec2_security_group:
+        profile: "{{ item.aws_profile | default(omit) }}"
+        iam_instance_profile: "{{ item.iam_instance_profile | default(omit) }}"
+        region: "{{ item.region | default(omit) }}"
+        vpc_id: "{{ item.vpc_id or vpc_subnet.vpc_id }}"
+        name: "{{ item.security_group_name }}"
+        description: "{{ item.security_group_description }}"
+        rules: "{{ item.security_group_rules }}"
+        rules_egress: "{{ item.security_group_rules_egress }}"
+      vars:
+        vpc_subnet: "{{ subnet_info.results[index].subnets[0] }}"
+      loop: "{{ platforms }}"
+      loop_control:
+        index_var: index
+        label: "{{ item.name }}"
+      when: item.security_groups | length == 0
+
+    - name: Create ephemeral EC2 instance(s)
+      amazon.aws.ec2_instance:
+        name: "{{ item.name }}"
+        profile: "{{ item.aws_profile | default(omit) }}"
+        region: "{{ item.region | default(omit) }}"
+        filters: "{{ platform_filters }}"
+        instance_type: "{{ item.instance_type }}"
+        image_id: "{{ platform_image_id }}"
+        vpc_subnet_id: "{{ item.vpc_subnet_id }}"
+        security_groups: "{{ platform_security_groups }}"
+        network:
+          assign_public_ip: "{{ item.assign_public_ip }}"
+        volumes: "{{ item.volumes }}"
+        key_name: "{{ (item.key_inject_method == 'ec2') | ternary(item.key_name, omit) }}"
+        tags: "{{ platform_tags }}"
+        user_data: "{{ platform_user_data }}"
+        state: "running"
+        wait: true
+      vars:
+        platform_security_groups: "{{ item.security_groups or [item.security_group_name] }}"
+        platform_generated_image_id: "{{ (ami_info.results[index].images | sort(attribute='creation_date', reverse=True))[0].image_id }}"
+        platform_image_id: "{{ item.image or platform_generated_image_id }}"
+
+        platform_generated_cloud_config:
+          users:
+            - name: "{{ item.ssh_user }}"
+              ssh_authorized_keys:
+                - "{{ local_keypairs.results[index].public_key }}"
+              sudo: "ALL=(ALL) NOPASSWD:ALL"
+        platform_cloud_config: >-
+          {{ (item.key_inject_method == 'cloud-init')
+               | ternary((item.cloud_config | combine(platform_generated_cloud_config)), item.cloud_config) }}
+        platform_user_data: |-
+          #cloud-config
+          {{ platform_cloud_config | to_yaml }}
+
+        platform_generated_tags:
+          instance: "{{ item.name }}"
+          molecule-run-id: "{{ run_config.run_id }}"
+        platform_tags: "{{ (item.tags or {}) | combine(platform_generated_tags) }}"
+        platform_filter_keys: "{{ platform_generated_tags.keys() | map('regex_replace', '^(.+)$', 'tag:\\1') }}"
+        platform_filters: "{{ dict(platform_filter_keys | zip(platform_generated_tags.values())) }}"
+      loop: "{{ platforms }}"
+      loop_control:
+        index_var: index
+        label: "{{ item.name }}"
+      register: ec2_instances_async
+      async: 7200
+      poll: 0
+
+    - name: Instance boot block
+      when: ec2_instances_async is changed
+      block:
+        - name: Wait for instance creation to complete
+          ansible.builtin.async_status:
+            jid: "{{ item.ansible_job_id }}"
+          loop: "{{ ec2_instances_async.results }}"
+          loop_control:
+            index_var: index
+            label: "{{ platforms[index].name }}"
+          register: ec2_instances
+          until: ec2_instances is finished
+          retries: 300
+
+        - name: Collect instance configs
+          ansible.builtin.set_fact:
+            instance_config:
+              instance: "{{ item.name }}"
+              address: "{{ item.assign_public_ip | ternary(instance.public_ip_address, instance.private_ip_address) }}"
+              user: "{{ item.ssh_user }}"
+              port: "{{ item.ssh_port }}"
+              identity_file: "{{ item.private_key_path }}"
+              instance_ids:
+                - "{{ instance.instance_id }}"
+          vars:
+            instance: "{{ ec2_instances.results[index].instances[0] }}"
+          loop: "{{ platforms }}"
+          loop_control:
+            index_var: index
+            label: "{{ item.name }}"
+          register: instance_configs
+
+        - name: Write Molecule instance configs
+          ansible.builtin.copy:
+            dest: "{{ molecule_instance_config }}"
+            content: >-
+              {{ instance_configs.results
+                   | map(attribute='ansible_facts.instance_config')
+                   | list
+                   | to_json
+                   | from_json
+                   | to_yaml }}
+            mode: "0600"
+
+        - name: Start SSH pollers
+          ansible.builtin.wait_for:
+            host: "{{ item.address }}"
+            port: "{{ item.port }}"
+            search_regex: SSH
+            delay: 10
+            timeout: 320
+          loop: "{{ instance_configs.results | map(attribute='ansible_facts.instance_config') | list }}"
+          loop_control:
+            label: "{{ item.instance }}"
+          register: ssh_wait_async
+          async: 300
+          poll: 0
+
+        - name: Wait for SSH
+          ansible.builtin.async_status:
+            jid: "{{ item.ansible_job_id }}"
+          loop: "{{ ssh_wait_async.results }}"
+          loop_control:
+            index_var: index
+            label: "{{ platforms[index].name }}"
+          register: ssh_wait
+          until: ssh_wait is finished
+          retries: 300
+          delay: 1
+
+        - name: Wait for boot process to finish
+          ansible.builtin.pause:
+            seconds: "{{ platforms | map(attribute='boot_wait_seconds') | max }}"

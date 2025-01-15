@@ -1,0 +1,40 @@
+---
+
+# Disable Firewalld
+# We recommend disabling firewalld. For Kubernetes 1.19+, firewalld must be turned off.
+- name: Disable FIREWALLD
+  ansible.builtin.systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+  when:
+    - ansible_facts.services["firewalld.service"] is defined
+    - ansible_facts.services["firewalld.service"].status != "not-found"
+  notify: "Restart {{ service_name }}"
+
+- name: Include task file network_manager_fix.yaml
+  ansible.builtin.include_tasks: network_manager_fix.yaml
+
+- name: Add server iptables rules
+  ansible.builtin.include_tasks: iptables_rules.yml
+  when:
+    # - ansible_facts.services["iptables.service"] is defined
+    - rke2_add_iptables_rules | bool
+
+- name: Add fapolicyd rules
+  ansible.builtin.copy:
+    content: "{{ fapolicyd_rules }}"
+    dest: /etc/fapolicyd/rules.d/80-rke2.rules
+    mode: '0644'
+    owner: root
+    group: fapolicyd
+  when:
+    - ansible_facts.services["fapolicyd.service"] is defined
+    - ansible_facts.services["fapolicyd.service"].state == "running"
+  vars:
+    fapolicyd_rules: |
+      allow perm=any all : dir=/var/lib/rancher/
+      allow perm=any all : dir=/opt/cni/
+      allow perm=any all : dir=/run/k3s/
+      allow perm=any all : dir=/var/lib/kubelet/
+  notify: Restart fapolicyd

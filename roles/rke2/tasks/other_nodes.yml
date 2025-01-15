@@ -1,0 +1,27 @@
+---
+
+- name: Wait for remote k8s apiserver
+  ansible.builtin.wait_for:
+    host: "{{ rke2_kubernetes_api_server_host }}"
+    port: "6443"
+    state: present
+    timeout: "300"
+  changed_when: false
+
+# - name: Include task file add-manifest-addons.yml
+#   ansible.builtin.include_tasks: add-manifest-addons.yml
+#   when:
+#     - manifest_config_file_path is defined
+#     - manifest_config_file_path | length > 0
+
+- name: Generate config.yml on other nodes
+  ansible.builtin.include_tasks: config.yml
+
+- name: Flush_handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure rke2 is running
+  ansible.builtin.service:
+    state: started
+    enabled: true
+    name: "{{ service_name }}"

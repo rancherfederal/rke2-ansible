@@ -1,0 +1,36 @@
+---
+
+# Add RKE2 Common repo
+- name: Add the rke2-common repo RHEL/CentOS/Rocky
+  ansible.builtin.yum_repository:
+    name: "{{ rke2_common_yum_repo.name }}"
+    description: "{{ rke2_common_yum_repo.description }}"
+    baseurl: "{{ rke2_common_yum_repo.baseurl }}"
+    gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
+    gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
+    enabled: "{{ rke2_common_yum_repo.enabled }}"
+
+# Add RKE2 versioned repo
+- name: Add the rke2 versioned repo CentOS/RHEL/Rocky
+  ansible.builtin.yum_repository:
+    name: "{{ rke2_versioned_yum_repo.name }}"
+    description: "{{ rke2_versioned_yum_repo.description }}"
+    baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
+    gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
+    gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
+    enabled: "{{ rke2_versioned_yum_repo.enabled }}"
+
+# - name: Debug install
+#   ansible.builtin.debug:
+#     msg: installing {{ service_name }}{{ rke2_version_rpm }}
+
+- name: YUM-Based Install
+  ansible.builtin.dnf:
+    name: "{{ service_name }}{{ rke2_version_rpm }}"
+    state: "{{ rke2_package_state }}"
+    allow_downgrade: true
+  register: result
+  retries: 10
+  until: result is succeeded
+  delay: 30
+  notify: "Restart {{ service_name }}"

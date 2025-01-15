@@ -1,0 +1,135 @@
+---
+
+- name: Populate service facts
+  ansible.builtin.service_facts: {}
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Set for install method of tarball
+  ansible.builtin.set_fact:
+    install_method: tarball
+  when: |-
+      ((ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Rocky') or
+      rke2_install_tarball_url != "" or
+      rke2_install_local_tarball_path != "" or
+      rke2_force_tarball_install|bool)
+
+- name: Set for install method of rpm
+  ansible.builtin.set_fact:
+    install_method: rpm
+  when:
+    - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
+    - not rke2_force_tarball_install|bool
+
+- name: Set as server
+  ansible.builtin.set_fact:
+    service_name: rke2-server
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Set as agent
+  ansible.builtin.set_fact:
+    service_name: rke2-agent
+  when:
+    - inventory_hostname in groups.get('rke2_agents', [])
+
+- name: Satisfy OS Pre-Reqs
+  ansible.builtin.include_tasks: pre_reqs.yml
+
+- name: Has rke2 been installed already
+  ansible.builtin.include_tasks: previous_install.yml
+
+- name: Check for images bundle
+  ansible.builtin.include_tasks: images_bundle.yml
+  when:
+    - rke2_images_urls != [] or
+      rke2_images_local_tarball_path != []
+
+- name: Determine rke2_version to install
+  ansible.builtin.include_tasks: calculate_rke2_version.yml
+  when:
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
+
+- name: Start check_node_ready.yml
+  ansible.builtin.include_tasks: check_node_ready.yml
+  vars:
+    check_node_ready_timeout: 2
+    check_node_ready_retries: 2
+    check_node_ready_delay: 2
+    check_node_ready_ignore_errors: true
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Create a list of ready servers
+  ansible.builtin.set_fact:
+    ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: Tarball Install
+  ansible.builtin.include_tasks: tarball_install.yml
+  when:
+    - install_method == "tarball"
+
+- name: RPM Install
+  ansible.builtin.include_tasks: rpm_install.yml
+  when:
+    - install_method == "rpm"
+
+- name: Set rke2 configuration files
+  ansible.builtin.include_tasks: configure_rke2.yml
+
+- name: Include task file add_manifest_addons.yml
+  ansible.builtin.include_tasks: add_manifest_addons.yml
+  vars:
+    source_directory: "{{ rke2_manifest_config_directory }}"
+    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_0
+  when:
+    - rke2_manifest_config_directory is defined
+    - rke2_manifest_config_directory | length > 0
+    - inventory_hostname in groups['rke2_servers'][0]
+
+# is the ready_servers array is empty, we assume it's a new cluster and use the first server in groups['rke2_servers']
+- name: Start the first rke2 node
+  ansible.builtin.include_tasks: first_server.yml
+  when:
+    - inventory_hostname in groups['rke2_servers'][0]
+    - ready_servers | length == 0
+
+- name: Save_generated_token.yml
+  ansible.builtin.include_tasks: save_generated_token.yml
+  vars:
+    token_source_node: "{{ groups['rke2_servers'][0] }}"
+  when:
+    - ready_servers | length == 0
+
+# is the ready_servers array is > 0, we assume it's an established cluster and treat all nodes equally (no need for initial server procedure)
+- name: Save_generated_token.yml
+  ansible.builtin.include_tasks: save_generated_token.yml
+  vars:
+    token_source_node: "{{ ready_servers[0] }}"
+  when:
+    - ready_servers | length > 0
+
+- name: Start all other rke2 nodes
+  ansible.builtin.include_tasks: other_nodes.yml
+
+- name: Configure kubectl,crictl,ctr
+  ansible.builtin.include_tasks: utilities.yml
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Include task file add_manifest_addons.yml
+  ansible.builtin.include_tasks: add_manifest_addons.yml
+  vars:
+    source_directory: "{{ rke2_manifest_config_post_run_directory }}"
+    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_1
+  when:
+    - rke2_manifest_config_post_run_directory is defined
+    - rke2_manifest_config_post_run_directory | length > 0
+    - inventory_hostname in groups['rke2_servers'][0]

@@ -1,0 +1,44 @@
+---
+rke2_kubernetes_api_server_host: ""
+rke2_tarball_install_dir: "/usr/local"
+rke2_install_local_tarball_path: ""
+rke2_install_tarball_url: ""
+rke2_images_urls: []
+rke2_images_local_tarball_path: []
+rke2_channel: "stable"
+rke2_audit_policy_config_file_path: ""
+rke2_registry_config_file_path: ""
+rke2_pod_security_admission_config_file_path: ""
+rke2_add_iptables_rules: false
+rke2_manifest_config_directory: ""
+rke2_manifest_config_post_run_directory: ""
+rke2_force_tarball_install: false
+rke2_install_version: ""
+rke2_common_yum_repo:
+  name: rancher-rke2-common
+  description: "Rancher RKE2 Common Latest"
+  baseurl: "https://rpm.rancher.io/rke2/{{ rke2_channel }}/common/centos/$releasever/noarch"
+  gpgcheck: true
+  gpgkey: "https://rpm.rancher.io/public.key"
+  enabled: true
+
+rke2_versioned_yum_repo:
+  name: "rancher-rke2-v{{ rke2_version_majmin }}"  # noqa jinja[spacing]
+  description: "Rancher RKE2 Version"
+  baseurl: "https://rpm.rancher.io/rke2/{{ rke2_channel }}/{{ rke2_version_majmin }}/centos/$releasever/$basearch"
+  gpgcheck: true
+  gpgkey: "https://rpm.rancher.io/public.key"
+  enabled: true
+rke2_kubelet_node_name:
+  - "nodeNameNotFound"
+rke2_config: {}
+rke2_metrics_running: false
+rke2_node_ready: "false"
+rke2_api_server_running: false
+rke2_installed: false
+rke2_version_changed: false
+rke2_reboot: false
+rke2_version_majmin: ""
+rke2_version_rpm: ""
+rke2_package_state: "installed"
+rke2_systemd_env_config_file_path: ""

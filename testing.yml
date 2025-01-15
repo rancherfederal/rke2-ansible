@@ -1,3 +1,6 @@
 ---
-- name: Playbook for testing
-  import_playbook: playbooks/testing.yml
+- name: Testing play
+  hosts: all
+  become: true
+  roles:
+    - role: testing

@@ -1,0 +1,4 @@
+---
+rke2_install_local_tarball_path: "{{ playbook_dir }}/docs/tarball_install_sample/files/rke2.linux-amd64.tar.gz"
+rke2_images_local_tarball_path:
+  - "{{ playbook_dir }}/docs/tarball_install_sample/files/rke2.linux-amd64.tar.gz"

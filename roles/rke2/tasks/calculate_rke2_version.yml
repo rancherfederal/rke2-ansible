@@ -1,0 +1,93 @@
+---
+
+- name: "Determine latest version from internet"
+  when:
+    - rke2_install_version | length == 0
+    - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
+  block:
+
+    - name: Get versions from update.rke2.io
+      ansible.builtin.uri:
+        url: https://update.rke2.io/v1-release/channels/{{ rke2_channel }}
+        follow_redirects: safe
+        remote_src: true
+      register: rke2_version_url
+
+    - name: Save version
+      ansible.builtin.shell: set -o pipefail && echo {{ rke2_version_url.url }} | sed -e 's|.*/||'
+      register: rke2_full_version
+      changed_when: false
+      args:
+        executable: /usr/bin/bash
+
+    - name: Set rke2_full_version fact from internet source
+      ansible.builtin.set_fact:
+        rke2_full_version: "{{ rke2_full_version.stdout }}"
+
+- name: Unset rke2_full_version if skipped
+  ansible.builtin.set_fact:
+    rke2_full_version: ""
+  when:
+    - rke2_full_version.skipped is defined
+    - rke2_full_version is skipped
+
+# - name: Set rke2_full_version fact
+#   ansible.builtin.set_fact:
+#     rke2_full_version: "{{ rke2_full_version.stdout if (install_rke2_version | length == 0) else install_rke2_version }}"
+
+- name: Set rke2_full_version fact from variable source
+  ansible.builtin.set_fact:
+    rke2_full_version: "{{ rke2_install_version }}"
+  when:
+    - rke2_install_version | length > 0
+
+- name: Set rke2_package_state to latest
+  ansible.builtin.set_fact:
+    rke2_package_state: "latest"
+  when:
+    - rke2_full_version | length == 0
+
+- name: "Set install version for RPM"
+  when:
+    - install_method == "rpm"
+    - rke2_full_version | length > 0
+  block:
+
+    - name: Set Maj.Min version
+      ansible.builtin.shell:
+        cmd: set -o pipefail && echo {{ rke2_full_version }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
+      register: rke2_version_majmin_tmp
+      changed_when: false
+      args:
+        executable: /usr/bin/bash
+
+    - name: Set rke2_version_majmin fact
+      ansible.builtin.set_fact:
+        rke2_version_majmin: "{{ rke2_version_majmin_tmp.stdout }}"
+
+    - name: Set RPM version
+      ansible.builtin.shell:
+        cmd: set -o pipefail && echo {{ rke2_full_version }} | sed -E -e "s/[\+-]/~/g" | sed -E -e "s/v(.*)/\1/"
+      register: rke2_version_rpm_tmp
+      changed_when: false
+      args:
+        executable: /usr/bin/bash
+
+    - name: Set rke2_version_rpm fact
+      ansible.builtin.set_fact:
+        rke2_version_rpm: "{{ rke2_version_rpm_tmp.stdout }}"
+
+    - name: Prepend 'dash' to version string
+      ansible.builtin.set_fact:
+        rke2_version_rpm: "{{ '-' + rke2_version_rpm }}"
+      when:
+        - rke2_version_rpm | length > 0
+
+#   - name: Describe versions
+#   ansible.builtin.debug:
+#     msg:
+#       - "Full version, with revision indication: {{ rke2_full_version }}"
+#       - "Major and Minor Only: {{ rke2_version_majmin }}"
+#       - "RPM Version (tilde): {{ rke2_version_rpm }}"

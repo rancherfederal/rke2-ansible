@@ -1,0 +1,60 @@
+---
+driver:
+  name: ec2
+
+platforms:
+  - name: master-01
+    image: ami-051a0f669bb174783
+    instance_type: t2.medium
+    region: us-east-2
+    assign_public_ip: true
+    tags:
+      deployed-with: "molecule"
+      molecule-scenario: "default"
+    groups:
+      - rke2_servers
+  - name: worker-01
+    image: ami-051a0f669bb174783
+    instance_type: t2.medium
+    region: us-east-2
+    assign_public_ip: true
+    tags:
+      deployed-with: "molecule"
+      molecule-scenario: "default"
+    groups:
+      - rke2_agents
+
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ../template/converge.yml
+    create: ../template/create.yml
+    destroy: ../template/destroy.yml
+    requirements: ../template/requirements.yml
+  inventory:
+    hosts:
+      rke2_cluster:
+        children:
+          rke2_servers:
+            vars:
+              group_rke2_config:
+                node-label:
+                  - serverGroupLabel=true
+            hosts:
+              master-01:
+                host_rke2_config:
+                  node-label:
+                    - host0Label=true
+          rke2_agents:
+            vars:
+              group_rke2_config:
+                node-label:
+                  - agentGroupLabel=true
+            hosts:
+              worker-01:
+                host_rke2_config:
+                  node-label:
+                    - host1Label=true
+
+verifier:
+  name: ansible

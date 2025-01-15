@@ -1,0 +1,143 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  vars:
+    # Run config handling
+    default_run_id: "{{ lookup('password', '/dev/null chars=ascii_lowercase length=5') }}"
+    default_run_config:
+      run_id: "{{ default_run_id }}"
+
+    run_config_path: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/run-config.yml"
+    run_config_from_file: "{{ (lookup('file', run_config_path, errors='ignore') or '{}') | from_yaml }}"
+    run_config: '{{ default_run_config | combine(run_config_from_file) }}'
+
+    # Platform settings handling
+    default_aws_profile: "{{ lookup('env', 'AWS_PROFILE') }}"
+    default_key_inject_method: cloud-init  # valid values: [cloud-init, ec2]
+    default_key_name: "molecule-{{ run_config.run_id }}"
+    default_security_group_name: "molecule-{{ run_config.run_id }}"
+
+    platform_defaults:
+      aws_profile: "{{ default_aws_profile }}"
+      key_inject_method: "{{ default_key_inject_method }}"
+      key_name: "{{ default_key_name }}"
+      region: ""
+      security_group_name: "{{ default_security_group_name }}"
+      security_groups: []
+      vpc_id: ""
+      vpc_subnet_id: "{{ lookup('env', 'VPC_SUBNET_ID') }}"
+
+    # Merging defaults into a list of dicts is, it turns out, not straightforward
+    platforms: >-
+      {{ [platform_defaults | dict2items]
+           | product(molecule_yml.platforms | map('dict2items') | list)
+           | map('flatten', levels=1)
+           | list
+           | map('items2dict')
+           | list }}
+
+    # Stored instance config
+    instance_config: "{{ (lookup('file', molecule_instance_config, errors='ignore') or '{}') | from_yaml }}"
+  pre_tasks:
+    - name: Validate platform configurations
+      ansible.builtin.assert:
+        that:
+          - platforms | length > 0
+          - platform.name is string and platform.name | length > 0
+          - platform.aws_profile is string
+          - platform.key_inject_method is in ["cloud-init", "ec2"]
+          - platform.key_name is string and platform.key_name | length > 0
+          - platform.region is string
+          - platform.security_group_name is string and platform.security_group_name | length > 0
+          - platform.security_groups is sequence
+          - platform.vpc_id is string
+          - platform.vpc_subnet_id is string and platform.vpc_subnet_id | length > 0
+        quiet: true
+      loop: '{{ platforms }}'
+      loop_control:
+        loop_var: platform
+        label: "{{ platform.name }}"
+  tasks:
+    - name: Look up subnets to determine VPCs (if needed)
+      amazon.aws.ec2_vpc_subnet_info:
+        profile: "{{ item.aws_profile | default(omit) }}"
+        region: "{{ item.region | default(omit) }}"
+        subnet_ids: "{{ item.vpc_subnet_id }}"
+      loop: "{{ platforms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: not item.vpc_id
+      register: subnet_info
+
+    - name: Validate discovered information
+      ansible.builtin.assert:
+        that: platform.vpc_id or (subnet_info.results[index].subnets | length > 0)
+        quiet: true
+      loop: "{{ platforms }}"
+      loop_control:
+        loop_var: platform
+        index_var: index
+        label: "{{ platform.name }}"
+
+    - name: Destroy resources
+      when: instance_config | length != 0
+      block:
+        - name: Destroy ephemeral EC2 instances
+          amazon.aws.ec2_instance:
+            profile: "{{ item.aws_profile | default(omit) }}"
+            region: "{{ item.region | default(omit) }}"
+            instance_ids: "{{ instance_config | map(attribute='instance_ids') | flatten }}"
+            vpc_subnet_id: "{{ item.vpc_subnet_id }}"
+            state: absent
+          loop: "{{ platforms }}"
+          loop_control:
+            label: "{{ item.name }}"
+          register: ec2_instances_async
+          async: 7200
+          poll: 0
+
+        - name: Wait for instance destruction to complete
+          ansible.builtin.async_status:
+            jid: "{{ item.ansible_job_id }}"
+          loop: "{{ ec2_instances_async.results }}"
+          loop_control:
+            index_var: index
+            label: "{{ platforms[index].name }}"
+          register: ec2_instances
+          until: ec2_instances is finished
+          retries: 300
+
+        - name: Write Molecule instance configs
+          ansible.builtin.copy:
+            dest: "{{ molecule_instance_config }}"
+            content: "{{ {} | to_yaml }}"
+
+        - name: Destroy ephemeral security groups (if needed)
+          amazon.aws.ec2_security_group:
+            profile: "{{ item.aws_profile | default(omit) }}"
+            region: "{{ item.region | default(omit) }}"
+            vpc_id: "{{ item.vpc_id or vpc_subnet.vpc_id }}"
+            name: "{{ item.security_group_name }}"
+            state: absent
+          vars:
+            vpc_subnet: "{{ subnet_info.results[index].subnets[0] }}"
+          loop: "{{ platforms }}"
+          loop_control:
+            index_var: index
+            label: "{{ item.name }}"
+          when: item.security_groups | length == 0
+
+        - name: Destroy ephemeral keys (if needed)
+          amazon.aws.ec2_key:
+            profile: "{{ item.aws_profile | default(omit) }}"
+            region: "{{ item.region | default(omit) }}"
+            name: "{{ item.key_name }}"
+            state: absent
+          loop: "{{ platforms }}"
+          loop_control:
+            index_var: index
+            label: "{{ item.name }}"
+          when: item.key_inject_method == "ec2"

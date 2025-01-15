@@ -1,0 +1,24 @@
+---
+
+- name: Include task file config.yml
+  ansible.builtin.include_tasks: config.yml
+
+- name: Flush_handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure rke2 is running
+  ansible.builtin.service:
+    state: started
+    enabled: true
+    name: "{{ service_name }}"
+
+- name: Check_node_ready
+  any_errors_fatal: true
+  block:
+    - name: Start check_node_ready.yml
+      ansible.builtin.include_tasks: check_node_ready.yml
+      vars:
+        check_node_ready_timeout: 300
+        check_node_ready_retries: 30
+        check_node_ready_delay: 10
+        check_node_ready_ignore_errors: false

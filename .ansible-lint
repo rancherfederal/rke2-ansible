@@ -9,3 +9,4 @@ warn_list:
   - yaml[comments-indentation]
 skip_list:
   - experimental
+  - yaml[line-length]

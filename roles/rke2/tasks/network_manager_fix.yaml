@@ -1,0 +1,49 @@
+---
+
+# This fixes known issue with NetworkManager
+# https://docs.rke2.io/known_issues/#networkmanager
+
+# blockinfile or own entire file?
+- name: Add NetworkManager fix to rke2-canal.conf
+  ansible.builtin.blockinfile:
+    path: /etc/NetworkManager/conf.d/rke2-canal.conf
+    block: |
+      [keyfile]
+      unmanaged-devices=interface-name:cali*;interface-name:flannel*
+    create: true
+    mode: 0600
+  when: ansible_facts.services["NetworkManager.service"] is defined
+
+- name: Does rke2-canal.conf exist
+  ansible.builtin.stat:
+    path: /etc/NetworkManager/conf.d/rke2-canal.conf
+  register: rke2_canal_file
+
+- name: Set rke2-canal.conf file permissions
+  ansible.builtin.file:
+    path: /etc/NetworkManager/conf.d/rke2-canal.conf
+    mode: '0600'
+    owner: root
+    group: root
+  when: rke2_canal_file.stat.exists
+  notify: "Restart {{ service_name }}"
+
+- name: Disable service nm-cloud-setup
+  ansible.builtin.systemd:
+    name: nm-cloud-setup.service
+    enabled: false
+    state: stopped
+  when: ansible_facts.services["nm-cloud-setup.service"] is defined
+  notify:
+    - Reload NetworkManager
+    - "Restart {{ service_name }}"
+
+- name: Disable nm-cloud-setup.timer unit
+  ansible.builtin.systemd:
+    name: nm-cloud-setup.timer
+    state: stopped
+    enabled: false
+  when: ansible_facts.services["nm-cloud-setup.service"] is defined
+  notify:
+    - Reload NetworkManager
+    - "Restart {{ service_name }}"

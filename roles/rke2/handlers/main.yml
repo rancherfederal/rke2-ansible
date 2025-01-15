@@ -1,0 +1,47 @@
+---
+
+- name: Restart systemd-sysctl
+  ansible.builtin.service:
+    state: restarted
+    name: systemd-sysctl
+  when:
+    - not rke2_reboot
+
+- name: Restart fapolicyd
+  ansible.builtin.service:
+    state: restarted
+    name: fapolicyd
+  when:
+    - not rke2_reboot
+
+- name: Restart rke2-server
+  ansible.builtin.service:
+    state: restarted
+    enabled: true
+    name: rke2-server
+  throttle: 1
+  when:
+    - not rke2_reboot
+
+- name: Restart rke2-agent
+  ansible.builtin.service:
+    state: restarted
+    enabled: true
+    name: rke2-agent
+  throttle: 1
+  when:
+    - not rke2_reboot
+
+- name: Reload NetworkManager
+  ansible.builtin.systemd:
+    name: NetworkManager
+    state: reloaded
+  when:
+    - not rke2_reboot
+
+- name: Reboot the machine
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+  throttle: 1
+  when:
+    - rke2_reboot

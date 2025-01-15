@@ -2,12 +2,10 @@
 .cache/
 
 venv/
+.venv/
 
 test_inventory*
+inventory*
 
-rke2-images.linux-amd64.tar.gz
-rke2.linux-amd64.tar.gz
-
-
-tarball_install/*
-!tarball_install/README.md
+sample_files/tarball_install/*
+!sample_files/tarball_install/README.md

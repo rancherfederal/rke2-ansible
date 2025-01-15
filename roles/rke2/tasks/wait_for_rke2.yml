@@ -1,0 +1,45 @@
+---
+
+- name: Start rke2
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable service
+  ansible.builtin.systemd:
+    name: "{{ service_name }}"
+    state: started
+    enabled: true
+
+- name: Wait for k8s apiserver
+  ansible.builtin.wait_for:
+    host: "{{ rke2_kubernetes_api_server_host }}"
+    port: "6443"
+    state: present
+    timeout: 300
+
+- name: Wait for kubelet process to be present on host
+  ansible.builtin.command: >-
+    ps -C kubelet -F -ww --no-headers
+  register: kubelet_check
+  until: kubelet_check.rc == 0
+  retries: 20
+  delay: 10
+  changed_when: false
+
+- name: Extract the hostname-override parameter from the kubelet process
+  ansible.builtin.set_fact:
+    kubelet_hostname: "{{ kubelet_check.stdout | regex_search('\\s--hostname-override=([^\\s]+)', '\\1') }}"
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Wait for node to show Ready status
+  ansible.builtin.command: >-
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    --server https://127.0.0.1:6443 get no {{ kubelet_hostname[0] }}
+    -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+  register: status_result
+  until: status_result.stdout.find("True") != -1
+  retries: 20
+  delay: 10
+  changed_when: false
+  when:
+    - inventory_hostname in groups['rke2_servers']
