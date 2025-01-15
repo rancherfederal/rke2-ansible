@@ -14,7 +14,10 @@ Build a Kubernetes cluster using RKE2 via Ansible
 
 |‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
 |________________________________________________________|
-```
+```  
+
+> [!CAUTION]  
+> The RKE2-Ansible repository has been significantly refactored. Note that configurations/inventories written for the v1.0.0 release and earlier are not compatible with v2.0.0 and on. Please see the documentation and make any adjustments necessary. 
 
 Unofficial Rancher Government Repository
 ---------
