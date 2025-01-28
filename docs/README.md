@@ -16,6 +16,8 @@
       - [Example](#example-1)
     - [Defining an Audit Policy](#defining-an-audit-policy)
       - [Example](#example-2)
+    - [Defining a Registries.yaml Config](#defining-a-registries.yaml-config)
+      - [Example](#example-3)
     - [Adding Additional Cluster Manifests](#adding-additional-cluster-manifests)
       - [Pre-Deploy Example](#pre-deploy-example)
       - [Post-Deploy Example](#post-deploy-example)
@@ -181,6 +183,18 @@ group_rke2_config:
   kube-apiserver-arg:
     - audit-policy-file=/etc/rancher/rke2/audit-policy.yaml
     - audit-log-path=/var/lib/rancher/rke2/server/logs/audit.log
+```
+
+
+### Defining a registries.yaml Config
+As seen [here](https://docs.rke2.io/install/private_registry), RKE2 allows for manipulation of how containerd pulls containers. In order to define a registries.yaml config, nodes will need to have the `rke2_registry_config_file_path` variable defined. Assuming all nodes are to use the same registry configuration, this variable can be set at the top-level so that it applies to all nodes.
+
+#### Example 
+Below is an example of how this can be defined at the top-level:  
+
+__group_vars/all.yml:__
+```yaml
+rke2_registry_config_file_path: "{{ playbook_dir }}/docs/advanced_sample_inventory/files/registries.yaml"
 ```
 
 
