@@ -16,7 +16,7 @@
   when:
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
-    - not rke2_installed or rke2_installed_version != rke2_full_version
+    - not rke2_installed or rke2_installed_version | default("") != rke2_full_version
 
 - name: Send provided tarball from local control machine if available
   ansible.builtin.copy:

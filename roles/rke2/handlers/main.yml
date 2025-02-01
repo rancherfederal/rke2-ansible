@@ -1,5 +1,4 @@
 ---
-
 - name: Restart systemd-sysctl
   ansible.builtin.service:
     state: restarted
@@ -22,6 +21,7 @@
   throttle: 1
   when:
     - not rke2_reboot
+    - ("rke2_servers" in group_names)
 
 - name: Restart rke2-agent
   ansible.builtin.service:
@@ -31,6 +31,7 @@
   throttle: 1
   when:
     - not rke2_reboot
+    - ("rke2_agents" in group_names)
 
 - name: Reload NetworkManager
   ansible.builtin.systemd:
