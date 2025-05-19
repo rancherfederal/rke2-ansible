@@ -11,13 +11,22 @@
   ansible.builtin.set_fact:
     managed_files: "{{ local_files_find_return.files | map(attribute='path') | map('basename') }}"
 
+- name: Create addons manifest directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ destination_directory }}"
+    mode: '0750'
+    owner: root
+    group: root
+
 - name: Add manifest addons files from localhost
-  ansible.builtin.copy:
-    src: "{{ source_directory | regex_replace('\\/$', '') }}/"
-    dest: "{{ destination_directory }}"
+  ansible.builtin.template:
+    src: "{{ source_directory }}/{{ item }}"
+    dest: "{{ destination_directory }}/{{ item }}"
     mode: '0640'
     owner: root
     group: root
+  loop: "{{ managed_files }}"
 
 - name: Look up manifest files on remote
   ansible.builtin.find:
