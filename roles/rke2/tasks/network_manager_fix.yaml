@@ -14,7 +14,8 @@
     mode: 0600
     owner: root
     group: root
-  when: ansible_facts.services["NetworkManager.service"] is defined
+  when: ansible_facts.services["NetworkManager.service"] is defined and
+        ansible_facts.services["NetworkManager.service"].status != "not-found"
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
@@ -24,7 +25,8 @@
     name: nm-cloud-setup.service
     enabled: false
     state: stopped
-  when: ansible_facts.services["nm-cloud-setup.service"] is defined
+  when: ansible_facts.services["nm-cloud-setup.service"] is defined and
+        ansible_facts.services["NetworkManager.service"].status != "not-found"
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
@@ -34,7 +36,8 @@
     name: nm-cloud-setup.timer
     state: stopped
     enabled: false
-  when: ansible_facts.services["nm-cloud-setup.service"] is defined
+  when: ansible_facts.services["nm-cloud-setup.service"] is defined and
+        ansible_facts.services["NetworkManager.service"].status != "not-found"
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
