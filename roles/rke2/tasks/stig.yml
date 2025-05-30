@@ -86,7 +86,7 @@
 
 # #5
 - name: Stat the data directory
-  stat:
+  ansible.builtin.stat:
     path: /var/lib/rancher/rke2/data
   register: data_dir_stat
 - name: Fix permissions and ownership of data directory
@@ -146,7 +146,7 @@
   loop: "{{ found_server_dirs_0750.files }}"
 
 - name: Check if token file exists
-  stat:
+  ansible.builtin.stat:
     path: /var/lib/rancher/rke2/server/token
   register: stat_token_file
 - name: Set 0600 on token file (if it exists)
