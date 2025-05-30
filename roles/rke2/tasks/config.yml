@@ -16,5 +16,5 @@
     path: /etc/rancher/rke2/config.yaml
     block: "{{ rke2_config | to_nice_yaml(indent=0) }}"
     create: true
-    mode: "0640"
+    mode: "0600"
   notify: Restart {{ service_name }}

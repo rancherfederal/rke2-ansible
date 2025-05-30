@@ -133,3 +133,33 @@
     - rke2_manifest_config_post_run_directory is defined
     - rke2_manifest_config_post_run_directory | length > 0
     - inventory_hostname in groups['rke2_servers'][0]
+
+- name: Secure files created by installer
+  ansible.builtin.include_tasks: stig.yml
+  vars:
+    kubeconfig_files:
+      - rke2controller.kubeconfig
+      - kubelet.kubeconfig
+      - kubeproxy.kubeconfig
+    cert_files:
+      - client-ca.crt
+      - client-kubelet.crt
+      - client-kube-proxy.crt
+      - client-rke2-controller.crt
+      - server-ca.crt
+      - serving-kubelet.crt
+    key_files:
+      - client-kubelet.key
+      - serving-kubelet.key
+      - client-rke2-controller.key
+      - client-kube-proxy.key
+    agent_dirs:
+      - pod-manifests
+      - etc
+    server_dirs_0700:
+      - cred
+      - db
+      - tls
+    server_dirs_0750:
+      - manifests
+      - logs
