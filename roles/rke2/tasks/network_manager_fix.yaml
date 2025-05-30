@@ -25,8 +25,7 @@
     name: nm-cloud-setup.service
     enabled: false
     state: stopped
-  when: ansible_facts.services["nm-cloud-setup.service"] is defined and
-        ansible_facts.services["NetworkManager.service"].status != "not-found"
+  when: ansible_facts.services["nm-cloud-setup.service"] is defined
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
@@ -36,8 +35,7 @@
     name: nm-cloud-setup.timer
     state: stopped
     enabled: false
-  when: ansible_facts.services["nm-cloud-setup.service"] is defined and
-        ansible_facts.services["NetworkManager.service"].status != "not-found"
+  when: ansible_facts.services["nm-cloud-setup.timer"] is defined
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
