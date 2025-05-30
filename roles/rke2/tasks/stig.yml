@@ -9,7 +9,7 @@
     file_type: file
   register: found_files
 - name: Set permissions
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0600'
   loop: "{{ found_files.files }}"
@@ -22,7 +22,7 @@
     file_type: file
   register: found_kubeconfig_files
 - name: Apply 0640 to existing .kubeconfig files
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: root
     group: root
@@ -36,7 +36,7 @@
     file_type: file
   register: found_cert_files
 - name: Apply 0600 to .cert files
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: root
     group: root
@@ -50,7 +50,7 @@
     file_type: file
   register: found_key_files
 - name: Apply 0600 to .key files
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: root
     group: root
@@ -64,7 +64,7 @@
     file_type: directory
   register: found_agent_dirs
 - name: Apply 0700 to agent subdirectories
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: root
     group: root
@@ -79,7 +79,7 @@
     file_type: file
   register: bin_files
 - name: Set permissions to 0750 on existing files
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0750'
   loop: "{{ bin_files.files }}"
@@ -90,7 +90,7 @@
     path: /var/lib/rancher/rke2/data
   register: data_dir_stat
 - name: Fix permissions and ownership of data directory
-  file:
+  ansible.builtin.file:
     path: /var/lib/rancher/rke2/data
     state: directory
     owner: root
@@ -106,7 +106,7 @@
 #     recurse: yes
 #   register: data_files
 # - name: Set ownership and permissions to 0640 on each file
-#   file:
+#   ansible.builtin.file:
 #     path: "{{ item.path }}"
 #     owner: root
 #     group: root
@@ -122,7 +122,7 @@
     file_type: directory
   register: found_server_dirs_0700
 - name: Set permissions to 0700 on server dirs
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: root
     group: root
@@ -137,7 +137,7 @@
     file_type: directory
   register: found_server_dirs_0750
 - name: Set permissions to 0750 on server dirs
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: root
     group: root
@@ -150,7 +150,7 @@
     path: /var/lib/rancher/rke2/server/token
   register: stat_token_file
 - name: Set 0600 on token file (if it exists)
-  file:
+  ansible.builtin.file:
     path: /var/lib/rancher/rke2/server/token
     owner: root
     group: root
