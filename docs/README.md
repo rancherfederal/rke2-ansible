@@ -185,7 +185,7 @@ group_rke2_config:
 
 
 ### Adding Additional Cluster Manifests  
-If you have a cluster that needs extra manifests to be deployed or the cluster needs a critical component to be configured RKE2's "HelmChartConfig" is an available option (among others). The Ansible repository supports the use of these configuration files. Simply place the Helm chart configs in a folder, give Ansible the path to the folder, and Ansible will enumerate the files and place them on the first server node. 
+If you have a cluster that needs extra manifests to be deployed or the cluster needs a critical component to be configured, RKE2's "Helm Chart" and "HelmChartConfig" are an available option (among others). The Ansible repository supports the use of these configuration files. Simply place the file (or files) containing these manifests in a folder, give Ansible the path to the folder, and Ansible will enumerate the files and place them on the first server node. 
 
 There are two variables that control the deployment of manifests to the server nodes:  
   - `rke2_manifest_config_directory`
