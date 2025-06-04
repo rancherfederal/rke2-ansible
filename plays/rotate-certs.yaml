@@ -28,7 +28,7 @@
       ansible.builtin.service:
         name: rke2-server
         state: stopped
-    
+
     - name: Rotate certificates
       ansible.builtin.command:
         cmd: /bin/rke2 certificate rotate
@@ -48,7 +48,7 @@
       ansible.builtin.service:
         name: rke2-agent
         state: stopped
-    
+
     - name: Rotate certificates
       ansible.builtin.command:
         cmd: /bin/rke2 certificate rotate
