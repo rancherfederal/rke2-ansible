@@ -116,11 +116,11 @@ jobs:
 
       - name: Run playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vv --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vv --private-key .key ./plays/install.yml
 
       - name: Run playbook again for idempotency
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vv --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} -vv --private-key .key ./plays/install.yml
 
       - name: Run Ansible Tests
         run: |
@@ -143,7 +143,7 @@ jobs:
           
       - name: Run playbook again with added host
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} --verbose --private-key .key site.yml
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./${{ inputs.os }}/hosts.yml -u ${{ inputs.ssh_user }} --verbose --private-key .key ./plays/install.yml
 
       - name: Run Ansible Tests with added host
         run: |

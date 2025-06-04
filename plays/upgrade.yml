@@ -1,4 +1,4 @@
-# This is a very simply upgrade playbook.
+# This is a very simple upgrade playbook.
 # Please note that it is not intended to solve all possible scenarios,
 # every cluster has its own needs and an upgrade procedure should be
 # handled on a per cluster basis. This basic playbook will upgrade
@@ -13,7 +13,7 @@
     - name: Display warning
       ansible.builtin.pause:
         prompt: |-
-          This upgrade playbook is rather simple and does not drain worker nodes before upgrading.
+          This upgrade playbook is rather simple and does not drain agent nodes before upgrading.
           This should work fine for simpler deployments, but this playbook should be used with
           caution. Do you wish to continue?
           (Press 'C' to continue the play or 'A' to Abort)
