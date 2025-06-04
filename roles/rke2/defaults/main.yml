@@ -42,7 +42,7 @@ rke2_install_local_tarball_path: ""
 ### #URL where the install Tarball can be found. If installing on a RPM-based OS, this will override the RPM install and force a Tarball install.
 rke2_install_tarball_url: ""
 
-### RHEL-based OS's default to RPMs for installation, set to 'true' to force ansible to use a tarball. 
+### RHEL-based OS's default to RPMs for installation, set to 'true' to force ansible to use a tarball.
 ### Designed for use on an Internet connected system where you want to use the Tarball available from the GitHub.
 rke2_force_tarball_install: false
 
