@@ -1,5 +1,4 @@
 ---
-
 - name: RKE2 play
   hosts: all
   any_errors_fatal: true
