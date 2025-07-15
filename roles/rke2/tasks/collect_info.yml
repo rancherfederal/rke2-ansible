@@ -1,0 +1,36 @@
+- name: Populate service facts
+  ansible.builtin.service_facts: {}
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Set for install method of tarball
+  ansible.builtin.set_fact:
+    install_method: tarball
+  when: |-
+      ((ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Rocky') or
+      rke2_install_tarball_url != "" or
+      rke2_install_local_tarball_path != "" or
+      rke2_force_tarball_install|bool)
+
+- name: Set for install method of rpm
+  ansible.builtin.set_fact:
+    install_method: rpm
+  when:
+    - ansible_os_family == 'RedHat' or ansible_os_family == 'Rocky'
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
+    - not rke2_force_tarball_install|bool
+
+- name: Set as server
+  ansible.builtin.set_fact:
+    service_name: rke2-server
+  when:
+    - inventory_hostname in groups['rke2_servers']
+
+- name: Set as agent
+  ansible.builtin.set_fact:
+    service_name: rke2-agent
+  when:
+    - inventory_hostname in groups.get('rke2_agents', [])

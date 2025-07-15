@@ -1,0 +1,3 @@
+---
+- name: RKE2 play
+  import_playbook: ./plays/install.yml
