@@ -22,7 +22,7 @@
   hosts: all
   gather_facts: true
   tasks:
-    - name: Collect Cluster Info 
+    - name: Collect Cluster Info
       ansible.builtin.include_role:
         name: rke2
         tasks_from: collect_info

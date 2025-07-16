@@ -14,7 +14,7 @@
       ansible.builtin.pause:
         prompt: |-
           This playbook is rather simple and does not drain agent or server nodes before rotating
-          certificates. This should work fine for simpler deployments, but this playbook should 
+          certificates. This should work fine for simpler deployments, but this playbook should
           be used with caution. Do you wish to continue?
           (Press 'C' to continue the play or 'A' to Abort)
 
