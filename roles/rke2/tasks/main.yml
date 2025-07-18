@@ -128,6 +128,7 @@
   ansible.builtin.include_tasks: utilities.yml
   when:
     - inventory_hostname in groups['rke2_servers']
+  tags: ["setup-root"]
 
 - name: Include task file add_manifest_addons.yml
   ansible.builtin.include_tasks: add_manifest_addons.yml
