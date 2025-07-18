@@ -9,6 +9,7 @@
     ctstate: NEW
     jump: ACCEPT
   when: inventory_hostname in groups['rke2_servers']
+  tags: ["pre-reqs"]
 
 - name: Allow 6443
   ansible.builtin.iptables:
@@ -19,6 +20,7 @@
     ctstate: NEW
     jump: ACCEPT
   when: inventory_hostname in groups['rke2_servers']
+  tags: ["pre-reqs"]
 
 - name: Allow udp 8472
   ansible.builtin.iptables:
@@ -28,6 +30,7 @@
     destination_port: "8472"
     ctstate: NEW
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: Allow 10250
   ansible.builtin.iptables:
@@ -37,6 +40,7 @@
     destination_port: "10250"
     ctstate: NEW
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: Allow 2379
   ansible.builtin.iptables:
@@ -47,6 +51,7 @@
     ctstate: NEW
     jump: ACCEPT
   when: inventory_hostname in groups['rke2_servers']
+  tags: ["pre-reqs"]
 
 - name: Allow 2380
   ansible.builtin.iptables:
@@ -57,6 +62,7 @@
     ctstate: NEW
     jump: ACCEPT
   when: inventory_hostname in groups['rke2_servers']
+  tags: ["pre-reqs"]
 
 - name: Allow 30000:32767
   ansible.builtin.iptables:
@@ -66,6 +72,7 @@
     destination_port: "30000:32767"
     ctstate: NEW
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: Allow 443
   ansible.builtin.iptables:
@@ -75,6 +82,7 @@
     destination_port: "443"
     ctstate: NEW
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: "Allow cluster-cidr forward"
   ansible.builtin.iptables:
@@ -82,6 +90,7 @@
     chain: FORWARD
     source: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: "Allow cluster-cidr forward"
   ansible.builtin.iptables:
@@ -89,6 +98,7 @@
     chain: FORWARD
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: "Allow cluster-cidr input"
   ansible.builtin.iptables:
@@ -96,6 +106,7 @@
     chain: INPUT
     source: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: "Allow cluster-cidr input"
   ansible.builtin.iptables:
@@ -103,21 +114,25 @@
     chain: INPUT
     destination: '{{ rke2_config["cluster-cidr"] | default("10.42.0.0/16") | string }}'
     jump: ACCEPT
+  tags: ["pre-reqs"]
 
 - name: Save iptables
   ansible.builtin.shell: "iptables-save > /etc/sysconfig/iptables"
   become: true
   changed_when: false
   when: ansible_facts['os_family'] == 'RedHat'
+  tags: ["pre-reqs"]
 
 - name: Install iptables-persistent
   ansible.builtin.apt:
     name: iptables-persistent
     state: present
   when: ansible_facts['os_family'] == 'Debian'
+  tags: ["pre-reqs"]
 
 - name: Save iptables
   ansible.builtin.shell: "iptables-save > /etc/iptables/rules.v4"
   become: true
   changed_when: false
   when: ansible_facts['os_family'] == 'Debian'
+  tags: ["pre-reqs"]

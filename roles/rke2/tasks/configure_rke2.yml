@@ -8,6 +8,7 @@
 
 - name: Run CIS-Hardening Tasks
   ansible.builtin.include_tasks: cis_hardening.yml
+  tags: ["cis"]
 
 - name: Include task file add-systemd-env.yml
   ansible.builtin.include_tasks: add_ansible_managed_config.yml

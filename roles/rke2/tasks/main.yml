@@ -15,6 +15,7 @@
       rke2_install_tarball_url != "" or
       rke2_install_local_tarball_path != "" or
       rke2_force_tarball_install|bool)
+  tags: ["cis"]
 
 - name: Set for install method of rpm
   ansible.builtin.set_fact:
@@ -24,18 +25,21 @@
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
     - not rke2_force_tarball_install|bool
+  tags: ["cis"]
 
 - name: Set as server
   ansible.builtin.set_fact:
     service_name: rke2-server
   when:
     - inventory_hostname in groups['rke2_servers']
+  tags: ["cis"]
 
 - name: Set as agent
   ansible.builtin.set_fact:
     service_name: rke2-agent
   when:
     - inventory_hostname in groups.get('rke2_agents', [])
+  tags: ["cis"]
 
 - name: Satisfy OS Pre-Reqs
   ansible.builtin.include_tasks: pre_reqs.yml
@@ -83,6 +87,7 @@
 
 - name: Set rke2 configuration files
   ansible.builtin.include_tasks: configure_rke2.yml
+  tags: ["cis"]
 
 - name: Include task file add_manifest_addons.yml
   ansible.builtin.include_tasks: add_manifest_addons.yml
@@ -163,3 +168,4 @@
     server_dirs_0750:
       - manifests
       - logs
+  tags: ["stig"]

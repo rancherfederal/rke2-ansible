@@ -36,5 +36,6 @@
       allow perm=any all : dir=/var/lib/rancher/
       allow perm=any all : dir=/opt/cni/
       allow perm=any all : dir=/run/k3s/
+      
       allow perm=any all : dir=/var/lib/kubelet/
   notify: Restart fapolicyd
