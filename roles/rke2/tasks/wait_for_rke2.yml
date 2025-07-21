@@ -1,5 +1,5 @@
 ---
-# This is an unused file currently 
+# This is an unused file currently
 - name: Start rke2
   ansible.builtin.meta: flush_handlers
 
