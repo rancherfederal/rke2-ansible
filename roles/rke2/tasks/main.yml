@@ -2,7 +2,7 @@
 
 - name: Populate service facts
   ansible.builtin.service_facts: {}
-  tags: ["setup-os"]
+  tags: ["setup-os", "configure"]
 
 - name: Gather the package facts
   ansible.builtin.package_facts:
@@ -34,14 +34,14 @@
     service_name: rke2-server
   when:
     - inventory_hostname in groups['rke2_servers']
-  tags: ["cis", "setup-os"]
+  tags: ["cis", "setup-os", "configure"]
 
 - name: Set as agent
   ansible.builtin.set_fact:
     service_name: rke2-agent
   when:
     - inventory_hostname in groups.get('rke2_agents', [])
-  tags: ["cis", "setup-os"]
+  tags: ["cis", "setup-os", "configure"]
 
 - name: Satisfy OS Pre-Reqs
   ansible.builtin.include_tasks: pre_reqs.yml
@@ -71,12 +71,14 @@
     check_node_ready_ignore_errors: true
   when:
     - inventory_hostname in groups['rke2_servers']
+  tags: ["configure"]
 
 - name: Create a list of ready servers
   ansible.builtin.set_fact:
     ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
   delegate_to: localhost
   run_once: true
+  tags: ["configure"]
 
 - name: Tarball Install
   ansible.builtin.include_tasks: tarball_install.yml
@@ -124,9 +126,11 @@
     token_source_node: "{{ ready_servers[0] }}"
   when:
     - ready_servers | length > 0
+  tags: ["configure"]
 
 - name: Start all other rke2 nodes
   ansible.builtin.include_tasks: other_nodes.yml
+  tags: ["configure"]
 
 - name: Configure kubectl,crictl,ctr
   ansible.builtin.include_tasks: utilities.yml

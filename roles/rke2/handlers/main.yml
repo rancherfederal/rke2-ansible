@@ -22,7 +22,7 @@
   when:
     - not rke2_reboot
     - ("rke2_servers" in group_names)
-    - ansible_facts.services["rke2-agent"] is defined
+    - ansible_facts.services["rke2-server.service"] is defined
 
 - name: Restart rke2-agent
   ansible.builtin.service:
@@ -33,7 +33,7 @@
   when:
     - not rke2_reboot
     - ("rke2_agents" in group_names)
-    - ansible_facts.services["rke2-agent"] is defined
+    - ansible_facts.services["rke2-agent.service"] is defined
 
 - name: Reload NetworkManager
   ansible.builtin.systemd:

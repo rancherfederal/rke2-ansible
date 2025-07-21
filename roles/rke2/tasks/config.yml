@@ -4,11 +4,13 @@
 - name: Combine host and group config vars
   ansible.builtin.set_fact:
     temp_group_rke2_config: "{{ cluster_rke2_config | default({}) | ansible.builtin.combine((group_rke2_config | default({})), list_merge='prepend_rp') }}"
+  tags: ["configure"]
 
 # combine host and group vars to form primary rke2_config
 - name: Combine host and group config vars
   ansible.builtin.set_fact:
     rke2_config: "{{ temp_group_rke2_config | default({}) | ansible.builtin.combine((host_rke2_config | default({})), list_merge='prepend_rp') }}"
+  tags: ["configure"]
 
 # write final config
 - name: Create config.yaml
@@ -18,3 +20,4 @@
     create: true
     mode: "0600"
   notify: Restart {{ service_name }}
+  tags: ["configure"]
