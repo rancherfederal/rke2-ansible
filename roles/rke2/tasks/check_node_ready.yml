@@ -88,4 +88,4 @@
       "rke2_node_ready: {{ rke2_node_ready }}"
       "rke2_metrics_running: {{ rke2_metrics_running }}"
       "rke2_api_server_running: {{ rke2_api_server_running }}"
-  tags: ["configure"]
+  tags: ["never"]

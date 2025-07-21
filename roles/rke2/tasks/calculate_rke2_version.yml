@@ -54,7 +54,6 @@
     - install_method == "rpm"
     - rke2_full_version | length > 0
   block:
-
     - name: Set Maj.Min version
       ansible.builtin.shell:
         cmd: set -o pipefail && echo {{ rke2_full_version }} | /bin/awk -F'.' '{ print $1"."$2 }' | sed "s|^v||g"
@@ -85,9 +84,10 @@
       when:
         - rke2_version_rpm | length > 0
 
-#   - name: Describe versions
-#   ansible.builtin.debug:
-#     msg:
-#       - "Full version, with revision indication: {{ rke2_full_version }}"
-#       - "Major and Minor Only: {{ rke2_version_majmin }}"
-#       - "RPM Version (tilde): {{ rke2_version_rpm }}"
+- name: Describe versions
+  ansible.builtin.debug:
+    msg:
+      - "Full version, with revision indication: {{ rke2_full_version }}"
+      - "Major and Minor Only: {{ rke2_version_majmin }}"
+      - "RPM Version (tilde): {{ rke2_version_rpm }}"
+  tags: ["never"]
