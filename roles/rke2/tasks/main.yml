@@ -2,10 +2,12 @@
 
 - name: Populate service facts
   ansible.builtin.service_facts: {}
+  tags: ["setup-os"]
 
 - name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
+  tags: ["setup-os"]
 
 - name: Set for install method of tarball
   ansible.builtin.set_fact:
@@ -15,7 +17,7 @@
       rke2_install_tarball_url != "" or
       rke2_install_local_tarball_path != "" or
       rke2_force_tarball_install|bool)
-  tags: ["cis"]
+  tags: ["cis", "setup-os"]
 
 - name: Set for install method of rpm
   ansible.builtin.set_fact:
@@ -25,24 +27,25 @@
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
     - not rke2_force_tarball_install|bool
-  tags: ["cis"]
+  tags: ["cis", "setup-os"]
 
 - name: Set as server
   ansible.builtin.set_fact:
     service_name: rke2-server
   when:
     - inventory_hostname in groups['rke2_servers']
-  tags: ["cis"]
+  tags: ["cis", "setup-os"]
 
 - name: Set as agent
   ansible.builtin.set_fact:
     service_name: rke2-agent
   when:
     - inventory_hostname in groups.get('rke2_agents', [])
-  tags: ["cis"]
+  tags: ["cis", "setup-os"]
 
 - name: Satisfy OS Pre-Reqs
   ansible.builtin.include_tasks: pre_reqs.yml
+  tags: ["setup-os"]
 
 - name: Has rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
