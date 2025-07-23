@@ -4,6 +4,9 @@
 venv/
 .venv/
 
+# Ansible lint directory
+.ansible
+
 test_inventory*
 inventory*
 
