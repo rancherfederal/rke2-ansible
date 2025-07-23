@@ -60,15 +60,15 @@ Then you can call the RKE2 role in a play like so:
 ```
 
 ## Playbooks  
-Most of the playbooks provided by this repository are not intended to be used in production environments without testing and should therefore be considered experimental with two exceptions `site.yml` and `install.yml`.  All playbooks are provided as is and are not guranteed to be stable or safe.   
+Most of the playbooks provided by this repository are not intended to be used in production environments without testing and should therefore be considered experimental with two exceptions `site.yml` and `install.yml`.  All playbooks are provided as is and are not guaranteed to be stable or safe.   
 ### `site.yml`  
-`site.yml` has been kept for backwards compatability, `site.yml` only calls `install.yml`.
+`site.yml` has been kept for backwards compatibility, `site.yml` only calls `install.yml`.
 
 ### `install.yml`  
 This playbook is the full install playbook intended to build your RKE2 cluster.
 
 ### `rotate-certs.yml`  
-When building out a cluster RKE2 needs to generate certificates, all certifficates are valid for 365 days be default. This play stops the RKE2 service of each node (by default one at a time), rotates the certificates by calling `rke2 certificate rotate` then starts the service again.  
+When building out a cluster RKE2 needs to generate certificates, all certificates are valid for 365 days be default. This play stops the RKE2 service of each node (by default one at a time), rotates the certificates by calling `rke2 certificate rotate` then starts the service again.  
 > RKE2 client and server certificates are valid for 365 days from their date of issuance. Any certificates that are expired or within 120 days to expire are automatically renewed every time RKE2 starts. This renewal extends the lifetime of the existing certs.
 
 > [!NOTE]  
