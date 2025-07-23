@@ -13,11 +13,13 @@
     create: true
     mode: 0600
   when: ansible_facts.services["NetworkManager.service"] is defined
+  tags: ["setup-os"]
 
 - name: Does rke2-canal.conf exist
   ansible.builtin.stat:
     path: /etc/NetworkManager/conf.d/rke2-canal.conf
   register: rke2_canal_file
+  tags: ["setup-os"]
 
 - name: Set rke2-canal.conf file permissions
   ansible.builtin.file:
@@ -27,6 +29,7 @@
     group: root
   when: rke2_canal_file.stat.exists
   notify: "Restart {{ service_name }}"
+  tags: ["setup-os"]
 
 - name: Disable service nm-cloud-setup
   ansible.builtin.systemd:
@@ -37,6 +40,7 @@
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
+  tags: ["setup-os"]
 
 - name: Disable nm-cloud-setup.timer unit
   ansible.builtin.systemd:
@@ -47,3 +51,4 @@
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
+  tags: ["setup-os"]

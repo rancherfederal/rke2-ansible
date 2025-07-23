@@ -9,6 +9,7 @@
     - [`rotate-certs.yml`](#rotate-certsyml)
     - [`testing.yml`](#testingyml)
     - [`upgrade.yml`](#upgradeyml)
+  - [Tags](#tags)
 - [Defining Your Cluster](#defining-your-cluster)
   - [Minimal Cluster Inventory](#minimal-cluster-inventory)
   - [Structuring Your Variable Files](#structuring-your-variable-files)
@@ -81,6 +82,17 @@ This is used for the repositories testing, do not use.
 > This is a very basic playbook and running it against a production cluster is not advised. This playbook will not drain a node before upgrading. Use at your own risk.  
 
 This playbook collects the needed details from all nodes before running the installation on each server, then each agent. By default this playbook will only update one server at a time, then one agent at a time. 
+
+## Tags  
+The RKE2 role currently contains seven tags ("cis", "setup-os", "configure", "addons", "setup-root", "stig", "never"). Some must be run after the cluster is installed and some may happen before. When using these tags caution is advised.   
+
+- "cis" only runs the needed tasks to run the "cis_hardening.yml" task set. This task sets up the etcd user, configures systemctl, and reboots.
+- "setup-os" is used to run the "pre-reqs.yml" task set. This configures FirewallD, iptables, NetworkManager, and FapolicyD.
+- "configure" will update just the RKE2 configuration files. This does not include the add on manifests. 
+- "addons" is used to deploy the addon files, including post and pre-deployment manifests.
+- "setup-root" sets the root user up for access to `kubectl` and other useful binaries. 
+- "stig" resolves a few stig findings needed for compliance.
+- "never" Runs a couple debug tasks to display information in case of failures or debugging needs.
 
 # Defining Your Cluster  
 This repository is not intended to be opinionated and as a result it is important you to have read and understand the [RKE2 docs](https://docs.rke2.io/) before moving forward, this documentation is not intended to be an exhaustive explanation of all possible RKE2 configuration options, it is up to the end user to ensure their options are valid. 

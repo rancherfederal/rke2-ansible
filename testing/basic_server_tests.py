@@ -9,7 +9,7 @@ def test_rke2_config(host):
     rke2_config = host.file("/etc/rancher/rke2/config.yaml")
     assert rke2_config.user == "root"
     assert rke2_config.group == "root"
-    assert rke2_config.mode == 0o640
+    assert rke2_config.mode == 0o600
 
 
 def test_rke2_server_running_and_enabled(host):
