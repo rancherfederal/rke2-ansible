@@ -1,0 +1,59 @@
+# This is a very simple playbook. As the playbook runs it will
+# shutdown the rke2 service, run the rotate certificate store
+# command, then start said service again. This playbook will
+# rotate certificates on one server at a time, then one worker
+# at a time (by default). A server_rotate_serial or
+# worker_rotate_serial variable can be provided to change this
+# value.
+---
+- name: Warn user
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display warning
+      ansible.builtin.pause:
+        prompt: |-
+          This playbook is rather simple and does not drain agent or server nodes before rotating
+          certificates. This should work fine for simpler deployments, but this playbook should
+          be used with caution. Do you wish to continue?
+          (Press 'C' to continue the play or 'A' to Abort)
+
+- name: Rotate certificates on servers
+  hosts: rke2_servers
+  any_errors_fatal: true
+  become: true
+  serial: "{{ server_rotate_serial | default('1') }}"
+  tasks:
+    - name: Stop RKE2 server
+      ansible.builtin.service:
+        name: rke2-server
+        state: stopped
+
+    - name: Rotate certificates
+      ansible.builtin.command:
+        cmd: /bin/rke2 certificate rotate
+
+    - name: Start RKE2 server
+      ansible.builtin.service:
+        name: rke2-server
+        state: started
+
+- name: Rotate certificates on agents
+  hosts: rke2_agents
+  any_errors_fatal: true
+  become: true
+  serial: "{{ worker_rotate_serial | default('1') }}"
+  tasks:
+    - name: Stop RKE2 agent
+      ansible.builtin.service:
+        name: rke2-agent
+        state: stopped
+
+    - name: Rotate certificates
+      ansible.builtin.command:
+        cmd: /bin/rke2 certificate rotate
+
+    - name: Start RKE2 agent
+      ansible.builtin.service:
+        name: rke2-agent
+        state: started

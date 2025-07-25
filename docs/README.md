@@ -3,6 +3,12 @@
 - [Basic Usage](#basic-usage)
   - [Cloning](#cloning)
   - [Importing](#importing)
+  - [Playbooks](#playbooks)
+    - [`site.yml`](#siteyml)
+    - [`install.yml`](#installyml)
+    - [`rotate-certs.yml`](#rotate-certsyml)
+    - [`testing.yml`](#testingyml)
+    - [`upgrade.yml`](#upgradeyml)
   - [Tags](#tags)
 - [Defining Your Cluster](#defining-your-cluster)
   - [Minimal Cluster Inventory](#minimal-cluster-inventory)
@@ -52,6 +58,30 @@ Then you can call the RKE2 role in a play like so:
   roles:
     - role: rancherfederal.rke2_ansible.rke2
 ```
+
+## Playbooks  
+Most of the playbooks provided by this repository are not intended to be used in production environments without testing and should therefore be considered experimental with two exceptions `site.yml` and `install.yml`.  All playbooks are provided as is and are not guaranteed to be stable or safe.   
+### `site.yml`  
+`site.yml` has been kept for backwards compatibility, `site.yml` only calls `install.yml`.
+
+### `install.yml`  
+This playbook is the full install playbook intended to build your RKE2 cluster.
+
+### `rotate-certs.yml`  
+When building out a cluster RKE2 needs to generate certificates, all certificates are valid for 365 days be default. This play stops the RKE2 service of each node (by default one at a time), rotates the certificates by calling `rke2 certificate rotate` then starts the service again.  
+> RKE2 client and server certificates are valid for 365 days from their date of issuance. Any certificates that are expired or within 120 days to expire are automatically renewed every time RKE2 starts. This renewal extends the lifetime of the existing certs.
+
+> [!NOTE]  
+> Certificates will not be rotated if they are not within at least 120 days old of expiring. 
+
+### `testing.yml`  
+This is used for the repositories testing, do not use.
+
+### `upgrade.yml`  
+> [!CAUTION]  
+> This is a very basic playbook and running it against a production cluster is not advised. This playbook will not drain a node before upgrading. Use at your own risk.  
+
+This playbook collects the needed details from all nodes before running the installation on each server, then each agent. By default this playbook will only update one server at a time, then one agent at a time. 
 
 ## Tags  
 The RKE2 role currently contains seven tags ("cis", "setup-os", "configure", "addons", "setup-root", "stig", "never"). Some must be run after the cluster is installed and some may happen before. When using these tags caution is advised.   

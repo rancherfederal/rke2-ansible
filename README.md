@@ -30,7 +30,7 @@ See the [docs](https://docs.rke2.io/) more information about [RKE Government](ht
 Platforms
 ---------  
 
-[![Lint](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml) [![Rocky](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml) [![Ubuntu](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml)
+[![Lint](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml) [![Rocky](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml/badge.svg?branch=main)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml) [![Ubuntu](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml/badge.svg?branch=main)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml)
 
 The RKE2 Ansible playbook supports:
 - Rocky 8, and 9
@@ -51,7 +51,7 @@ Create an Ansible inventory file (or folder), you can check the docs folder for 
 
 Start provisioning the cluster using the following command:
 ```bash
-ansible-playbook site.yml -i inventory/hosts.yml -b
+ansible-playbook ./plays/site.yml -i inventory/hosts.yml -b
 ```  
 
 
