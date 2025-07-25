@@ -6,10 +6,12 @@
   register: local_files_find_return
   delegate_to: localhost
   become: false
+  tags: ["addons"]
 
 - name: Create array of managed files
   ansible.builtin.set_fact:
     managed_files: "{{ local_files_find_return.files | map(attribute='path') | map('basename') }}"
+  tags: ["addons"]
 
 - name: Add manifest addons files from localhost
   ansible.builtin.copy:
@@ -18,15 +20,18 @@
     mode: '0640'
     owner: root
     group: root
+  tags: ["addons"]
 
 - name: Look up manifest files on remote
   ansible.builtin.find:
     paths: "{{ destination_directory }}"
   register: remote_files_find_return
+  tags: ["addons"]
 
 - name: Create array of remote files
   ansible.builtin.set_fact:
     current_files: "{{ remote_files_find_return.files | map(attribute='path') | map('basename') }}"
+  tags: ["addons"]
 
 - name: Remove remote files not in managed files list
   ansible.builtin.file:
@@ -34,3 +39,4 @@
     state: absent
   with_items: "{{ current_files }}"
   when: item not in managed_files
+  tags: ["addons"]

@@ -12,13 +12,7 @@
       unmanaged-devices=interface-name:cali*;interface-name:flannel*
     create: true
     mode: 0600
-    owner: root
-    group: root
-  when: ansible_facts.services["NetworkManager.service"] is defined and
-        ansible_facts.services["NetworkManager.service"].status != "not-found"
-  notify:
-    - Reload NetworkManager
-    - "Restart {{ service_name }}"
+  when: ansible_facts.services["NetworkManager.service"] is defined
   tags: ["setup-os"]
 
 - name: Disable service nm-cloud-setup

@@ -2,10 +2,12 @@
 
 - name: Populate service facts
   ansible.builtin.service_facts: {}
+  tags: ["setup-os", "configure"]
 
 - name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
+  tags: ["setup-os"]
 
 - name: Set for install method of tarball
   ansible.builtin.set_fact:
@@ -15,6 +17,7 @@
       rke2_install_tarball_url != "" or
       rke2_install_local_tarball_path != "" or
       rke2_force_tarball_install|bool)
+  tags: ["cis", "setup-os"]
 
 - name: Set for install method of rpm
   ansible.builtin.set_fact:
@@ -24,21 +27,25 @@
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
     - not rke2_force_tarball_install|bool
+  tags: ["cis", "setup-os"]
 
 - name: Set as server
   ansible.builtin.set_fact:
     service_name: rke2-server
   when:
     - inventory_hostname in groups['rke2_servers']
+  tags: ["cis", "setup-os", "configure"]
 
 - name: Set as agent
   ansible.builtin.set_fact:
     service_name: rke2-agent
   when:
     - inventory_hostname in groups.get('rke2_agents', [])
+  tags: ["cis", "setup-os", "configure"]
 
 - name: Satisfy OS Pre-Reqs
   ansible.builtin.include_tasks: pre_reqs.yml
+  tags: ["setup-os"]
 
 - name: Has rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
@@ -64,12 +71,14 @@
     check_node_ready_ignore_errors: true
   when:
     - inventory_hostname in groups['rke2_servers']
+  tags: ["configure"]
 
 - name: Create a list of ready servers
   ansible.builtin.set_fact:
     ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
   delegate_to: localhost
   run_once: true
+  tags: ["configure"]
 
 - name: Tarball Install
   ansible.builtin.include_tasks: tarball_install.yml
@@ -83,6 +92,7 @@
 
 - name: Set rke2 configuration files
   ansible.builtin.include_tasks: configure_rke2.yml
+  tags: ["cis"]
 
 - name: Include task file add_manifest_addons.yml
   ansible.builtin.include_tasks: add_manifest_addons.yml
@@ -93,6 +103,7 @@
     - rke2_manifest_config_directory is defined
     - rke2_manifest_config_directory | length > 0
     - inventory_hostname in groups['rke2_servers'][0]
+  tags: ["addons"]
 
 # is the ready_servers array is empty, we assume it's a new cluster and use the first server in groups['rke2_servers']
 - name: Start the first rke2 node
@@ -115,14 +126,17 @@
     token_source_node: "{{ ready_servers[0] }}"
   when:
     - ready_servers | length > 0
+  tags: ["configure"]
 
 - name: Start all other rke2 nodes
   ansible.builtin.include_tasks: other_nodes.yml
+  tags: ["configure"]
 
 - name: Configure kubectl,crictl,ctr
   ansible.builtin.include_tasks: utilities.yml
   when:
     - inventory_hostname in groups['rke2_servers']
+  tags: ["setup-root"]
 
 - name: Include task file add_manifest_addons.yml
   ansible.builtin.include_tasks: add_manifest_addons.yml
@@ -133,3 +147,35 @@
     - rke2_manifest_config_post_run_directory is defined
     - rke2_manifest_config_post_run_directory | length > 0
     - inventory_hostname in groups['rke2_servers'][0]
+  tags: ["addons"]
+
+- name: Secure files created by installer
+  ansible.builtin.include_tasks: stig.yml
+  vars:
+    kubeconfig_files:
+      - rke2controller.kubeconfig
+      - kubelet.kubeconfig
+      - kubeproxy.kubeconfig
+    cert_files:
+      - client-ca.crt
+      - client-kubelet.crt
+      - client-kube-proxy.crt
+      - client-rke2-controller.crt
+      - server-ca.crt
+      - serving-kubelet.crt
+    key_files:
+      - client-kubelet.key
+      - serving-kubelet.key
+      - client-rke2-controller.key
+      - client-kube-proxy.key
+    agent_dirs:
+      - pod-manifests
+      - etc
+    server_dirs_0700:
+      - cred
+      - db
+      - tls
+    server_dirs_0750:
+      - manifests
+      - logs
+  tags: ["stig"]
