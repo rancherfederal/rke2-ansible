@@ -31,6 +31,7 @@
     check_node_ready_ignore_errors: true
   when:
     - inventory_hostname in groups['rke2_servers']
+    - rke2_installed
   tags: ["configure"]
 
 - name: Create a list of ready servers
@@ -38,6 +39,8 @@
     ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
   delegate_to: localhost
   run_once: true
+  when:
+    - (groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | list | length) > 0
   tags: ["configure"]
 
 - name: Tarball Install
@@ -70,14 +73,14 @@
   ansible.builtin.include_tasks: first_server.yml
   when:
     - inventory_hostname in groups['rke2_servers'][0]
-    - ready_servers | length == 0
+    - ready_servers is not defined or ready_servers | length == 0
 
 - name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
   vars:
     token_source_node: "{{ groups['rke2_servers'][0] }}"
   when:
-    - ready_servers | length == 0
+    - ready_servers is not defined or ready_servers | length == 0
 
 # is the ready_servers array is > 0, we assume it's an established cluster and treat all nodes equally (no need for initial server procedure)
 - name: Save_generated_token.yml
@@ -85,6 +88,7 @@
   vars:
     token_source_node: "{{ ready_servers[0] }}"
   when:
+    - ready_servers is defined
     - ready_servers | length > 0
   tags: ["configure"]
 

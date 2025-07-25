@@ -19,11 +19,6 @@
     - api_serve_status.state == "present"
   tags: ["configure"]
 
-- name: Set fact
-  ansible.builtin.set_fact:
-    rke2_api_server_running: "{{ rke2_api_server_running }}"
-  tags: ["configure"]
-
 - name: Get node_metrics
   ansible.builtin.uri:
     url: https://localhost:10250/metrics
@@ -42,11 +37,6 @@
     rke2_metrics_running: true
   when:
     - 200 | string in node_metrics.status | string
-  tags: ["configure"]
-
-- name: Set fact for rke2_metrics_running
-  ansible.builtin.set_fact:
-    rke2_metrics_running: "{{ rke2_metrics_running }}"
   tags: ["configure"]
 
 - name: Extract the kubelet_node_name from node metrics
@@ -75,11 +65,6 @@
   when:
     - status_result.rc is not undefined
     - status_result.rc | string == "0"
-  tags: ["configure"]
-
-- name: Set fact
-  ansible.builtin.set_fact:
-    rke2_node_ready: "{{ rke2_node_ready }}"
   tags: ["configure"]
 
 - name: Node status
