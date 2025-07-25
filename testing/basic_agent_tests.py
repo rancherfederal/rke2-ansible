@@ -11,7 +11,7 @@ def test_rke2_config(host):
     assert rke2_config.contains("server:")
     assert rke2_config.user == "root"
     assert rke2_config.group == "root"
-    assert rke2_config.mode == 0o640
+    assert rke2_config.mode == 0o600
 
 
 def test_rke2_server_running_and_enabled(host):

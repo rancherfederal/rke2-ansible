@@ -1,18 +1,23 @@
 # Common/valid Slang
 [C|c]onfig
 airgap
+addons?
 
 # Acronyms
-STIG
+[S|s][T|t][I|i][G|g]
+[C|c][I|i][S|s]
 
 # Tools
 [A|a]nsible
+etcd
 
 # Kubernetes
 Kubernetes
 [K|k]ubeconfig
 
 # Linux
-[F|f]apolicyd
+[F|f]apolicyD
 containerd
 SELinux
+systemctl
+iptables

@@ -1,0 +1,64 @@
+# This is a very simple upgrade playbook.
+# Please note that it is not intended to solve all possible scenarios,
+# every cluster has its own needs and an upgrade procedure should be
+# handled on a per cluster basis. This basic playbook will upgrade
+# one server at a time, then one worker at a time (by default).
+# A server_upgrade_serial or worker_upgrade_serial variable can be
+# provided to change this value.
+---
+- name: Warn user
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display warning
+      ansible.builtin.pause:
+        prompt: |-
+          This upgrade playbook is rather simple and does not drain agent nodes before upgrading.
+          This should work fine for simpler deployments, but this playbook should be used with
+          caution. Do you wish to continue?
+          (Press 'C' to continue the play or 'A' to Abort)
+
+- name: Collect Info
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Collect Cluster Info
+      ansible.builtin.include_role:
+        name: rke2
+        tasks_from: collect_info
+
+    - name: Check previous_install
+      ansible.builtin.include_role:
+        name: rke2
+        tasks_from: previous_install
+
+    - name: Check calculate_rke2_version.yml
+      ansible.builtin.include_role:
+        name: rke2
+        tasks_from: calculate_rke2_version.yml
+
+    - name: Check check_node_ready.yml
+      ansible.builtin.include_role:
+        name: rke2
+        tasks_from: check_node_ready.yml
+      vars:
+        check_node_ready_timeout: 2
+        check_node_ready_retries: 2
+        check_node_ready_delay: 2
+        check_node_ready_ignore_errors: true
+
+- name: Upgrade RKE2 servers
+  hosts: rke2_servers
+  any_errors_fatal: true
+  become: true
+  serial: "{{ server_upgrade_serial | default('1') }}"
+  roles:
+    - role: rke2
+
+- name: Upgrade RKE2 agents
+  hosts: rke2_agents
+  any_errors_fatal: true
+  become: true
+  serial: "{{ worker_upgrade_serial | default('1') }}"
+  roles:
+    - role: rke2

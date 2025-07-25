@@ -30,7 +30,7 @@ See the [docs](https://docs.rke2.io/) more information about [RKE Government](ht
 Platforms
 ---------  
 
-[![Lint](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml) [![Rocky](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml) [![Ubuntu](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml)
+[![Lint](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/lint.yml) [![Rocky](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml/badge.svg?branch=main)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/rocky.yml) [![Ubuntu](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml/badge.svg?branch=main)](https://github.com/rancherfederal/rke2-ansible/actions/workflows/ubuntu.yml)
 
 The RKE2 Ansible playbook supports:
 - Rocky 8, and 9
@@ -51,7 +51,7 @@ Create an Ansible inventory file (or folder), you can check the docs folder for 
 
 Start provisioning the cluster using the following command:
 ```bash
-ansible-playbook site.yml -i inventory/hosts.yml -b
+ansible-playbook ./plays/site.yml -i inventory/hosts.yml -b
 ```  
 
 
@@ -85,7 +85,7 @@ On rare occasions you may have to run the uninstall commands a second time.
 
 Known Issues
 ------------------
-- For RHEL8+ Operating Systems that have fapolicyd daemon running, rpm installation of RKE2 will fail due to a permission error while starting containerd. Users have to add the following rules file before installing RKE2. This is not an issue if the install.sh script is used to install RKE2. The RPM issue is expected to be fixed in later versions of RKE2.
+- For RHEL8+ Operating Systems that have FapolicyD daemon running, rpm installation of RKE2 will fail due to a permission error while starting containerd. Users have to add the following rules file before installing RKE2. This is not an issue if the install.sh script is used to install RKE2. The RPM issue is expected to be fixed in later versions of RKE2.
 ```bash
 cat <<-EOF >>"/etc/fapolicyd/rules.d/80-rke2.rules"
 allow perm=any all : dir=/var/lib/rancher/

@@ -3,6 +3,13 @@
 - [Basic Usage](#basic-usage)
   - [Cloning](#cloning)
   - [Importing](#importing)
+  - [Playbooks](#playbooks)
+    - [`site.yml`](#siteyml)
+    - [`install.yml`](#installyml)
+    - [`rotate-certs.yml`](#rotate-certsyml)
+    - [`testing.yml`](#testingyml)
+    - [`upgrade.yml`](#upgradeyml)
+  - [Tags](#tags)
 - [Defining Your Cluster](#defining-your-cluster)
   - [Minimal Cluster Inventory](#minimal-cluster-inventory)
   - [Structuring Your Variable Files](#structuring-your-variable-files)
@@ -16,6 +23,8 @@
       - [Example](#example-1)
     - [Defining an Audit Policy](#defining-an-audit-policy)
       - [Example](#example-2)
+    - [Defining a registries.yaml Config](#defining-a-registriesyaml-config)
+      - [Example](#example-3)
     - [Adding Additional Cluster Manifests](#adding-additional-cluster-manifests)
       - [Pre-Deploy Example](#pre-deploy-example)
       - [Post-Deploy Example](#post-deploy-example)
@@ -50,6 +59,40 @@ Then you can call the RKE2 role in a play like so:
     - role: rancherfederal.rke2_ansible.rke2
 ```
 
+## Playbooks  
+Most of the playbooks provided by this repository are not intended to be used in production environments without testing and should therefore be considered experimental with two exceptions `site.yml` and `install.yml`.  All playbooks are provided as is and are not guaranteed to be stable or safe.   
+### `site.yml`  
+`site.yml` has been kept for backwards compatibility, `site.yml` only calls `install.yml`.
+
+### `install.yml`  
+This playbook is the full install playbook intended to build your RKE2 cluster.
+
+### `rotate-certs.yml`  
+When building out a cluster RKE2 needs to generate certificates, all certificates are valid for 365 days be default. This play stops the RKE2 service of each node (by default one at a time), rotates the certificates by calling `rke2 certificate rotate` then starts the service again.  
+> RKE2 client and server certificates are valid for 365 days from their date of issuance. Any certificates that are expired or within 120 days to expire are automatically renewed every time RKE2 starts. This renewal extends the lifetime of the existing certs.
+
+> [!NOTE]  
+> Certificates will not be rotated if they are not within at least 120 days old of expiring. 
+
+### `testing.yml`  
+This is used for the repositories testing, do not use.
+
+### `upgrade.yml`  
+> [!CAUTION]  
+> This is a very basic playbook and running it against a production cluster is not advised. This playbook will not drain a node before upgrading. Use at your own risk.  
+
+This playbook collects the needed details from all nodes before running the installation on each server, then each agent. By default this playbook will only update one server at a time, then one agent at a time. 
+
+## Tags  
+The RKE2 role currently contains seven tags ("cis", "setup-os", "configure", "addons", "setup-root", "stig", "never"). Some must be run after the cluster is installed and some may happen before. When using these tags caution is advised.   
+
+- "cis" only runs the needed tasks to run the "cis_hardening.yml" task set. This task sets up the etcd user, configures systemctl, and reboots.
+- "setup-os" is used to run the "pre-reqs.yml" task set. This configures FirewallD, iptables, NetworkManager, and FapolicyD.
+- "configure" will update just the RKE2 configuration files. This does not include the add on manifests. 
+- "addons" is used to deploy the addon files, including post and pre-deployment manifests.
+- "setup-root" sets the root user up for access to `kubectl` and other useful binaries. 
+- "stig" resolves a few stig findings needed for compliance.
+- "never" Runs a couple debug tasks to display information in case of failures or debugging needs.
 
 # Defining Your Cluster  
 This repository is not intended to be opinionated and as a result it is important you to have read and understand the [RKE2 docs](https://docs.rke2.io/) before moving forward, this documentation is not intended to be an exhaustive explanation of all possible RKE2 configuration options, it is up to the end user to ensure their options are valid. 
@@ -181,6 +224,18 @@ group_rke2_config:
   kube-apiserver-arg:
     - audit-policy-file=/etc/rancher/rke2/audit-policy.yaml
     - audit-log-path=/var/lib/rancher/rke2/server/logs/audit.log
+```
+
+
+### Defining a registries.yaml Config
+As seen [here](https://docs.rke2.io/install/private_registry), RKE2 allows for manipulation of how containerd pulls containers. In order to define a registries.yaml config, nodes will need to have the `rke2_registry_config_file_path` variable defined. Assuming all nodes are to use the same registry configuration, this variable can be set at the top-level so that it applies to all nodes.
+
+#### Example 
+Below is an example of how this can be defined at the top-level:  
+
+__group_vars/all.yml:__
+```yaml
+rke2_registry_config_file_path: "{{ playbook_dir }}/docs/advanced_sample_inventory/files/registries.yaml"
 ```
 
 
