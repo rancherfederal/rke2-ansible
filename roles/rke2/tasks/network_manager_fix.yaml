@@ -19,6 +19,7 @@
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
+  tags: ["setup-os"]
 
 - name: Disable service nm-cloud-setup
   ansible.builtin.systemd:
@@ -29,6 +30,7 @@
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
+  tags: ["setup-os"]
 
 - name: Disable nm-cloud-setup.timer unit
   ansible.builtin.systemd:
@@ -39,3 +41,4 @@
   notify:
     - Reload NetworkManager
     - "Restart {{ service_name }}"
+  tags: ["setup-os"]
