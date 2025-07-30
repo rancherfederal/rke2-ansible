@@ -34,4 +34,3 @@
   retries: 10
   until: result is succeeded
   delay: 30
-  notify: "Restart {{ service_name }}"

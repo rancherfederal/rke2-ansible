@@ -79,7 +79,7 @@ This is used for the repositories testing, do not use.
 
 ### `upgrade.yml`  
 > [!CAUTION]  
-> This is a very basic playbook and running it against a production cluster is not advised. This playbook will not drain a node before upgrading. Use at your own risk.  
+> This is a very basic playbook and running it against a production cluster is not advised. This playbook will not drain a node before upgrading. Please consider using the [Rancher System Upgrade Controller](https://github.com/rancher/system-upgrade-controller) instead. Use this playbook at your own risk.   
 
 This playbook collects the needed details from all nodes before running the installation on each server, then each agent. By default this playbook will only update one server at a time, then one agent at a time. 
 
