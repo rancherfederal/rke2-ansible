@@ -15,8 +15,8 @@
         prompt: |-
           This upgrade playbook is rather simple and does not drain agent nodes before upgrading.
           This should work fine for simpler deployments, but this playbook should be used with
-          caution. Do you wish to continue?
-          (Press 'C' to continue the play or 'A' to Abort)
+          caution. Please consider using Rancher System Upgrade Controller instead.
+          Do you wish to continue? (Press 'C' to continue the play or 'A' to Abort)
 
 - name: Collect Info
   hosts: all
