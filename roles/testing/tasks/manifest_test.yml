@@ -3,7 +3,7 @@
 - name: Copy basic-deployment.yaml to remote machine
   ansible.builtin.copy:
     src: basic-deployment.yaml
-    dest: "{{ rke2_data_dir }}/server/manifests/""
+    dest: "{{ rke2_data_dir }}/server/manifests/"
     owner: root
     group: root
     mode: '0644'
