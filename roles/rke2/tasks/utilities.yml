@@ -1,6 +1,6 @@
 ---
 
-- name: Add "{{ rke2_data_dir }}/bin to PATH"
+- name: "Add {{ rke2_data_dir }}/bin to PATH"
   ansible.builtin.lineinfile:
     dest: "/root/.bashrc"
     line: 'PATH=$PATH:{{ rke2_data_dir }}/bin'
