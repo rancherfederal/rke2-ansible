@@ -4,6 +4,8 @@
 venv/
 .venv/
 
+.ansible/
+
 test_inventory*
 inventory*
 

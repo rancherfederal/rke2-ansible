@@ -20,9 +20,10 @@
     gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
     enabled: "{{ rke2_versioned_yum_repo.enabled }}"
 
-# - name: Debug install
-#   ansible.builtin.debug:
-#     msg: installing {{ service_name }}{{ rke2_version_rpm }}
+- name: Debug install
+  ansible.builtin.debug:
+    msg: installing {{ service_name }}{{ rke2_version_rpm }}
+  tags: ["never"]
 
 - name: YUM-Based Install
   ansible.builtin.dnf:
@@ -33,4 +34,3 @@
   retries: 10
   until: result is succeeded
   delay: 30
-  notify: "Restart {{ service_name }}"
