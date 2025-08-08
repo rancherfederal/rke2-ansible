@@ -3,7 +3,7 @@
 - name: Copy basic-deployment.yaml to remote machine
   ansible.builtin.copy:
     src: basic-deployment.yaml
-    dest: /var/lib/rancher/rke2/server/manifests/
+    dest: "{{ rke2_data_dir }}/server/manifests/""
     owner: root
     group: root
     mode: '0644'
@@ -18,7 +18,7 @@
 
 - name: Did the Pod deploy as expected?
   ansible.builtin.command: >-
-    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    "{{ rke2_data_dir }}/bin/kubectl" --kubeconfig /etc/rancher/rke2/rke2.yaml
     get pod automated-testing-pod
     -o jsonpath='{.status.phase}'
   register: status_result

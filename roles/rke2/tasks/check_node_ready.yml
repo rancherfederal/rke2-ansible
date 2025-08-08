@@ -23,9 +23,9 @@
   ansible.builtin.uri:
     url: https://localhost:10250/metrics
     return_content: true
-    ca_path: /var/lib/rancher/rke2/server/tls/server-ca.crt
-    client_cert: /var/lib/rancher/rke2/server/tls/client-admin.crt
-    client_key: /var/lib/rancher/rke2/server/tls/client-admin.key
+    ca_path: "{{ rke2_data_dir }}/server/tls/server-ca.crt"
+    client_cert: "{{ rke2_data_dir }}/server/tls/client-admin.crt"
+    client_key: "{{ rke2_data_dir }}/server/tls/client-admin.key"
   register: node_metrics
   retries: "{{ check_node_ready_retries }}"
   delay: "{{ check_node_ready_delay }}"
@@ -48,7 +48,7 @@
 
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
-    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
+    "{{ rke2_data_dir }}/bin/kubectl" --kubeconfig /etc/rancher/rke2/rke2.yaml
     --server https://127.0.0.1:6443 get no {{ kubelet_node_name[0] }}
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
   register: status_result

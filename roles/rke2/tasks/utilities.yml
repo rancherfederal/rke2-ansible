@@ -1,9 +1,9 @@
 ---
 
-- name: Add /var/lib/rancher/rke2/bin to PATH
+- name: Add "{{ rke2_data_dir }}/bin to PATH"
   ansible.builtin.lineinfile:
     dest: "/root/.bashrc"
-    line: 'PATH=$PATH:/var/lib/rancher/rke2/bin'
+    line: 'PATH=$PATH:{{ rke2_data_dir }}/bin'
     insertafter: EOF
     create: true
     mode: 0600
@@ -11,7 +11,7 @@
 
 - name: Symlink crictl config to /etc/crictl.yaml
   ansible.builtin.file:
-    src: "/var/lib/rancher/rke2/agent/etc/crictl.yaml"
+    src: "{{ rke2_data_dir }}/agent/etc/crictl.yaml"
     dest: "/etc/crictl.yaml"
     state: link
   tags: ["setup-root"]
@@ -25,7 +25,7 @@
 
 - name: Symlink kubectl config to /root/.kube/config
   ansible.builtin.file:
-    src: "/var/lib/rancher/rke2/server/cred/admin.kubeconfig"
+    src: "{{ rke2_data_dir }}/server/cred/admin.kubeconfig"
     dest: "/root/.kube/config"
     state: link
   tags: ["setup-root"]

@@ -20,7 +20,7 @@
 # #3
 - name: Find .kubeconfig files
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/agent
+    paths: "{{ rke2_data_dir }}/agent"
     patterns: "{{ kubeconfig_files }}"
     file_type: file
   register: found_kubeconfig_files
@@ -37,7 +37,7 @@
 
 - name: Find .cert files
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/agent
+    paths: "{{ rke2_data_dir }}/agent"
     patterns: "{{ cert_files }}"
     file_type: file
   register: found_cert_files
@@ -54,7 +54,7 @@
 
 - name: Find .key files
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/agent
+    paths: "{{ rke2_data_dir }}/agent"
     patterns: "{{ key_files }}"
     file_type: file
   register: found_key_files
@@ -71,7 +71,7 @@
 
 - name: Find agent subdirectories
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/agent
+    paths: "{{ rke2_data_dir }}/agent"
     patterns: "{{ agent_dirs }}"
     file_type: directory
   register: found_agent_dirs
@@ -88,9 +88,9 @@
   tags: ["stig"]
 
 # #4
-- name: Find all existing files in /var/lib/rancher/rke2/bin
+- name: Find all existing files in "{{ rke2_data_dir }}/bin"
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/bin
+    paths: "{{ rke2_data_dir }}/bin"
     file_type: file
   register: bin_files
   tags: ["stig"]
@@ -105,13 +105,13 @@
 # #5
 - name: Stat the data directory
   ansible.builtin.stat:
-    path: /var/lib/rancher/rke2/data
+    path: "{{ rke2_data_dir }}/data"
   register: data_dir_stat
   tags: ["stig"]
 
 - name: Fix permissions and ownership of data directory
   ansible.builtin.file:
-    path: /var/lib/rancher/rke2/data
+    path: "{{ rke2_data_dir }}/data"
     state: directory
     owner: root
     group: root
@@ -120,9 +120,9 @@
   tags: ["stig"]
 
 # #6 - Broken Check
-# - name: Find all regular files in /var/lib/rancher/rke2/data
+# - name: Find all regular files in "{{ rke2_data_dir }}/data"
 #   ansible.builtin.find:
-#     paths: /var/lib/rancher/rke2/data
+#     paths: "{{ rke2_data_dir }}/data"
 #     file_type: file
 #     recurse: yes
 #   register: data_files
@@ -138,7 +138,7 @@
 # #7
 - name: Find existing 0700 server directories
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/server
+    paths: "{{ rke2_data_dir }}/server"
     patterns: "{{ server_dirs_0700 }}"
     file_type: directory
   register: found_server_dirs_0700
@@ -156,7 +156,7 @@
 
 - name: Find existing 0750 server directories
   ansible.builtin.find:
-    paths: /var/lib/rancher/rke2/server
+    paths: "{{ rke2_data_dir }}/server"
     patterns: "{{ server_dirs_0750 }}"
     file_type: directory
   register: found_server_dirs_0750
@@ -174,13 +174,13 @@
 
 - name: Check if token file exists
   ansible.builtin.stat:
-    path: /var/lib/rancher/rke2/server/token
+    path: "{{ rke2_data_dir }}/server/token"
   register: stat_token_file
   tags: ["stig"]
 
 - name: Set 0600 on token file (if it exists)
   ansible.builtin.file:
-    path: /var/lib/rancher/rke2/server/token
+    path: "{{ rke2_data_dir }}/server/token"
     owner: root
     group: root
     mode: '0600'

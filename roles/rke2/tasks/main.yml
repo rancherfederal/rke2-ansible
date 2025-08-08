@@ -22,6 +22,9 @@
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
 
+- name: Check if data-dir is set in any config file
+  ansible.builtin.include_tasks: check_datadir.yml
+
 - name: Start check_node_ready.yml
   ansible.builtin.include_tasks: check_node_ready.yml
   vars:
@@ -61,7 +64,7 @@
   ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
     source_directory: "{{ rke2_manifest_config_directory }}"
-    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_0
+    destination_directory: "{{ rke2_data_dir }}/server/manifests/ansible_managed_0"
   when:
     - rke2_manifest_config_directory is defined
     - rke2_manifest_config_directory | length > 0
@@ -106,7 +109,7 @@
   ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
     source_directory: "{{ rke2_manifest_config_post_run_directory }}"
-    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_1
+    destination_directory: "{{ rke2_data_dir }}/server/manifests/ansible_managed_1"
   when:
     - rke2_manifest_config_post_run_directory is defined
     - rke2_manifest_config_post_run_directory | length > 0
