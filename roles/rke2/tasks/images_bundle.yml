@@ -19,7 +19,7 @@
 - name: Copy local tarball images
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ rke2_data_dir }}/agent/images/""
+    dest: "{{ rke2_data_dir }}/agent/images/"
     mode: '0644'
   with_items:
     - "{{ rke2_images_local_tarball_path }}"
