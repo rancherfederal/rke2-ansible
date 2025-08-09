@@ -41,7 +41,7 @@
         suffix: .rke2-install
       register: temp_dir
 
-    - name: Sanitize RPM dir path # remove trailing slash so we can add one later
+    - name: Sanitize RPM dir path  # remove trailing slash so we can add one later
       ansible.builtin.set_fact:
         sanitized_path: "{{ rke2_rpms_path | regex_replace('\\/$', '') }}"
 
@@ -49,6 +49,7 @@
       ansible.builtin.copy:
         src: "{{ sanitized_path }}/"
         dest: "{{ temp_dir.path }}/rke2_rpms"
+        mode: '0755'
 
     - name: Find all RPMs in local directory
       ansible.builtin.find:
@@ -72,7 +73,7 @@
       ansible.builtin.dnf:
         name: "{{ filtered_rpms }}"
         state: present
-      
+
     - name: Clean up temporary directory
       ansible.builtin.file:
         path: "{{ temp_dir.path }}"
