@@ -111,20 +111,19 @@
         src: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
         dest: "{{ rke2_tarball_install_dir }}"
         remote_src: true
+      notify: Restart {{ service_name }}
 
     - name: TARBALL | Updating rke2-server.service
       ansible.builtin.replace:
         path: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-server.service"
         regexp: '/usr/local'
         replace: '{{ rke2_tarball_install_dir }}'
-      notify: Restart rke2-server
 
     - name: TARBALL | Updating rke2-agent.service
       ansible.builtin.replace:
         path: "{{ rke2_tarball_install_dir }}/lib/systemd/system/rke2-agent.service"
         regexp: '/usr/local'
         replace: '{{ rke2_tarball_install_dir }}'
-      notify: Restart rke2-agent
 
     - name: TARBALL | Updating rke2-uninstall.sh
       ansible.builtin.replace:
