@@ -2,7 +2,7 @@
 
 - name: Set Maj.Min version
   ansible.builtin.set_fact:
-    rke2_version_majmin: "/{{ rke2_install_version | ansible.builtin.regex_replace('^v?(\\d+\\.\\d+).*', '\\1') }}"
+    rke2_version_majmin: "{{ rke2_install_version | ansible.builtin.regex_replace('^v?(\\d+\\.\\d+).*', '\\1') }}"
   when:
     - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'
 
