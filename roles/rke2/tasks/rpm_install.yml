@@ -1,5 +1,11 @@
 ---
 
+- name: Set Maj.Min version
+  ansible.builtin.set_fact:
+    rke2_version_majmin: "/{{ rke2_install_version | ansible.builtin.regex_replace('^v?(\\d+\\.\\d+).*', '\\1') }}"
+  when:
+    - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'
+
 # Add RKE2 Common repo
 - name: Add the rke2-common repo RHEL/CentOS/Rocky
   ansible.builtin.yum_repository:
@@ -20,14 +26,18 @@
     gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
     enabled: "{{ rke2_versioned_yum_repo.enabled }}"
 
+- name: Set RKE2 RPM version
+  ansible.builtin.set_fact:
+    rke2_version_rpm: "{{ rke2_install_version | regex_replace('[\\+-]', '~') | regex_replace('^v', '') }}"
+
 - name: Debug install
   ansible.builtin.debug:
-    msg: installing {{ service_name }}{{ rke2_version_rpm }}
+    msg: installing {{ service_name }}-{{ rke2_version_rpm }}
   tags: ["never"]
 
 - name: YUM-Based Install
   ansible.builtin.dnf:
-    name: "{{ service_name }}{{ rke2_version_rpm }}"
+    name: "{{ service_name }}-{{ rke2_version_rpm }}"
     state: "{{ rke2_package_state }}"
     allow_downgrade: true
   register: result

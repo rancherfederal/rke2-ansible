@@ -10,15 +10,7 @@
   ansible.builtin.set_fact:
     arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
 
-- name: Determine if current version differs from what is being installed
-  ansible.builtin.set_fact:
-    rke2_version_changed: true
-  when:
-    - rke2_install_local_tarball_path == ""
-    - rke2_install_tarball_url == ""
-    - not rke2_installed or rke2_installed_version | default("") != rke2_full_version
-
-- name: Send provided tarball from local control machine if available
+- name: Send provided tarball from local control machine if specified
   ansible.builtin.copy:
     src: "{{ rke2_install_local_tarball_path }}"
     dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
@@ -26,7 +18,7 @@
   when:
     - rke2_install_local_tarball_path != ""
 
-- name: Download Tar from provided URL
+- name: Download Tar from provided URL if specified
   ansible.builtin.get_url:
     url: "{{ rke2_install_tarball_url }}"
     dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
@@ -34,9 +26,17 @@
   when:
     - rke2_install_tarball_url != ""
 
+- name: Check if new tarball is needed from github
+  ansible.builtin.set_fact:
+    rke2_version_changed: true
+  when:
+    - rke2_install_local_tarball_path == ""
+    - rke2_install_tarball_url == ""
+    - not rke2_installed or rke2_installed_version | default("") != rke2_install_version
+
 - name: Download the tar from github releases
   ansible.builtin.get_url:
-    url: "https://github.com/rancher/rke2/releases/download/{{ rke2_full_version }}/rke2.linux-{{ arch }}.tar.gz"
+    url: "https://github.com/rancher/rke2/releases/download/{{ rke2_install_version }}/rke2.linux-{{ arch }}.tar.gz"
     dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
     mode: "0644"
   when:
