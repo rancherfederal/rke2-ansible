@@ -2,13 +2,13 @@
 
 - name: Wait for node-token
   ansible.builtin.wait_for:
-    path: /var/lib/rancher/rke2/server/node-token
+    path: "{{ rke2_data_dir }}/server/node-token"
   delegate_to: "{{ token_source_node }}"
   tags: ["configure"]
 
 - name: Read node-token from master
   ansible.builtin.slurp:
-    src: /var/lib/rancher/rke2/server/node-token
+    src: "{{ rke2_data_dir }}/server/node-token"
   register: node_token
   delegate_to: "{{ token_source_node }}"
   tags: ["configure"]
