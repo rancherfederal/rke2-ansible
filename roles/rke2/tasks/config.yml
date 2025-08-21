@@ -1,19 +1,19 @@
 ---
 
-# combine host and group vars to form primary rke2_config
-- name: Combine host and group config vars
+# combine cluster and group vars to form temp rke2_config
+- name: Combine cluster and group config vars
   ansible.builtin.set_fact:
     temp_group_rke2_config: "{{ cluster_rke2_config | default({}) | ansible.builtin.combine((group_rke2_config | default({})), list_merge='prepend_rp') }}"
   tags: ["configure"]
 
-# combine host and group vars to form primary rke2_config
-- name: Combine host and group config vars
+# combine prevrious with host vars to form final rke2_config
+- name: Combine previous config and host config vars
   ansible.builtin.set_fact:
     rke2_config: "{{ temp_group_rke2_config | default({}) | ansible.builtin.combine((host_rke2_config | default({})), list_merge='prepend_rp') }}"
   tags: ["configure"]
 
 # write final config
-- name: Create config.yaml
+- name: Write config.yaml
   ansible.builtin.blockinfile:
     path: /etc/rancher/rke2/config.yaml
     block: "{{ rke2_config | to_nice_yaml(indent=0) }}"

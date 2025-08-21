@@ -24,6 +24,9 @@
     - rke2_install_version | length == 0
     - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'  # needed to calculate RPM URL since path includes maj.min in url
 
+- name: Check if data-dir is set in any config file
+  ansible.builtin.include_tasks: check_datadir.yml
+
 - name: Start check_node_ready.yml
   ansible.builtin.include_tasks: check_node_ready.yml
   vars:
@@ -63,7 +66,7 @@
   ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
     source_directory: "{{ rke2_manifest_config_directory }}"
-    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_0
+    destination_directory: "{{ rke2_data_dir }}/server/manifests/ansible_managed_0"
   when:
     - rke2_manifest_config_directory is defined
     - rke2_manifest_config_directory | length > 0
@@ -108,7 +111,7 @@
   ansible.builtin.include_tasks: add_manifest_addons.yml
   vars:
     source_directory: "{{ rke2_manifest_config_post_run_directory }}"
-    destination_directory: /var/lib/rancher/rke2/server/manifests/ansible_managed_1
+    destination_directory: "{{ rke2_data_dir }}/server/manifests/ansible_managed_1"
   when:
     - rke2_manifest_config_post_run_directory is defined
     - rke2_manifest_config_post_run_directory | length > 0

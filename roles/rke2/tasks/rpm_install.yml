@@ -1,46 +1,81 @@
 ---
+- name: Install all from remote web server
+  when: rke2_rpms_path | length == 0
+  block:
+    # Add RKE2 Common repo
+    - name: Add the rke2-common repo RHEL/CentOS/Rocky
+      ansible.builtin.yum_repository:
+        name: "{{ rke2_common_yum_repo.name }}"
+        description: "{{ rke2_common_yum_repo.description }}"
+        baseurl: "{{ rke2_common_yum_repo.baseurl }}"
+        gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
+        gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
+        enabled: "{{ rke2_common_yum_repo.enabled }}"
 
-- name: Set Maj.Min version
-  ansible.builtin.set_fact:
-    rke2_version_majmin: "{{ rke2_install_version | ansible.builtin.regex_replace('^v?(\\d+\\.\\d+).*', '\\1') }}"
-  when:
-    - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'
+    # Add RKE2 versioned repo
+    - name: Add the rke2 versioned repo CentOS/RHEL/Rocky
+      ansible.builtin.yum_repository:
+        name: "{{ rke2_versioned_yum_repo.name }}"
+        description: "{{ rke2_versioned_yum_repo.description }}"
+        baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
+        gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
+        gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
+        enabled: "{{ rke2_versioned_yum_repo.enabled }}"
 
-# Add RKE2 Common repo
-- name: Add the rke2-common repo RHEL/CentOS/Rocky
-  ansible.builtin.yum_repository:
-    name: "{{ rke2_common_yum_repo.name }}"
-    description: "{{ rke2_common_yum_repo.description }}"
-    baseurl: "{{ rke2_common_yum_repo.baseurl }}"
-    gpgcheck: "{{ rke2_common_yum_repo.gpgcheck }}"
-    gpgkey: "{{ rke2_common_yum_repo.gpgkey }}"
-    enabled: "{{ rke2_common_yum_repo.enabled }}"
+    - name: DNF-Based Install
+      ansible.builtin.dnf:
+        name: "{{ service_name }}{{ rke2_version_rpm }}"
+        state: "{{ rke2_package_state }}"
+        allow_downgrade: true
+      register: result
+      retries: 10
+      until: result is succeeded
+      delay: 30
 
-# Add RKE2 versioned repo
-- name: Add the rke2 versioned repo CentOS/RHEL/Rocky
-  ansible.builtin.yum_repository:
-    name: "{{ rke2_versioned_yum_repo.name }}"
-    description: "{{ rke2_versioned_yum_repo.description }}"
-    baseurl: "{{ rke2_versioned_yum_repo.baseurl }}"
-    gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
-    gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
-    enabled: "{{ rke2_versioned_yum_repo.enabled }}"
+- name: Install all from local directory
+  when: rke2_rpms_path | length > 0
+  block:
+    - name: RPM | Make temp dir
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: .rke2-install
+      register: temp_dir
 
-- name: Set RKE2 RPM version
-  ansible.builtin.set_fact:
-    rke2_version_rpm: "{{ rke2_install_version | regex_replace('[\\+-]', '~') | regex_replace('^v', '') }}"
+    - name: Sanitize RPM dir path  # remove trailing slash so we can add one later
+      ansible.builtin.set_fact:
+        sanitized_path: "{{ rke2_rpms_path | regex_replace('\\/$', '') }}"
 
-- name: Debug install
-  ansible.builtin.debug:
-    msg: installing {{ service_name }}-{{ rke2_version_rpm }}
-  tags: ["never"]
+    - name: Send RPM dir from local control machine
+      ansible.builtin.copy:
+        src: "{{ sanitized_path }}/"
+        dest: "{{ temp_dir.path }}/rke2_rpms"
+        mode: '0755'
 
-- name: YUM-Based Install
-  ansible.builtin.dnf:
-    name: "{{ service_name }}-{{ rke2_version_rpm }}"
-    state: "{{ rke2_package_state }}"
-    allow_downgrade: true
-  register: result
-  retries: 10
-  until: result is succeeded
-  delay: 30
+    - name: Find all RPMs in local directory
+      ansible.builtin.find:
+        paths: "{{ temp_dir.path }}/rke2_rpms"
+        patterns: "*.rpm"
+      register: rpm_files
+
+    - name: Ensuring both server and agent RPMs aren't being installed
+      ansible.builtin.set_fact:
+        do_not_install: "{{ 'rke2-agent' if service_name == 'rke2-server' else 'rke2-server' }}"
+
+    - name: "Removing from install list: {{ do_not_install }}"
+      ansible.builtin.set_fact:
+        filtered_rpms: >
+          {{ rpm_files.files
+          | map(attribute='path')
+          | reject('search', do_not_install)
+          | list }}
+
+    - name: Install all found RPM packages
+      ansible.builtin.dnf:
+        name: "{{ filtered_rpms }}"
+        state: present
+
+    - name: Clean up temporary directory
+      ansible.builtin.file:
+        path: "{{ temp_dir.path }}"
+        state: absent
+      when: temp_dir.path is defined
