@@ -21,6 +21,8 @@
   when:
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
+    - rke2_install_version | length == 0
+    - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'  # needed to calculate RPM URL since path includes maj.min in url
 
 - name: Check if data-dir is set in any config file
   ansible.builtin.include_tasks: check_datadir.yml
