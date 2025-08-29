@@ -31,7 +31,7 @@
         gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
         gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
         enabled: "{{ rke2_versioned_yum_repo.enabled }}"
-    
+
     # - name: Debug
     #   debug:
     #     msg: "Installing: {{ service_name }} Version: {{ rke2_version_rpm }} "
