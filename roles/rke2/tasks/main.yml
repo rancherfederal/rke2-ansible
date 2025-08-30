@@ -7,7 +7,7 @@
   ansible.builtin.include_tasks: pre_reqs.yml
   tags: ["setup-os"]
 
-- name: Has rke2 been installed already
+- name: Determine if rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
 
 - name: Check for images bundle
@@ -34,17 +34,37 @@
     check_node_ready_ignore_errors: true
   when:
     - inventory_hostname in groups['rke2_servers']
-    - rke2_installed
+    - rke2_running | default (false)
   tags: ["configure"]
 
 - name: Create a list of ready servers
   ansible.builtin.set_fact:
-    ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
+    ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
   delegate_to: localhost
   run_once: true
   when:
     - (groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | list | length) > 0
   tags: ["configure"]
+
+- name: Check for nodes where rke2 was running previously
+  when:
+    - rke2_running is not defined
+    - rke2_installed
+  block:
+    - name: Check for node-token file on installed but not ready servers
+      ansible.builtin.stat:
+        path: /var/lib/rancher/rke2/server/node-token
+      register: node_token_stat
+      tags: ["configure"]
+
+    - name: Create a list of configured but not ready servers
+      ansible.builtin.set_fact:
+        not_ready_servers: "{{ not_ready_servers | default([]) + [inventory_hostname] }}"
+      when:
+        - node_token_stat.stat.exists
+      run_once: true
+      delegate_to: localhost
+      tags: ["configure"]
 
 - name: Tarball Install
   ansible.builtin.include_tasks: tarball_install.yml
@@ -71,12 +91,22 @@
     - inventory_hostname in groups['rke2_servers'][0]
   tags: ["addons"]
 
-# is the ready_servers array is empty, we assume it's a new cluster and use the first server in groups['rke2_servers']
+# - name: Ready status
+#   ansible.builtin.debug:
+#     msg: |
+#       "ready_servers: {{ ready_servers | default([]) }}"
+#       "not_ready_servers: {{ not_ready_servers | default([])}}"
+
+# if the ready_servers array is empty, we assume it's a new cluster and use the first server in groups['rke2_servers']
+# or
+# one of the nodes was running and is in the stopped state and needs to be started first.
 - name: Start the first rke2 node
   ansible.builtin.include_tasks: first_server.yml
   when:
-    - inventory_hostname in groups['rke2_servers'][0]
     - ready_servers is not defined or ready_servers | length == 0
+    - >
+      (not_ready_servers | default([]) | length > 0 and inventory_hostname == not_ready_servers[0]) or
+      (not_ready_servers | default([]) | length == 0 and inventory_hostname == groups['rke2_servers'][0])
 
 - name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
