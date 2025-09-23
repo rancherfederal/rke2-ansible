@@ -88,7 +88,7 @@
   tags: ["stig"]
 
 # #4
-- name: "Find all existing files in { rke2_data_dir }}/bin"
+- name: "Find all existing files in {{ rke2_data_dir }}/bin"
   ansible.builtin.find:
     paths: "{{ rke2_data_dir }}/bin"
     file_type: file
