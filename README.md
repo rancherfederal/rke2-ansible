@@ -51,7 +51,7 @@ Create an Ansible inventory file (or folder), you can check the docs folder for 
 
 Start provisioning the cluster using the following command:
 ```bash
-ansible-playbook ./plays/site.yml -i inventory/hosts.yml -b
+ansible-playbook ./playbooks/site.yml -i inventory/hosts.yml -b
 ```  
 
 
