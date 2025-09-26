@@ -3,6 +3,7 @@ rke2_pod_security_admission_config_file_path: "{{ playbook_dir }}/docs/advanced_
 rke2_audit_policy_config_file_path: "{{ playbook_dir }}/docs/advanced_sample_inventory/files/audit-policy.yaml"
 rke2_manifest_config_directory: "{{ playbook_dir }}/docs/advanced_sample_inventory/pre-deploy-manifests/"
 rke2_manifest_config_post_run_directory: "{{ playbook_dir }}/docs/advanced_sample_inventory/post-deploy-manifests/"
+kube_api_authn_webhook_file_path: "{{ playbook_dir }}/docs/advanced_sample_inventory/files/kube-api-authn-webhook.yaml"
 
 group_rke2_config:
   # Use Cilium as the CNI
@@ -16,3 +17,4 @@ group_rke2_config:
   kube-apiserver-arg:
     - audit-policy-file=/etc/rancher/rke2/audit-policy.yaml
     - audit-log-path=/var/lib/rancher/rke2/server/logs/audit.log
+    - authentication-token-webhook-config-file=/var/lib/rancher/rke2/kube-api-authn-webhook.yaml
