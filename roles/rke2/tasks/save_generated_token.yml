@@ -1,4 +1,5 @@
 ---
+
 - name: Wait for node-token
   ansible.builtin.wait_for:
     path: /var/lib/rancher/rke2/server/node-token
@@ -26,7 +27,7 @@
 
 - name: Set temp fact for api host
   ansible.builtin.set_fact:
-    rke2_kubernetes_api_server_host: "{{ hostvars[token_source_node]['ansible_default_ipv4']['address'] }}"
+    rke2_kubernetes_api_server_host: "{{ token_source_node }}"
   when:
     - rke2_kubernetes_api_server_host == ""
 
