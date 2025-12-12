@@ -42,13 +42,13 @@
 - name: Create a list of ready servers
   ansible.builtin.set_fact:
     ready_servers: >-
-      {{ 
-        groups.rke2_servers 
-        | map('extract', hostvars) 
-        | selectattr('rke2_node_ready', 'defined') 
-        | selectattr('rke2_node_ready', 'equalto', true) 
-        | map(attribute='inventory_hostname') 
-        | list 
+      {{
+        groups.rke2_servers
+        | map('extract', hostvars)
+        | selectattr('rke2_node_ready', 'defined')
+        | selectattr('rke2_node_ready', 'equalto', true)
+        | map(attribute='inventory_hostname')
+        | list
       }}
   delegate_to: localhost
   run_once: true
@@ -56,6 +56,8 @@
     - (groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | list | length) > 0
 
 - name: Install RKE2
+  when:
+    - (rke2_installed is false) or (rke2_installed is true and rke2_upgrade is true)
   block:
     - name: Tarball Install
       ansible.builtin.include_tasks: tarball_install.yml
@@ -65,8 +67,6 @@
       ansible.builtin.include_tasks: rpm_install.yml
       when:
         - install_method == "rpm"
-  when:
-    - (rke2_installed is false) or (rke2_installed is true and rke2_upgrade is true)
 
 - name: Set rke2 configuration files
   ansible.builtin.include_tasks: configure_rke2.yml
