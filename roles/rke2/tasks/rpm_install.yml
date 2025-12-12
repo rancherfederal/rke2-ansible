@@ -75,7 +75,7 @@
       ansible.builtin.set_fact:
         do_not_install: "{{ 'rke2-agent' if service_name == 'rke2-server' else 'rke2-server' }}"
 
-    - name: "Removing from install list: {{ do_not_install }}"
+    - name: Removing identified Server or Agent package from install list
       ansible.builtin.set_fact:
         filtered_rpms: >
           {{ rpm_files.files
