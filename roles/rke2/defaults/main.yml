@@ -93,6 +93,9 @@ rke2_manifest_config_post_run_directory: ""
 ## Path, local to Ansible control host, where systemd environment file config can be found (Proxy Config).
 rke2_systemd_env_config_file_path: ""
 
+## Set to 'false' if Ansible should not attempt to upgrade an installed version of RKE2. This is useful if using the System Upgrade Controller to manage the installed version of RKE2.
+rke2_upgrade: true
+
 # Should not be changed:
 rke2_metrics_running: false
 rke2_node_ready: "false"
