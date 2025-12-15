@@ -16,7 +16,9 @@
           This upgrade playbook is rather simple and does not drain agent nodes before upgrading.
           This should work fine for simpler deployments, but this playbook should be used with
           caution. Please consider using Rancher System Upgrade Controller instead.
-          Do you wish to continue? (Press 'C' to continue the play or 'A' to Abort)
+          Do you wish to continue? (Press 'C' to continue the play or any other key to Abort)
+      register: continue_prompt
+      failed_when: continue_prompt.user_input not in ['C']
 
 - name: Collect Info
   hosts: all
@@ -31,6 +33,11 @@
       ansible.builtin.include_role:
         name: rke2
         tasks_from: previous_install
+
+    - name: Check if data-dir is set in any config file
+      ansible.builtin.include_role:
+        name: rke2
+        tasks_from: check_datadir.yml
 
     - name: Check calculate_rke2_version.yml
       ansible.builtin.include_role:
