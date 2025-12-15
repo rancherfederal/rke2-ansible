@@ -39,6 +39,11 @@
         name: rke2
         tasks_from: check_datadir.yml
 
+    - name: Check calculate_rke2_version.yml
+      ansible.builtin.include_role:
+        name: rke2
+        tasks_from: calculate_rke2_version.yml
+
     - name: Check check_node_ready.yml
       ansible.builtin.include_role:
         name: rke2
