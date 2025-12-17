@@ -101,6 +101,7 @@ systemctl restart fapolicyd
 
 ```
 
+- The rke2-selinux RPM will set proper SELinux context for RKE2 on systems with SELinux enabled. If modifying `data-dir`, the rke2-selinux RPM is not aware of this change and will not be setting the proper context on the new `data-dir` directories. Setting the proper SELinux context for a modified `data-dir` is not supported by this playbook and should be handled externally before this playbook runs.
 
 Author Information
 ------------------
