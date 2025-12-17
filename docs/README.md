@@ -87,7 +87,7 @@ This playbook collects the needed details from all nodes before running the inst
 The RKE2 role currently contains seven tags ("cis", "setup-os", "configure", "addons", "setup-root", "stig", "never"). Some must be run after the cluster is installed and some may happen before. When using these tags caution is advised.   
 
 - "cis" only runs the needed tasks to run the "cis_hardening.yml" task set. This task sets up the etcd user, configures systemctl, and reboots.
-- "setup-os" is used to run the "pre-reqs.yml" task set. This configures FirewallD, iptables, NetworkManager, and FapolicyD.
+- "setup-os" is used to run the "pre-reqs.yml" task set. This configures FirewallD, iptables, and NetworkManager.
 - "configure" will update just the RKE2 configuration files. This does not include the add on manifests. 
 - "addons" is used to deploy the addon files, including post and pre-deployment manifests.
 - "setup-root" sets the root user up for access to `kubectl` and other useful binaries. 

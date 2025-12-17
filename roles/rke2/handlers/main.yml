@@ -6,13 +6,6 @@
   when:
     - not rke2_reboot
 
-- name: Restart fapolicyd
-  ansible.builtin.service:
-    state: restarted
-    name: fapolicyd
-  when:
-    - not rke2_reboot
-
 - name: Restart rke2-server
   ansible.builtin.service:
     state: restarted

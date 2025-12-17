@@ -50,7 +50,7 @@
   ansible.builtin.include_tasks: add_ansible_managed_config.yml
   vars:
     file_contents: "{{ lookup('file', kube_api_authn_webhook_file_path) }}"
-    file_destination: "/var/lib/rancher/rke2/kube-api-authn-webhook.yaml"
+    file_destination: "{{ rke2_data_dir }}kube-api-authn-webhook.yaml"
     file_description: "authorized cluster endpoint config"
     file_path: "{{ kube_api_authn_webhook_file_path }}"
   when:
