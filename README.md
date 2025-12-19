@@ -86,7 +86,7 @@ On rare occasions you may have to run the uninstall commands a second time.
 Known Issues
 ------------------
 
-As of RKE2 1.30.5, FapolicyD is now managed via the rke2-common RPM and will not be managed by this playbook.
+As of RKE2 1.30.5, FapolicyD rules are now deployed via the rke2-common RPM. The RPM does not attempt to restart FapolicyD, therefore this playbook still assumes ownership of the FapolicyD rules.
 
 - For RHEL8+ Operating Systems that have FapolicyD daemon running, rpm installation of RKE2 will fail due to a permission error while starting containerd. Users have to add the following rules file before installing RKE2. This is not an issue if the install.sh script is used to install RKE2. The RPM issue is expected to be fixed in later versions of RKE2.
 ```bash
