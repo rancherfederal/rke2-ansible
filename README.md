@@ -85,7 +85,13 @@ On rare occasions you may have to run the uninstall commands a second time.
 
 Known Issues
 ------------------
+
 - For RHEL8+ Operating Systems that have FapolicyD daemon running, rpm installation of RKE2 will fail due to a permission error while starting containerd. Users have to add the following rules file before installing RKE2. This is not an issue if the install.sh script is used to install RKE2. The RPM issue is expected to be fixed in later versions of RKE2.
+
+As of RKE2 1.30.5, FapolicyD rules are now deployed via the rke2-common RPM. The RPM does not attempt to restart FapolicyD, therefore this playbook still assumes ownership of the FapolicyD rules.
+
+The rke2-common RPM creates the 80-rke2.rules file with root:root ownership. This playbook will modify that to be root:fapolicy, which may result in a change being shown on a second playbook run.
+
 ```bash
 cat <<-EOF >>"/etc/fapolicyd/rules.d/80-rke2.rules"
 allow perm=any all : dir=/var/lib/rancher/
@@ -98,6 +104,7 @@ systemctl restart fapolicyd
 
 ```
 
+- The rke2-selinux RPM will set proper SELinux context for RKE2 on systems with SELinux enabled. If modifying `data-dir`, the rke2-selinux RPM is not aware of this change and will not be setting the proper context on the new `data-dir` directories. Setting the proper SELinux context for a modified `data-dir` is not supported by this playbook and should be handled externally before this playbook runs.
 
 Author Information
 ------------------

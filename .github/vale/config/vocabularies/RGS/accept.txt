@@ -10,6 +10,7 @@ addons?
 # Tools
 [A|a]nsible
 etcd
+rke2-selinux
 
 # Kubernetes
 Kubernetes

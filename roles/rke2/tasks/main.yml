@@ -3,6 +3,9 @@
   ansible.builtin.include_tasks: collect_info.yml
   tags: ["setup-os", "configure", "cis"]
 
+- name: Check if data-dir is set in any config file
+  ansible.builtin.include_tasks: check_datadir.yml
+
 - name: Satisfy OS Pre-Reqs
   ansible.builtin.include_tasks: pre_reqs.yml
   tags: ["setup-os"]
@@ -23,9 +26,6 @@
     - rke2_install_tarball_url == ""
     - rke2_install_version | length == 0
     - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'  # needed to calculate RPM URL since path includes maj.min in url
-
-- name: Check if data-dir is set in any config file
-  ansible.builtin.include_tasks: check_datadir.yml
 
 - name: Start check_node_ready.yml
   ansible.builtin.include_tasks: check_node_ready.yml
