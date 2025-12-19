@@ -75,8 +75,7 @@
       delegate_to: localhost
       tags: ["configure"]
 
-- name: Tarball Install
-  ansible.builtin.include_tasks: tarball_install.yml
+- name: Install RKE2
   when:
     - (rke2_installed is false) or (rke2_installed is true and rke2_upgrade is true)
   block:
