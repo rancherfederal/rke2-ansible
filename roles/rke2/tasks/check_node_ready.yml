@@ -1,23 +1,23 @@
 ---
 
-- name: Wait for k8s apiserver
-  ansible.builtin.wait_for:
-    host: localhost
-    port: "6443"
-    state: present
-    timeout: "{{ check_node_ready_timeout }}"
-  changed_when: false
-  register: api_serve_status
-  ignore_errors: "{{ check_node_ready_ignore_errors }}"
-  tags: ["configure"]
+# - name: Wait for k8s apiserver
+#   ansible.builtin.wait_for:
+#     host: localhost
+#     port: "6443"
+#     state: present
+#     timeout: "{{ check_node_ready_timeout }}"
+#   changed_when: false
+#   register: api_server_status
+#   ignore_errors: "{{ check_node_ready_ignore_errors }}"
+#   tags: ["configure"]
 
-- name: Set fact
-  ansible.builtin.set_fact:
-    rke2_api_server_running: true
-  when:
-    - api_serve_status.state is not undefined
-    - api_serve_status.state == "present"
-  tags: ["configure"]
+# - name: Set fact
+#   ansible.builtin.set_fact:
+#     rke2_api_server_running: true
+#   when:
+#     - api_server_status.state is not undefined
+#     - api_server_status.state == "present"
+#   tags: ["configure"]
 
 - name: Get node_metrics
   ansible.builtin.uri:
@@ -57,6 +57,7 @@
   delay: "{{ check_node_ready_delay }}"
   changed_when: false
   ignore_errors: "{{ check_node_ready_ignore_errors }}"
+  when: kubelet_node_name is defined
   tags: ["configure"]
 
 - name: Set fact
@@ -67,10 +68,10 @@
     - status_result.rc | string == "0"
   tags: ["configure"]
 
-- name: Node status
-  ansible.builtin.debug:
-    msg: |
-      "rke2_node_ready: {{ rke2_node_ready }}"
-      "rke2_metrics_running: {{ rke2_metrics_running }}"
-      "rke2_api_server_running: {{ rke2_api_server_running }}"
-  tags: ["never"]
+# - name: Node status
+#   ansible.builtin.debug:
+#     msg: |
+#       "rke2_node_ready: {{ rke2_node_ready }}"
+#       "rke2_metrics_running: {{ rke2_metrics_running }}"
+#       "rke2_api_server_running: {{ rke2_api_server_running }}"
+#   tags: ["never"]
