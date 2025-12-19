@@ -15,8 +15,9 @@
         prompt: |-
           This playbook is rather simple and does not drain agent or server nodes before rotating
           certificates. This should work fine for simpler deployments, but this playbook should
-          be used with caution. Do you wish to continue?
-          (Press 'C' to continue the play or 'A' to Abort)
+          be used with caution. Do you wish to continue? (Press 'C' to continue the play or any other key to Abort)
+      register: continue_prompt
+      failed_when: continue_prompt.user_input not in ['C']
 
 - name: Rotate certificates on servers
   hosts: rke2_servers

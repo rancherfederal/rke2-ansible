@@ -4,9 +4,9 @@
   become: true
   tags: ["cis"]
   when:
-    - (cluster_rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$')) or
-      (group_rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$')) or
-      (host_rke2_config.profile | default("") | regex_search('^cis(-\\d+.\\d+)?$'))
+    - ((cluster_rke2_config | default({})).profile | default("") | regex_search('^cis(-\\d+.\\d+)?$')) is not none or
+      ((group_rke2_config | default({})).profile | default("") | regex_search('^cis(-\\d+.\\d+)?$')) is not none or
+      ((host_rke2_config | default({})).profile | default("") | regex_search('^cis(-\\d+.\\d+)?$')) is not none
   block:
     - name: Create etcd group
       ansible.builtin.group:

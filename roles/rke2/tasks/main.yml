@@ -21,6 +21,8 @@
   when:
     - rke2_install_local_tarball_path == ""
     - rke2_install_tarball_url == ""
+    - rke2_install_version | length == 0
+    - '"rpm.rancher.io" in rke2_versioned_yum_repo.baseurl'  # needed to calculate RPM URL since path includes maj.min in url
 
 - name: Check if data-dir is set in any config file
   ansible.builtin.include_tasks: check_datadir.yml
@@ -39,12 +41,19 @@
 
 - name: Create a list of ready servers
   ansible.builtin.set_fact:
-    ready_servers: "{{ groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | map(attribute='inventory_hostname') | list }}"
+    ready_servers: >-
+      {{
+        groups.rke2_servers
+        | map('extract', hostvars)
+        | selectattr('rke2_node_ready', 'defined')
+        | selectattr('rke2_node_ready', 'equalto', true)
+        | map(attribute='inventory_hostname')
+        | list
+      }}
   delegate_to: localhost
   run_once: true
   when:
     - (groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | list | length) > 0
-  tags: ["configure"]
 
 - name: Check for nodes where rke2 was running previously
   when:
@@ -69,12 +78,16 @@
 - name: Tarball Install
   ansible.builtin.include_tasks: tarball_install.yml
   when:
-    - install_method == "tarball"
-
-- name: RPM Install
-  ansible.builtin.include_tasks: rpm_install.yml
-  when:
-    - install_method == "rpm"
+    - (rke2_installed is false) or (rke2_installed is true and rke2_upgrade is true)
+  block:
+    - name: Tarball Install
+      ansible.builtin.include_tasks: tarball_install.yml
+      when:
+        - install_method == "tarball"
+    - name: RPM Install
+      ansible.builtin.include_tasks: rpm_install.yml
+      when:
+        - install_method == "rpm"
 
 - name: Set rke2 configuration files
   ansible.builtin.include_tasks: configure_rke2.yml

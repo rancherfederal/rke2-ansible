@@ -1,7 +1,17 @@
 ---
+
 - name: Install all from remote web server
   when: rke2_rpms_path | length == 0
   block:
+    - name: Set Maj.Min version
+      ansible.builtin.set_fact:
+        rke2_version_majmin: "{{ rke2_install_version | ansible.builtin.regex_replace('^v?(\\d+\\.\\d+).*', '\\1') }}"
+
+    - name: Set RPM version
+      ansible.builtin.set_fact:
+        rke2_version_rpm: "-{{ rke2_install_version | regex_replace('[+-]', '~', 'g') | regex_replace('^v(.*)', '\\1') }}"
+      when: rke2_install_version | length > 0
+
     # Add RKE2 Common repo
     - name: Add the rke2-common repo RHEL/CentOS/Rocky
       ansible.builtin.yum_repository:
@@ -21,6 +31,10 @@
         gpgcheck: "{{ rke2_versioned_yum_repo.gpgcheck }}"
         gpgkey: "{{ rke2_versioned_yum_repo.gpgkey }}"
         enabled: "{{ rke2_versioned_yum_repo.enabled }}"
+
+    # - name: Debug
+    #   debug:
+    #     msg: "Installing: {{ service_name }} Version: {{ rke2_version_rpm }} "
 
     - name: DNF-Based Install
       ansible.builtin.dnf:
@@ -61,7 +75,7 @@
       ansible.builtin.set_fact:
         do_not_install: "{{ 'rke2-agent' if service_name == 'rke2-server' else 'rke2-server' }}"
 
-    - name: "Removing from install list: {{ do_not_install }}"
+    - name: Removing identified Server or Agent package from install list
       ansible.builtin.set_fact:
         filtered_rpms: >
           {{ rpm_files.files

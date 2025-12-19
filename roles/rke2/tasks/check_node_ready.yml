@@ -62,7 +62,7 @@
 
 - name: Set fact
   ansible.builtin.set_fact:
-    rke2_node_ready: "true"
+    rke2_node_ready: true
   when:
     - status_result.rc is not undefined
     - status_result.rc | string == "0"

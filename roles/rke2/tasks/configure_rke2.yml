@@ -45,3 +45,13 @@
     file_path: "{{ rke2_pod_security_admission_config_file_path }}"
   when:
     - inventory_hostname in groups['rke2_servers']
+
+- name: "Include task file add_ansible_managed_config.yml for {{ file_description }}"
+  ansible.builtin.include_tasks: add_ansible_managed_config.yml
+  vars:
+    file_contents: "{{ lookup('file', kube_api_authn_webhook_file_path) }}"
+    file_destination: "/var/lib/rancher/rke2/kube-api-authn-webhook.yaml"
+    file_description: "authorized cluster endpoint config"
+    file_path: "{{ kube_api_authn_webhook_file_path }}"
+  when:
+    - inventory_hostname in groups['rke2_servers']
