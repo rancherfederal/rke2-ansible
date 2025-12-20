@@ -7,7 +7,7 @@
     state: present
     timeout: "{{ check_node_ready_timeout }}"
   changed_when: false
-  register: api_serve_status
+  register: api_server_status
   ignore_errors: "{{ check_node_ready_ignore_errors }}"
   tags: ["configure"]
 
@@ -15,8 +15,8 @@
   ansible.builtin.set_fact:
     rke2_api_server_running: true
   when:
-    - api_serve_status.state is not undefined
-    - api_serve_status.state == "present"
+    - api_server_status.state is not undefined
+    - api_server_status.state == "present"
   tags: ["configure"]
 
 - name: Get node_metrics
@@ -49,28 +49,33 @@
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
     "{{ rke2_data_dir }}/bin/kubectl" --kubeconfig /etc/rancher/rke2/rke2.yaml
-    --server https://127.0.0.1:6443 get no {{ kubelet_node_name[0] }}
+    --server https://127.0.0.1:6443 get node "{{ kubelet_node_name[0] }}"
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
   register: status_result
   until: status_result.stdout.find("True") != -1
   retries: "{{ check_node_ready_retries }}"
   delay: "{{ check_node_ready_delay }}"
   changed_when: false
-  ignore_errors: "{{ check_node_ready_ignore_errors }}"
+  # ignore_errors: "{{ check_node_ready_ignore_errors }}"
+  when: kubelet_node_name is defined
+  failed_when:
+    - not check_node_ready_ignore_errors
+    - not status_result.stdout | string == "True"
   tags: ["configure"]
 
-- name: Set fact
+- name: Set rke2_node_ready fact
   ansible.builtin.set_fact:
     rke2_node_ready: true
   when:
-    - status_result.rc is not undefined
-    - status_result.rc | string == "0"
+    - status_result.stdout is not undefined
+    - status_result.stdout | string == "True"
   tags: ["configure"]
 
-- name: Node status
-  ansible.builtin.debug:
-    msg: |
-      "rke2_node_ready: {{ rke2_node_ready }}"
-      "rke2_metrics_running: {{ rke2_metrics_running }}"
-      "rke2_api_server_running: {{ rke2_api_server_running }}"
-  tags: ["never"]
+# - name: Node status
+#   ansible.builtin.debug:
+#     msg: |
+#       "rke2_node_ready: {{ rke2_node_ready }}"
+#       #"status_result: {{ status_result }}"
+#       "rke2_metrics_running: {{ rke2_metrics_running }}"
+#       "rke2_api_server_running: {{ rke2_api_server_running }}"
+#   tags: ["never"]
