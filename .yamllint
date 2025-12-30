@@ -2,11 +2,20 @@
 extends: default
 
 rules:
+  braces:
+    max-spaces-inside: 1
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: false
   line-length:
     max: 200
     level: warning
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
 
 ignore: |
+  .ansible/
   .github/
   inventory/sample/group_vars/rke2_servers.yml
   inventory/sample/group_vars/rke2_agents.yml

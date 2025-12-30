@@ -10,7 +10,7 @@
   when:
     - ansible_facts.services["firewalld.service"] is defined
     - ansible_facts.services["firewalld.service"].status != "not-found"
-  notify: "Restart {{ service_name }}"
+  notify: "Restart {{ rke2_service_name }}"
 
 - name: Include task file network_manager_fix.yaml
   ansible.builtin.include_tasks: network_manager_fix.yaml

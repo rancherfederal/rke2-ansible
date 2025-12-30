@@ -10,7 +10,7 @@
   ansible.builtin.service:
     state: started
     enabled: true
-    name: "{{ service_name }}"
+    name: "{{ rke2_service_name }}"
 
 - name: Check_node_ready
   any_errors_fatal: true
@@ -18,7 +18,7 @@
     - name: Start check_node_ready.yml
       ansible.builtin.include_tasks: check_node_ready.yml
       vars:
-        check_node_ready_timeout: 300
-        check_node_ready_retries: 30
-        check_node_ready_delay: 10
+        check_node_ready_timeout: "{{ rke2_check_node_ready_timeout }}"
+        check_node_ready_retries: "{{ rke2_check_node_ready_retries }}"
+        check_node_ready_delay: "{{ rke2_check_node_ready_delay }}"
         check_node_ready_ignore_errors: false

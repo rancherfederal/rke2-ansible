@@ -13,7 +13,7 @@
   ansible.builtin.include_tasks: add_ansible_managed_config.yml
   vars:
     file_contents: "{{ lookup('file', rke2_systemd_env_config_file_path) }}"
-    file_destination: "/etc/default/{{ service_name }}"
+    file_destination: "/etc/default/{{ rke2_service_name }}"
     file_description: "systemd env options"
     file_path: "{{ rke2_systemd_env_config_file_path }}"
 

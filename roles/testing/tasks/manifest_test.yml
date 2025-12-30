@@ -21,11 +21,11 @@
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
     get pod automated-testing-pod
     -o jsonpath='{.status.phase}'
-  register: status_result
+  register: testing_status_result
   delegate_to: "{{ groups['rke2_servers'][0] }}"
   changed_when: false
 
 - name: Assertions
   ansible.builtin.assert:
     that:
-      - "'Running' in status_result.stdout"
+      - "'Running' in testing_status_result.stdout"

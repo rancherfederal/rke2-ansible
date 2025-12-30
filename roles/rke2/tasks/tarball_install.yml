@@ -4,11 +4,11 @@
     state: directory
     suffix: .rke2-install.XXXXXXXXXX
     path: "{{ tarball_tmp_dir | default(omit) }}"
-  register: temp_dir
+  register: rke2_temp_dir
 
 - name: Set architecture specific variables
   ansible.builtin.set_fact:
-    arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    rke2_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
 
 - name: Determine if current version differs from what is being installed
   ansible.builtin.set_fact:
@@ -21,7 +21,7 @@
 - name: Send provided tarball from local control machine if available
   ansible.builtin.copy:
     src: "{{ rke2_install_local_tarball_path }}"
-    dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
+    dest: "{{ rke2_temp_dir.path }}/rke2.linux-{{ rke2_arch }}.tar.gz"
     mode: '0644'
   when:
     - rke2_install_local_tarball_path != ""
@@ -29,15 +29,15 @@
 - name: Download Tar from provided URL
   ansible.builtin.get_url:
     url: "{{ rke2_install_tarball_url }}"
-    dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
+    dest: "{{ rke2_temp_dir.path }}/rke2.linux-{{ rke2_arch }}.tar.gz"
     mode: "0644"
   when:
     - rke2_install_tarball_url != ""
 
 - name: Download the tar from github releases
   ansible.builtin.get_url:
-    url: "https://github.com/rancher/rke2/releases/download/{{ rke2_full_version }}/rke2.linux-{{ arch }}.tar.gz"
-    dest: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
+    url: "https://github.com/rancher/rke2/releases/download/{{ rke2_full_version }}/rke2.linux-{{ rke2_arch }}.tar.gz"
+    dest: "{{ rke2_temp_dir.path }}/rke2.linux-{{ rke2_arch }}.tar.gz"
     mode: "0644"
   when:
     - rke2_install_local_tarball_path == ""
@@ -56,13 +56,13 @@
   block:
     - name: Unarchive tarball into temp location
       ansible.builtin.unarchive:
-        src: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
-        dest: "{{ temp_dir.path }}"
+        src: "{{ rke2_temp_dir.path }}/rke2.linux-{{ rke2_arch }}.tar.gz"
+        dest: "{{ rke2_temp_dir.path }}"
         remote_src: true
       changed_when: false
 
     - name: Get tarball RKE2 version from temp location
-      ansible.builtin.shell: set -o pipefail && {{ temp_dir.path }}/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
+      ansible.builtin.shell: set -o pipefail && {{ rke2_temp_dir.path }}/bin/rke2 -v | awk '$1 ~ /rke2/ { print $3 }'
       register: rke2_tarball_version_tmp
       changed_when: false
       args:
@@ -108,7 +108,7 @@
 
     - name: Unarchive rke2 tar
       ansible.builtin.unarchive:
-        src: "{{ temp_dir.path }}/rke2.linux-{{ arch }}.tar.gz"
+        src: "{{ rke2_temp_dir.path }}/rke2.linux-{{ rke2_arch }}.tar.gz"
         dest: "{{ rke2_tarball_install_dir }}"
         remote_src: true
 
@@ -182,6 +182,6 @@
 
 - name: Remove the temp_dir
   ansible.builtin.file:
-    path: "{{ temp_dir.path }}"
+    path: "{{ rke2_temp_dir.path }}"
     state: absent
-  when: temp_dir.path is defined
+  when: rke2_temp_dir.path is defined
