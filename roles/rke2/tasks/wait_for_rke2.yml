@@ -5,7 +5,7 @@
 
 - name: Enable service
   ansible.builtin.systemd:
-    name: "{{ service_name }}"
+    name: "{{ rke2_service_name }}"
     state: started
     enabled: true
 
@@ -14,32 +14,34 @@
     host: "{{ rke2_kubernetes_api_server_host }}"
     port: "6443"
     state: present
-    timeout: 300
+    timeout: "{{ rke2_wait_for_api_server_timeout }}"
 
 - name: Wait for kubelet process to be present on host
   ansible.builtin.command: >-
     ps -C kubelet -F -ww --no-headers
-  register: kubelet_check
-  until: kubelet_check.rc == 0
+  register: rke2_kubelet_check
+  until: rke2_kubelet_check.rc == 0
   retries: 20
   delay: 10
   changed_when: false
 
 - name: Extract the hostname-override parameter from the kubelet process
   ansible.builtin.set_fact:
-    kubelet_hostname: "{{ kubelet_check.stdout | regex_search('\\s--hostname-override=([^\\s]+)', '\\1') }}"
+    rke2_kubelet_hostname: "{{ rke2_kubelet_check.stdout | regex_search('\\s--hostname-override=([^\\s]+)', '\\1') | default('', true) }}"
   when:
     - inventory_hostname in groups['rke2_servers']
 
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
-    --server https://127.0.0.1:6443 get no {{ kubelet_hostname[0] }}
+    --server https://127.0.0.1:6443 get node "{{ rke2_kubelet_hostname }}"
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
-  register: status_result
-  until: status_result.stdout.find("True") != -1
+  register: rke2_status_result
+  until: rke2_status_result.stdout.find("True") != -1
   retries: 20
   delay: 10
   changed_when: false
   when:
     - inventory_hostname in groups['rke2_servers']
+    - rke2_kubelet_hostname is defined
+    - rke2_kubelet_hostname | length > 0

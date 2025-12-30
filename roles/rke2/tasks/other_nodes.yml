@@ -5,7 +5,7 @@
     host: "{{ rke2_kubernetes_api_server_host }}"
     port: "6443"
     state: present
-    timeout: "300"
+    timeout: "{{ rke2_wait_for_api_server_timeout }}"
   changed_when: false
 
 # - name: Include task file add-manifest-addons.yml
@@ -24,4 +24,4 @@
   ansible.builtin.service:
     state: started
     enabled: true
-    name: "{{ service_name }}"
+    name: "{{ rke2_service_name }}"

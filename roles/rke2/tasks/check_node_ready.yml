@@ -7,19 +7,15 @@
     state: present
     timeout: "{{ check_node_ready_timeout }}"
   changed_when: false
-  register: api_serve_status
+  register: rke2_api_server_status
   ignore_errors: "{{ check_node_ready_ignore_errors }}"
 
 - name: Set fact
   ansible.builtin.set_fact:
     rke2_api_server_running: true
   when:
-    - api_serve_status.state is not undefined
-    - api_serve_status.state == "present"
-
-- name: Set fact
-  ansible.builtin.set_fact:
-    rke2_api_server_running: "{{ rke2_api_server_running }}"
+    - rke2_api_server_status.state is not undefined
+    - rke2_api_server_status.state == "present"
 
 - name: Get node_metrics
   ansible.builtin.uri:
@@ -28,7 +24,7 @@
     ca_path: /var/lib/rancher/rke2/server/tls/server-ca.crt
     client_cert: /var/lib/rancher/rke2/server/tls/client-admin.crt
     client_key: /var/lib/rancher/rke2/server/tls/client-admin.key
-  register: node_metrics
+  register: rke2_node_metrics
   retries: "{{ check_node_ready_retries }}"
   delay: "{{ check_node_ready_delay }}"
   ignore_errors: "{{ check_node_ready_ignore_errors }}"
@@ -37,40 +33,46 @@
   ansible.builtin.set_fact:
     rke2_metrics_running: true
   when:
-    - 200 | string in node_metrics.status | string
-
-- name: Set fact for rke2_metrics_running
-  ansible.builtin.set_fact:
-    rke2_metrics_running: "{{ rke2_metrics_running }}"
+    - (rke2_node_metrics.status | default('')) | string == "200"
 
 - name: Extract the kubelet_node_name from node metrics
   ansible.builtin.set_fact:
-    kubelet_node_name: "{{ node_metrics.content | regex_search('kubelet_node_name{node=\"(.*)\"}', '\\1') }}"
+    rke2_kubelet_node_name: "{{ rke2_node_metrics.content | regex_search('kubelet_node_name{node=\"(.*)\"}', '\\1') | default('', true) }}"
   when:
-    - 200 | string in node_metrics.status | string
+    - (rke2_node_metrics.status | default('')) | string == "200"
+
+- name: Fail if kubelet node name could not be determined
+  ansible.builtin.fail:
+    msg: "Unable to determine kubelet node name from metrics."
+  when:
+    - not check_node_ready_ignore_errors
+    - rke2_kubelet_node_name is not defined or rke2_kubelet_node_name | length == 0
 
 - name: Wait for node to show Ready status
   ansible.builtin.command: >-
     /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml
-    --server https://127.0.0.1:6443 get no {{ kubelet_node_name[0] }}
+    --server https://127.0.0.1:6443 get node "{{ rke2_kubelet_node_name }}"
     -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
-  register: status_result
-  until: status_result.stdout.find("True") != -1
+  register: rke2_status_result
+  until: rke2_status_result.stdout.find("True") != -1
   retries: "{{ check_node_ready_retries }}"
   delay: "{{ check_node_ready_delay }}"
   changed_when: false
   ignore_errors: "{{ check_node_ready_ignore_errors }}"
-
-- name: Set fact
-  ansible.builtin.set_fact:
-    rke2_node_ready: "true"
+  failed_when:
+    - not check_node_ready_ignore_errors
+    - (rke2_status_result.stdout | default('')) | string != "True"
   when:
-    - status_result.rc is not undefined
-    - status_result.rc | string == "0"
+    - rke2_kubelet_node_name is defined
+    - rke2_kubelet_node_name | length > 0
 
 - name: Set fact
   ansible.builtin.set_fact:
-    rke2_node_ready: "{{ rke2_node_ready }}"
+    rke2_node_ready: true
+  when:
+    - rke2_status_result is defined
+    - rke2_status_result.stdout is defined
+    - (rke2_status_result.stdout | string) == "True"
 
 - name: Node status
   ansible.builtin.debug:

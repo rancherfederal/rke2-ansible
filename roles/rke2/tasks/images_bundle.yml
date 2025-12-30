@@ -14,7 +14,7 @@
   when:
     - rke2_images_urls != []
   with_items: "{{ rke2_images_urls }}"
-  notify: "Restart {{ service_name }}"
+  notify: "Restart {{ rke2_service_name }}"
 
 - name: Copy local tarball images
   ansible.builtin.copy:
@@ -25,4 +25,4 @@
     - "{{ rke2_images_local_tarball_path }}"
   when:
     - rke2_images_local_tarball_path != []
-  notify: "Restart {{ service_name }}"
+  notify: "Restart {{ rke2_service_name }}"

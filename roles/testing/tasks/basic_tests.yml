@@ -3,17 +3,17 @@
 - name: "Is the rke2/config.yaml in place?"
   ansible.builtin.stat:
     path: /etc/rancher/rke2/config.yaml
-  register: test_rke2_config_file
+  register: testing_rke2_config_file
 
 - name: "Is 'selinux: true' in rke2/config.yaml?"
   ansible.builtin.lineinfile:
     path: /etc/rancher/rke2/config.yaml
     line: "selinux: true"
   check_mode: true
-  register: test_is_selinux_true
+  register: testing_is_selinux_true
 
 - name: Assertions
   ansible.builtin.assert:
     that:
-      - test_rke2_config_file.stat.exists
-      - not test_is_selinux_true.failed
+      - testing_rke2_config_file.stat.exists
+      - not testing_is_selinux_true.failed

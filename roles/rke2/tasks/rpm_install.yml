@@ -22,15 +22,15 @@
 
 # - name: Debug install
 #   ansible.builtin.debug:
-#     msg: installing {{ service_name }}{{ rke2_version_rpm }}
+#     msg: installing {{ rke2_service_name }}{{ rke2_version_rpm }}
 
 - name: YUM-Based Install
   ansible.builtin.dnf:
-    name: "{{ service_name }}{{ rke2_version_rpm }}"
+    name: "{{ rke2_service_name }}{{ rke2_version_rpm }}"
     state: "{{ rke2_package_state }}"
     allow_downgrade: true
-  register: result
+  register: rke2_rpm_install_result
   retries: 10
-  until: result is succeeded
+  until: rke2_rpm_install_result is succeeded
   delay: 30
-  notify: "Restart {{ service_name }}"
+  notify: "Restart {{ rke2_service_name }}"

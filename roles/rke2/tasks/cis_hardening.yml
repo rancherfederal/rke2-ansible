@@ -25,13 +25,13 @@
         src: /usr/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: true
-        mode: 0600
-      register: sysctl_operation_yum
+        mode: '0600'
+      register: rke2_sysctl_operation_yum
       when:
-        - install_method == "rpm"
+        - rke2_install_method == "rpm"
       notify:
         - Restart systemd-sysctl
-        - "Restart {{ service_name }}"
+        - "Restart {{ rke2_service_name }}"
         - Reboot the machine
 
     - name: Copy systemctl file for kernel hardening for non-yum installs
@@ -39,13 +39,13 @@
         src: /usr/local/share/rke2/rke2-cis-sysctl.conf
         dest: /etc/sysctl.d/60-rke2-cis.conf
         remote_src: true
-        mode: 0600
-      register: sysctl_operation_tarball
+        mode: '0600'
+      register: rke2_sysctl_operation_tarball
       when:
-        - install_method == "tarball"
+        - rke2_install_method == "tarball"
       notify:
         - Restart systemd-sysctl
-        - "Restart {{ service_name }}"
+        - "Restart {{ rke2_service_name }}"
         - Reboot the machine
 
     # Per CIS hardening guide, if Kubernetes is already running, making changes to sysctl can result in unexpected
@@ -55,6 +55,6 @@
       ansible.builtin.set_fact:
         rke2_reboot: true
       when:
-        - (sysctl_operation_yum.changed or sysctl_operation_tarball.changed)
+        - (rke2_sysctl_operation_yum.changed or rke2_sysctl_operation_tarball.changed)
         - rke2_running is defined
         - rke2_running

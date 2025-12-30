@@ -51,7 +51,7 @@
 
 - name: "Set install version for RPM"
   when:
-    - install_method == "rpm"
+    - rke2_install_method == "rpm"
     - rke2_full_version | length > 0
   block:
 

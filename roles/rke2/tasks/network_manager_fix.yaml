@@ -11,7 +11,7 @@
       [keyfile]
       unmanaged-devices=interface-name:cali*;interface-name:flannel*
     create: true
-    mode: 0600
+    mode: '0600'
   when: ansible_facts.services["NetworkManager.service"] is defined
 
 - name: Does rke2-canal.conf exist
@@ -26,7 +26,7 @@
     owner: root
     group: root
   when: rke2_canal_file.stat.exists
-  notify: "Restart {{ service_name }}"
+  notify: "Restart {{ rke2_service_name }}"
 
 - name: Disable service nm-cloud-setup
   ansible.builtin.systemd:
@@ -36,7 +36,7 @@
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
   notify:
     - Reload NetworkManager
-    - "Restart {{ service_name }}"
+    - "Restart {{ rke2_service_name }}"
 
 - name: Disable nm-cloud-setup.timer unit
   ansible.builtin.systemd:
@@ -46,4 +46,4 @@
   when: ansible_facts.services["nm-cloud-setup.service"] is defined
   notify:
     - Reload NetworkManager
-    - "Restart {{ service_name }}"
+    - "Restart {{ rke2_service_name }}"

@@ -8,14 +8,14 @@
     - name: Check for node-token (existing cluster)
       ansible.builtin.stat:
         path: /var/lib/rancher/rke2/server/node-token
-      register: node_token_tmp
+      register: rke2_node_token_tmp
 
     - name: Read node-token (existing cluster)
       ansible.builtin.slurp:
         src: /var/lib/rancher/rke2/server/node-token
       register: rke2_config_token_tmp
       when:
-        - node_token_tmp.stat.exists
+        - rke2_node_token_tmp.stat.exists
 
     - name: Set node-token fact (existing cluster)
       ansible.builtin.set_fact:
@@ -39,21 +39,21 @@
 
     - name: Read host with token (existing cluster)
       ansible.builtin.set_fact:
-        existing_join_host: "{{ ansible_hostname }}"
+        rke2_existing_join_host: "{{ ansible_hostname }}"
       when:
-        - node_token_tmp.stat.exists
+        - rke2_node_token_tmp.stat.exists
 
     - name: Set join server fact on all hosts (existing cluster)
       ansible.builtin.set_fact:
-        rke2_kubernetes_api_server_host: "{{ hostvars[item]['existing_join_host'] }}"
+        rke2_kubernetes_api_server_host: "{{ hostvars[item]['rke2_existing_join_host'] }}"
       delegate_to: localhost
       run_once: true
       loop: "{{ groups['all'] }}"
       when:
-        - "hostvars[item]['existing_join_host'] is defined"
+        - "hostvars[item]['rke2_existing_join_host'] is defined"
         - hostvars[item]['rke2_kubernetes_api_server_host'] == ""
       vars:
-        rke2_kubernetes_api_server_host: "{{ existing_join_host | default('') }}"
+        rke2_kubernetes_api_server_host: "{{ rke2_existing_join_host | default('') }}"
 
 - name: No existing cluster found and api server not set
   ansible.builtin.set_fact:

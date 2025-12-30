@@ -8,22 +8,22 @@
 - name: Read node-token from master
   ansible.builtin.slurp:
     src: /var/lib/rancher/rke2/server/node-token
-  register: node_token
+  register: rke2_node_token
   delegate_to: "{{ token_source_node }}"
 
 - name: Store Master node-token
   ansible.builtin.set_fact:
-    rke2_config_token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+    rke2_config_token: "{{ rke2_node_token.content | b64decode | regex_replace('\n', '') }}"
   delegate_to: "{{ token_source_node }}"
 
 - name: Set temp fact to store token config line
   ansible.builtin.set_fact:
-    temp_token:
+    rke2_temp_token:
       token: "{{ rke2_config_token }}"
 
-- name: Update host_rke2_config fact to contain server line
+- name: Update host_rke2_config fact to contain server line  # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
-    host_rke2_config: "{{ temp_token | default({}) | ansible.builtin.combine((host_rke2_config | default({})), list_merge='prepend_rp') }}"
+    host_rke2_config: "{{ rke2_temp_token | default({}) | ansible.builtin.combine((host_rke2_config | default({})), list_merge='prepend_rp') }}"
 
 - name: Set temp fact for api host
   ansible.builtin.set_fact:
@@ -33,9 +33,9 @@
 
 - name: Set temp fact to store server config line with custom join server URL
   ansible.builtin.set_fact:
-    temp_host_rke2_config:
+    rke2_temp_host_rke2_config:
       server: "https://{{ rke2_kubernetes_api_server_host }}:9345"
 
-- name: Update host_rke2_config fact to contain server line
+- name: Update host_rke2_config fact to contain server line  # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
-    host_rke2_config: "{{ temp_host_rke2_config | default({}) | ansible.builtin.combine((host_rke2_config | default({})), list_merge='prepend_rp') }}"
+    host_rke2_config: "{{ rke2_temp_host_rke2_config | default({}) | ansible.builtin.combine((host_rke2_config | default({})), list_merge='prepend_rp') }}"

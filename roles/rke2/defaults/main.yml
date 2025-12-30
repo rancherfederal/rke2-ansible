@@ -33,7 +33,7 @@ rke2_kubelet_node_name:
   - "nodeNameNotFound"
 rke2_config: {}
 rke2_metrics_running: false
-rke2_node_ready: "false"
+rke2_node_ready: false
 rke2_api_server_running: false
 rke2_installed: false
 rke2_version_changed: false
@@ -42,3 +42,7 @@ rke2_version_majmin: ""
 rke2_version_rpm: ""
 rke2_package_state: "installed"
 rke2_systemd_env_config_file_path: ""
+rke2_check_node_ready_timeout: 600
+rke2_check_node_ready_retries: 60
+rke2_check_node_ready_delay: 10
+rke2_wait_for_api_server_timeout: 600
