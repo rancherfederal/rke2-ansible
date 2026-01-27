@@ -29,7 +29,7 @@
     state: restarted
     enabled: true
     name: rke2-agent
-  throttle: 1
+  throttle: "{{ rke2_agent_service_restart_throttle }}"
   when:
     - not rke2_reboot
     - ("rke2_agents" in group_names)

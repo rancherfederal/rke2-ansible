@@ -102,6 +102,9 @@ kube_api_authn_webhook_file_path: ""
 ## Set to 'false' if Ansible should not attempt to upgrade an installed version of RKE2. This is useful if using the System Upgrade Controller to manage the installed version of RKE2.
 rke2_upgrade: true
 
+## Value for how many Agent nodes can have their service restarted at time when a config change is made
+rke2_agent_service_restart_throttle: 1
+
 # Should not be changed:
 rke2_metrics_running: false
 rke2_node_ready: "false"
