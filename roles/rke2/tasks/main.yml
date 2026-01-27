@@ -10,7 +10,7 @@
   ansible.builtin.include_tasks: pre_reqs.yml
   tags: ["setup-os"]
 
-- name: Has rke2 been installed already
+- name: Determine if rke2 been installed already
   ansible.builtin.include_tasks: previous_install.yml
 
 - name: Check for images bundle
@@ -54,6 +54,12 @@
   run_once: true
   when:
     - (groups.rke2_servers | map('extract', hostvars) | selectattr('rke2_node_ready', 'defined') | selectattr('rke2_node_ready', 'equalto', true) | list | length) > 0
+
+- name: Show the list of ready servers
+  ansible.builtin.debug:
+    var: ready_servers
+  run_once: true
+  when: ready_servers is defined
 
 - name: Install RKE2
   when:
