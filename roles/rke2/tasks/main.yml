@@ -99,7 +99,7 @@
 - name: Save_generated_token.yml
   ansible.builtin.include_tasks: save_generated_token.yml
   vars:
-    token_source_node: "{{ groups['rke2_servers'][0] }}"
+    token_source_node: "{{ groups['rke2_servers'] | intersect(ansible_play_batch) | first }}"
   when:
     - ready_servers is not defined or ready_servers | length == 0
 
